@@ -27,12 +27,7 @@ interface Win {
   users: { username: string; avatar_url: string | null } | null;
 }
 
-interface WinsFeedProps {
-  currentUserId: string;
-  canPost: boolean; // paid + founding only
-}
-
-export default function WinsFeed({ currentUserId, canPost }: WinsFeedProps) {
+export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
   const [filter, setFilter] = useState<WinCategory | "all">("all");
   const [wins, setWins] = useState<Win[]>([]);
   const [reactedIds, setReactedIds] = useState<Set<string>>(new Set());
@@ -48,14 +43,11 @@ export default function WinsFeed({ currentUserId, canPost }: WinsFeedProps) {
       .select("*, users(username, avatar_url)")
       .order("created_at", { ascending: false });
 
-    if (filter !== "all") {
-      query = query.eq("category", filter);
-    }
+    if (filter !== "all") query = query.eq("category", filter);
 
     const { data } = await query;
     setWins((data as Win[]) ?? []);
 
-    // Fetch which wins current user has reacted to
     if (data && data.length > 0) {
       const ids = data.map((w: Win) => w.id);
       const { data: reactions } = await supabase
@@ -71,15 +63,13 @@ export default function WinsFeed({ currentUserId, canPost }: WinsFeedProps) {
     setLoading(false);
   }, [filter, currentUserId]);
 
-  useEffect(() => {
-    fetchWins();
-  }, [fetchWins]);
+  useEffect(() => { fetchWins(); }, [fetchWins]);
 
   return (
     <div className="px-10 py-8">
-      {/* Top bar: filter + post button */}
+      {/* Top bar */}
       <div className="flex items-center justify-between mb-8" style={{ gap: "16px" }}>
-        {/* Category filter */}
+        {/* Category filters */}
         <div className="flex items-center flex-wrap" style={{ gap: "0" }}>
           {CATEGORIES.map(({ value, label }) => {
             const active = filter === value;
@@ -106,46 +96,38 @@ export default function WinsFeed({ currentUserId, canPost }: WinsFeedProps) {
           })}
         </div>
 
-        {/* Post button */}
-        {canPost && (
-          <button
-            onClick={() => setModalOpen(true)}
-            className="font-poppins shrink-0"
-            style={{
-              background: "#f0ebe0",
-              color: "#0a0a0a",
-              fontSize: "11px",
-              fontWeight: 500,
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              padding: "10px 18px",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Post a Win
-          </button>
-        )}
+        {/* POST A WIN button — always visible */}
+        <button
+          onClick={() => setModalOpen(true)}
+          className="font-poppins shrink-0"
+          style={{
+            background: "#f0ebe0",
+            color: "#0a0a0a",
+            fontSize: "11px",
+            fontWeight: 500,
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            padding: "10px 20px",
+            border: "none",
+            cursor: "pointer",
+            borderRadius: 0,
+          }}
+        >
+          Post a Win
+        </button>
       </div>
 
       {/* Feed */}
       {loading ? (
-        <p
-          className="font-playfair italic text-[rgba(240,235,224,0.2)]"
-          style={{ fontSize: "15px" }}
-        >
+        <p className="font-playfair italic text-[rgba(240,235,224,0.2)]" style={{ fontSize: "15px" }}>
           Loading…
         </p>
       ) : wins.length === 0 ? (
-        <p
-          className="font-playfair italic text-[rgba(240,235,224,0.2)]"
-          style={{ fontSize: "15px" }}
-        >
+        <p className="font-playfair italic text-[rgba(240,235,224,0.2)]" style={{ fontSize: "15px" }}>
           {filter === "all" ? "No wins yet. Be the first." : `No ${filter} wins yet.`}
         </p>
       ) : (
         <div>
-          {/* Top border for the first item */}
           <div style={{ borderTop: "0.5px solid rgba(240,235,224,0.08)" }} />
           {wins.map((win) => (
             <WinCard
@@ -158,14 +140,10 @@ export default function WinsFeed({ currentUserId, canPost }: WinsFeedProps) {
         </div>
       )}
 
-      {/* Post modal */}
       {modalOpen && (
         <PostWinModal
           onClose={() => setModalOpen(false)}
-          onPosted={() => {
-            setModalOpen(false);
-            fetchWins();
-          }}
+          onPosted={() => { setModalOpen(false); fetchWins(); }}
         />
       )}
     </div>
