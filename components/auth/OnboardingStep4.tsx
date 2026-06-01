@@ -102,7 +102,7 @@ export default function OnboardingStep4() {
     localStorage.removeItem("onboarding_step2");
     localStorage.removeItem("onboarding_step3");
 
-    router.push("/wins");
+    router.push("/login?success=true");
   }
 
   return (
