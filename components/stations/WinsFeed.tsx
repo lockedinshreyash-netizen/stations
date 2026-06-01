@@ -30,7 +30,7 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
 
     let query = supabase
       .from("wins")
-      .select("id, title, description, category, media_url, reactions_count, reaction_counts, created_at, users(username, avatar_url)")
+      .select("*, users(username, avatar_url)")
       .order("created_at", { ascending: false });
 
     if (filter !== "all") query = query.eq("category", filter);
