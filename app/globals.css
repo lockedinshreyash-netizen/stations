@@ -1,28 +1,77 @@
 @import "tailwindcss";
 
+/* ============================================================
+   THEME VARIABLES
+   --fg-rgb is the foreground colour as raw channels so any
+   alpha can be expressed: rgba(var(--fg-rgb), 0.08) etc.
+   ============================================================ */
+[data-theme="dark"] {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-surface: #1a1a1a;
+  --sidebar-bg: #0d0d0d;
+  --fg-rgb: 240, 235, 224;
+  --accent: #c0392b;
+  --accent-rgb: 192, 57, 43;
+
+  /* Named tokens (spec) */
+  --text-primary: rgb(var(--fg-rgb));
+  --text-secondary: rgba(var(--fg-rgb), 0.5);
+  --text-muted: rgba(var(--fg-rgb), 0.3);
+  --border: rgba(var(--fg-rgb), 0.1);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f5f0e8;
+  --bg-secondary: #ede8e0;
+  --bg-surface: #e5e0d8;
+  --sidebar-bg: #e8e3db;
+  --fg-rgb: 10, 10, 10;
+  --accent: #c0392b;
+  --accent-rgb: 192, 57, 43;
+
+  --text-primary: rgb(var(--fg-rgb));
+  --text-secondary: rgba(var(--fg-rgb), 0.6);
+  --text-muted: rgba(var(--fg-rgb), 0.35);
+  --border: rgba(var(--fg-rgb), 0.1);
+}
+
+/* Default to dark before JS runs (anti-flash script also sets it) */
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-surface: #1a1a1a;
+  --sidebar-bg: #0d0d0d;
+  --fg-rgb: 240, 235, 224;
+  --accent: #c0392b;
+  --accent-rgb: 192, 57, 43;
+}
+
+/* Map Tailwind tokens to the theme vars so utility classes flip too */
 @theme inline {
-  --color-bg-primary: #0a0a0a;
-  --color-bg-secondary: #111111;
-  --color-bg-surface: #1a1a1a;
-  --color-text-primary: #f0ebe0;
-  --color-text-secondary: rgba(240, 235, 224, 0.5);
-  --color-text-muted: rgba(240, 235, 224, 0.3);
-  --color-accent-red: #c0392b;
-  --color-border: rgba(240, 235, 224, 0.1);
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-surface: var(--bg-surface);
+  --color-text-primary: rgb(var(--fg-rgb));
+  --color-text-secondary: rgba(var(--fg-rgb), 0.5);
+  --color-text-muted: rgba(var(--fg-rgb), 0.3);
+  --color-accent-red: var(--accent);
+  --color-border: rgba(var(--fg-rgb), 0.1);
   --font-poppins: var(--font-poppins);
   --font-playfair: var(--font-playfair);
 }
 
 * {
-  border-color: rgba(240, 235, 224, 0.1);
+  border-color: rgba(var(--fg-rgb), 0.1);
 }
 
 body {
-  background: #0a0a0a;
-  color: #f0ebe0;
+  background: var(--bg-primary);
+  color: rgb(var(--fg-rgb));
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
 ::selection {
-  background: #c0392b;
-  color: #f0ebe0;
+  background: var(--accent);
+  color: var(--bg-primary);
 }

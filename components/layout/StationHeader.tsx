@@ -6,10 +6,10 @@ interface StationHeaderProps {
 
 export default function StationHeader({ number, name, tagline }: StationHeaderProps) {
   return (
-    <div className="px-10 border-b border-[rgba(240,235,224,0.06)]" style={{ paddingTop: "64px", paddingBottom: "48px" }}>
+    <div className="px-10 border-b border-[rgba(var(--fg-rgb),0.06)]" style={{ paddingTop: "64px", paddingBottom: "48px" }}>
       {/* Eyebrow */}
       <p
-        className="font-playfair italic text-[rgba(240,235,224,0.4)]"
+        className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]"
         style={{ fontSize: "12px", marginBottom: "8px" }}
       >
         {number} —
@@ -23,7 +23,7 @@ export default function StationHeader({ number, name, tagline }: StationHeaderPr
         }
       `}</style>
       <h1
-        className="station-name font-poppins font-black uppercase text-[#f0ebe0] leading-none"
+        className="station-name font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] leading-none"
         style={{ letterSpacing: "0.03em" }}
       >
         {name}
@@ -32,7 +32,7 @@ export default function StationHeader({ number, name, tagline }: StationHeaderPr
       {/* Tagline */}
       {tagline && (
         <p
-          className="font-playfair italic text-[rgba(240,235,224,0.35)]"
+          className="font-playfair italic text-[rgba(var(--fg-rgb),0.35)]"
           style={{ fontSize: "17px", lineHeight: 1.6, marginTop: "80px" }}
         >
           {tagline}

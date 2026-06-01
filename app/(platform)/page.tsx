@@ -27,22 +27,22 @@ export default async function PlatformHome() {
   return (
     <div>
       {/* Editorial header — same treatment as station pages */}
-      <div className="px-10 border-b border-[rgba(240,235,224,0.06)]" style={{ paddingTop: "64px", paddingBottom: "48px" }}>
+      <div className="px-10 border-b border-[rgba(var(--fg-rgb),0.06)]" style={{ paddingTop: "64px", paddingBottom: "48px" }}>
         <p
-          className="font-playfair italic text-[rgba(240,235,224,0.4)]"
+          className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]"
           style={{ fontSize: "12px", marginBottom: "8px" }}
         >
           Welcome back —
         </p>
         <h1
-          className="font-poppins font-black uppercase text-[#f0ebe0] leading-none"
+          className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] leading-none"
           style={{ fontSize: "clamp(96px, 12vw, 140px)", letterSpacing: "0.03em" }}
         >
           {user.username.toUpperCase()}
-          <span className="text-[#c0392b]">.</span>
+          <span className="text-[var(--accent)]">.</span>
         </h1>
         <p
-          className="font-playfair italic text-[rgba(240,235,224,0.35)] mt-4"
+          className="font-playfair italic text-[rgba(var(--fg-rgb),0.35)] mt-4"
           style={{ fontSize: "16px", lineHeight: 1.5 }}
         >
           {user.category} · {roles.join(", ")}
@@ -55,7 +55,7 @@ export default async function PlatformHome() {
         {/* Stats */}
         <div>
           <p
-            className="font-poppins font-light uppercase text-[rgba(240,235,224,0.25)] mb-5"
+            className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.25)] mb-5"
             style={{ fontSize: "11px", letterSpacing: "0.2em" }}
           >
             Your stats
@@ -71,13 +71,13 @@ export default async function PlatformHome() {
         {/* Active challenges */}
         <div>
           <p
-            className="font-poppins font-light uppercase text-[rgba(240,235,224,0.25)] mb-5"
+            className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.25)] mb-5"
             style={{ fontSize: "11px", letterSpacing: "0.2em" }}
           >
             Active challenges
           </p>
           <p
-            className="font-playfair italic text-[rgba(240,235,224,0.2)]"
+            className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]"
             style={{ fontSize: "15px" }}
           >
             No active challenges.
@@ -87,19 +87,19 @@ export default async function PlatformHome() {
         {/* Recent wins */}
         <div>
           <p
-            className="font-poppins font-light uppercase text-[rgba(240,235,224,0.25)] mb-5"
+            className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.25)] mb-5"
             style={{ fontSize: "11px", letterSpacing: "0.2em" }}
           >
             Recent wins
           </p>
           <p
-            className="font-playfair italic text-[rgba(240,235,224,0.2)]"
+            className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]"
             style={{ fontSize: "15px" }}
           >
             No wins yet.{" "}
             <a
               href="/wins"
-              className="text-[rgba(240,235,224,0.35)] underline underline-offset-4 hover:text-[#f0ebe0] transition-colors"
+              className="text-[rgba(var(--fg-rgb),0.35)] underline underline-offset-4 hover:text-[rgb(var(--fg-rgb))] transition-colors"
             >
               Post your first win.
             </a>
