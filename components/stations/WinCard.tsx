@@ -118,32 +118,26 @@ export default function WinCard({ win, currentUserId, userReactions }: WinCardPr
           {win.description}
         </p>
 
-        {/* Images */}
+        {/* First image preview */}
         {win.image_urls && win.image_urls.length > 0 && (
-          <div
-            className="flex"
-            style={{ marginTop: "14px", gap: "8px", maxHeight: "320px", overflow: "hidden" }}
-          >
-            {win.image_urls.slice(0, 2).map((url, i) => (
-              <img
-                key={i}
-                src={url}
-                alt={`${win.title} image ${i + 1}`}
-                className="object-cover"
-                style={{
-                  flex: 1,
-                  maxHeight: "320px",
-                  minWidth: 0,
-                }}
-              />
-            ))}
+          <div style={{ marginTop: "14px", maxHeight: "240px", overflow: "hidden" }}>
+            <img
+              src={win.image_urls[0]}
+              alt={win.title}
+              className="w-full object-cover"
+              style={{ maxHeight: "240px" }}
+            />
           </div>
         )}
 
-        {/* Legacy media_url fallback */}
-        {(!win.image_urls || win.image_urls.length === 0) && win.media_url && (
-          <div style={{ marginTop: "14px", maxHeight: "320px", overflow: "hidden" }}>
-            <img src={win.media_url} alt={win.title} className="w-full object-cover" style={{ maxHeight: "320px" }} />
+        {/* Link indicator — navigates to detail (inside Link) */}
+        {win.media_url && (
+          <div
+            className="flex items-center font-poppins font-light text-[rgba(240,235,224,0.35)]"
+            style={{ marginTop: "12px", gap: "6px", fontSize: "11px" }}
+          >
+            <span style={{ fontSize: "12px" }}>🔗</span>
+            <span>Link attached</span>
           </div>
         )}
       </Link>

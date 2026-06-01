@@ -21,7 +21,7 @@ export default function WinDetail({ win, currentUserId, initialUserReactions }: 
 
   const username = win.users?.username ?? "member";
   const timeAgo = formatDistanceToNow(new Date(win.created_at), { addSuffix: true });
-  const images: string[] = win.image_urls?.length ? win.image_urls : win.media_url ? [win.media_url] : [];
+  const images: string[] = win.image_urls?.length ? win.image_urls.slice(0, 2) : [];
 
   // Realtime: refresh counts when another user reacts
   useEffect(() => {
@@ -117,34 +117,51 @@ export default function WinDetail({ win, currentUserId, initialUserReactions }: 
       </p>
 
       {/* Images */}
-      {images.length > 0 && (
-        <div
-          className="flex"
-          style={{ marginTop: "28px", gap: "8px", maxHeight: "500px", overflow: "hidden" }}
-        >
-          {images.slice(0, 2).map((url, i) => (
+      {images.length === 1 && (
+        <div style={{ marginTop: "28px" }}>
+          <img
+            src={images[0]}
+            alt={win.title}
+            onClick={() => window.open(images[0], "_blank")}
+            className="w-full object-cover"
+            style={{ maxHeight: "500px", cursor: "pointer" }}
+          />
+        </div>
+      )}
+      {images.length === 2 && (
+        <div className="flex" style={{ marginTop: "28px", gap: "8px" }}>
+          {images.map((url, i) => (
             <img
               key={i}
               src={url}
-              alt={`${win.title} image ${i + 1}`}
+              alt={win.title}
+              onClick={() => window.open(url, "_blank")}
               className="object-cover"
-              style={{ flex: 1, maxHeight: "500px", minWidth: 0 }}
+              style={{ flex: 1, maxHeight: "360px", minWidth: 0, cursor: "pointer" }}
             />
           ))}
         </div>
       )}
 
-      {/* External link */}
-      {win.media_url && images[0] !== win.media_url && (
-        <a
-          href={win.media_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-poppins font-light hover:opacity-70 transition-opacity"
-          style={{ fontSize: "13px", color: "#c0392b", marginTop: "20px", display: "inline-block" }}
-        >
-          {win.media_url} ↗
-        </a>
+      {/* Link */}
+      {win.media_url && (
+        <div className="flex flex-col" style={{ marginTop: "28px", gap: "8px" }}>
+          <p
+            className="font-poppins font-light uppercase"
+            style={{ fontSize: "10px", letterSpacing: "0.18em", color: "rgba(240,235,224,0.3)" }}
+          >
+            Link
+          </p>
+          <a
+            href={win.media_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-poppins font-light hover:underline"
+            style={{ fontSize: "13px", color: "#c0392b", wordBreak: "break-all" }}
+          >
+            {win.media_url}
+          </a>
+        </div>
       )}
 
       {/* Reactions */}
