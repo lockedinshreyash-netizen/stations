@@ -2,35 +2,25 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import WinCard from "@/components/stations/WinCard";
+import WinCard, { type WinCardData } from "@/components/stations/WinCard";
 import PostWinModal from "@/components/stations/PostWinModal";
-import type { WinCategory } from "@/types";
+import type { WinCategory, ReactionType } from "@/types";
 
 const CATEGORIES: { value: WinCategory | "all"; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "startup", label: "Startup" },
-  { value: "project", label: "Project" },
-  { value: "fitness", label: "Fitness" },
-  { value: "exam", label: "Exam" },
+  { value: "all",      label: "All"      },
+  { value: "startup",  label: "Startup"  },
+  { value: "project",  label: "Project"  },
+  { value: "fitness",  label: "Fitness"  },
+  { value: "exam",     label: "Exam"     },
   { value: "personal", label: "Personal" },
-  { value: "other", label: "Other" },
+  { value: "other",    label: "Other"    },
 ];
-
-interface Win {
-  id: string;
-  title: string;
-  description: string;
-  category: WinCategory;
-  media_url: string | null;
-  reactions_count: number;
-  created_at: string;
-  users: { username: string; avatar_url: string | null } | null;
-}
 
 export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
   const [filter, setFilter] = useState<WinCategory | "all">("all");
-  const [wins, setWins] = useState<Win[]>([]);
-  const [reactedIds, setReactedIds] = useState<Set<string>>(new Set());
+  const [wins, setWins] = useState<WinCardData[]>([]);
+  // { win_id -> Set<reaction_type> }
+  const [reactionMap, setReactionMap] = useState<Record<string, Set<ReactionType>>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -40,24 +30,31 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
 
     let query = supabase
       .from("wins")
-      .select("*, users(username, avatar_url)")
+      .select("id, title, description, category, media_url, reactions_count, reaction_counts, created_at, users(username, avatar_url)")
       .order("created_at", { ascending: false });
 
     if (filter !== "all") query = query.eq("category", filter);
 
     const { data } = await query;
-    setWins((data as Win[]) ?? []);
+    const winRows = (data as unknown as WinCardData[]) ?? [];
+    setWins(winRows);
 
-    if (data && data.length > 0) {
-      const ids = data.map((w: Win) => w.id);
+    if (winRows.length > 0) {
+      const ids = winRows.map((w) => w.id);
       const { data: reactions } = await supabase
         .from("win_reactions")
-        .select("win_id")
+        .select("win_id, reaction_type")
         .eq("user_id", currentUserId)
         .in("win_id", ids);
-      setReactedIds(new Set((reactions ?? []).map((r: { win_id: string }) => r.win_id)));
+
+      const map: Record<string, Set<ReactionType>> = {};
+      for (const r of reactions ?? []) {
+        if (!map[r.win_id]) map[r.win_id] = new Set();
+        map[r.win_id].add(r.reaction_type as ReactionType);
+      }
+      setReactionMap(map);
     } else {
-      setReactedIds(new Set());
+      setReactionMap({});
     }
 
     setLoading(false);
@@ -67,7 +64,6 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
 
   return (
     <div className="px-10 py-8">
-      {/* Top bar */}
       <style>{`
         .wins-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .wins-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
@@ -79,29 +75,20 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
           .wins-filters::-webkit-scrollbar { display: none; }
         }
       `}</style>
+
       <div className="wins-topbar mb-8">
-        {/* POST A WIN button — on mobile: full width, above filters */}
         <button
           onClick={() => setModalOpen(true)}
           className="wins-postbtn font-poppins"
           style={{
-            background: "#f0ebe0",
-            color: "#0a0a0a",
-            fontSize: "11px",
-            fontWeight: 500,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            padding: "10px 20px",
-            border: "none",
-            cursor: "pointer",
-            borderRadius: 0,
-            order: -1,
+            background: "#f0ebe0", color: "#0a0a0a", fontSize: "11px", fontWeight: 500,
+            letterSpacing: "0.15em", textTransform: "uppercase", padding: "10px 20px",
+            border: "none", cursor: "pointer", borderRadius: 0, order: -1,
           }}
         >
           Post a Win
         </button>
 
-        {/* Category filters — on mobile: scrollable single row */}
         <div className="wins-filters">
           {CATEGORIES.map(({ value, label }) => {
             const active = filter === value;
@@ -111,15 +98,11 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
                 onClick={() => setFilter(value)}
                 className="font-poppins font-light uppercase transition-colors"
                 style={{
-                  fontSize: "11px",
-                  letterSpacing: "0.15em",
-                  padding: "6px 14px 8px",
-                  background: "none",
-                  border: "none",
+                  fontSize: "11px", letterSpacing: "0.15em", padding: "6px 14px 8px",
+                  background: "none", border: "none",
                   borderBottom: active ? "2px solid #c0392b" : "2px solid transparent",
                   color: active ? "#f0ebe0" : "rgba(240,235,224,0.35)",
-                  cursor: "pointer",
-                  transition: "color 150ms, border-color 150ms",
+                  cursor: "pointer", transition: "color 150ms, border-color 150ms",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -130,11 +113,8 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
         </div>
       </div>
 
-      {/* Feed */}
       {loading ? (
-        <p className="font-playfair italic text-[rgba(240,235,224,0.2)]" style={{ fontSize: "15px" }}>
-          Loading…
-        </p>
+        <p className="font-playfair italic text-[rgba(240,235,224,0.2)]" style={{ fontSize: "15px" }}>Loading…</p>
       ) : wins.length === 0 ? (
         <p className="font-playfair italic text-[rgba(240,235,224,0.2)]" style={{ fontSize: "15px" }}>
           {filter === "all" ? "No wins yet. Be the first." : `No ${filter} wins yet.`}
@@ -147,7 +127,7 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
               key={win.id}
               win={win}
               currentUserId={currentUserId}
-              userReacted={reactedIds.has(win.id)}
+              userReactions={reactionMap[win.id] ?? new Set()}
             />
           ))}
         </div>

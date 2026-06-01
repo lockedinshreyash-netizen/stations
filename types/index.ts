@@ -25,6 +25,16 @@ export type WinCategory =
   | "exam"
   | "personal"
   | "other";
+
+export type ReactionType = "respect" | "fire" | "build" | "focused" | "strong";
+
+export interface ReactionCounts {
+  respect: number;
+  fire: number;
+  build: number;
+  focused: number;
+  strong: number;
+}
 export type BuildStage = "idea" | "building" | "launched";
 export type ChallengeType = "weekly" | "monthly";
 export type ChallengeMetric =
@@ -94,6 +104,15 @@ export interface Win {
   category: WinCategory;
   media_url: string | null;
   reactions_count: number;
+  reaction_counts: ReactionCounts | null;
+  created_at: string;
+}
+
+export interface WinReaction {
+  id: string;
+  win_id: string;
+  user_id: string;
+  reaction_type: ReactionType;
   created_at: string;
 }
 
