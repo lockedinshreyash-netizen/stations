@@ -15,10 +15,16 @@ export default function StationHeader({ number, name, tagline }: StationHeaderPr
         {number} —
       </p>
 
-      {/* Station name */}
+      {/* Station name — scales down on mobile */}
+      <style>{`
+        .station-name { font-size: clamp(96px, 12vw, 140px); }
+        @media (max-width: 767px) {
+          .station-name { font-size: clamp(48px, 12vw, 72px); }
+        }
+      `}</style>
       <h1
-        className="font-poppins font-black uppercase text-[#f0ebe0] leading-none"
-        style={{ fontSize: "clamp(96px, 12vw, 140px)", letterSpacing: "0.03em" }}
+        className="station-name font-poppins font-black uppercase text-[#f0ebe0] leading-none"
+        style={{ letterSpacing: "0.03em" }}
       >
         {name}
       </h1>

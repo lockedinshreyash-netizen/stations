@@ -68,9 +68,41 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
   return (
     <div className="px-10 py-8">
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-8" style={{ gap: "16px" }}>
-        {/* Category filters */}
-        <div className="flex items-center flex-wrap" style={{ gap: "0" }}>
+      <style>{`
+        .wins-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .wins-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
+        .wins-postbtn { flex-shrink: 0; }
+        @media (max-width: 767px) {
+          .wins-topbar { flex-direction: column; align-items: stretch; gap: 10px; }
+          .wins-postbtn { width: 100%; }
+          .wins-filters { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+          .wins-filters::-webkit-scrollbar { display: none; }
+        }
+      `}</style>
+      <div className="wins-topbar mb-8">
+        {/* POST A WIN button — on mobile: full width, above filters */}
+        <button
+          onClick={() => setModalOpen(true)}
+          className="wins-postbtn font-poppins"
+          style={{
+            background: "#f0ebe0",
+            color: "#0a0a0a",
+            fontSize: "11px",
+            fontWeight: 500,
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            padding: "10px 20px",
+            border: "none",
+            cursor: "pointer",
+            borderRadius: 0,
+            order: -1,
+          }}
+        >
+          Post a Win
+        </button>
+
+        {/* Category filters — on mobile: scrollable single row */}
+        <div className="wins-filters">
           {CATEGORIES.map(({ value, label }) => {
             const active = filter === value;
             return (
@@ -88,6 +120,7 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
                   color: active ? "#f0ebe0" : "rgba(240,235,224,0.35)",
                   cursor: "pointer",
                   transition: "color 150ms, border-color 150ms",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {label}
@@ -95,26 +128,6 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
             );
           })}
         </div>
-
-        {/* POST A WIN button — always visible */}
-        <button
-          onClick={() => setModalOpen(true)}
-          className="font-poppins shrink-0"
-          style={{
-            background: "#f0ebe0",
-            color: "#0a0a0a",
-            fontSize: "11px",
-            fontWeight: 500,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            padding: "10px 20px",
-            border: "none",
-            cursor: "pointer",
-            borderRadius: 0,
-          }}
-        >
-          Post a Win
-        </button>
       </div>
 
       {/* Feed */}
