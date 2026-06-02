@@ -271,9 +271,14 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
           )}
         </button>
 
-        {/* Username + tier — hidden when collapsed */}
+        {/* Username + tier — hidden when collapsed, click to open profile */}
         {!collapsed && (
-          <div className="flex flex-col min-w-0" style={{ gap: "3px" }}>
+          <button
+            type="button"
+            onClick={() => setProfileOpen(true)}
+            className="flex flex-col min-w-0 text-left transition-opacity hover:opacity-70"
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 0, gap: "3px" }}
+          >
             <span
               className="font-poppins font-light text-[rgb(var(--fg-rgb))] truncate"
               style={{ fontSize: "12px" }}
@@ -281,7 +286,7 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
               {user.username}
             </span>
             <TierLabel tier={user.membership_tier} />
-          </div>
+          </button>
         )}
       </div>
     </aside>
