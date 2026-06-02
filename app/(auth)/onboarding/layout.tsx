@@ -19,13 +19,13 @@ export default function OnboardingLayout({
   const stepNumber = currentIndex + 1;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
       {/* Header */}
       <header className="px-8 pt-8 pb-0 flex items-center justify-between">
-        <span className="font-poppins font-black text-xl tracking-widest uppercase text-[#f0ebe0]">
+        <span className="font-poppins font-black text-xl tracking-widest uppercase text-[rgb(var(--fg-rgb))]">
           STATIONS
         </span>
-        <span className="text-[rgba(240,235,224,0.3)] text-sm font-light tracking-widest uppercase">
+        <span className="text-[rgba(var(--fg-rgb),0.3)] text-sm font-light tracking-widest uppercase">
           Step {stepNumber} of 4
         </span>
       </header>
@@ -40,8 +40,8 @@ export default function OnboardingLayout({
               style={{
                 background:
                   i < stepNumber
-                    ? "#c0392b"
-                    : "rgba(240,235,224,0.1)",
+                    ? "var(--accent)"
+                    : "rgba(var(--fg-rgb),0.1)",
               }}
             />
           ))}

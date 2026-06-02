@@ -42,9 +42,9 @@ function LoginForm() {
   }
 
   const inputStyle: React.CSSProperties = {
-    background: "#1a1a1a",
-    border: "0.5px solid rgba(240,235,224,0.15)",
-    color: "#f0ebe0",
+    background: "var(--bg-surface)",
+    border: "0.5px solid rgba(var(--fg-rgb),0.15)",
+    color: "rgb(var(--fg-rgb))",
     fontSize: "14px",
     padding: "14px 16px",
     outline: "none",
@@ -56,12 +56,12 @@ function LoginForm() {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: "#0a0a0a", padding: "40px 48px" }}
+      style={{ background: "var(--bg-primary)", padding: "40px 48px" }}
     >
       {/* Wordmark */}
       <div>
         <span
-          className="font-poppins font-black uppercase text-[#f0ebe0]"
+          className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
           style={{ fontSize: "13px", letterSpacing: "0.2em" }}
         >
           STATIONS
@@ -74,13 +74,13 @@ function LoginForm() {
         {/* Success message from onboarding */}
         {success && (
           <div
-            className="font-poppins font-light text-[#f0ebe0]"
+            className="font-poppins font-light text-[rgb(var(--fg-rgb))]"
             style={{
               fontSize: "12px",
               letterSpacing: "0.05em",
               padding: "12px 16px",
-              background: "rgba(192,57,43,0.08)",
-              borderLeft: "2px solid #c0392b",
+              background: "rgba(var(--accent-rgb),0.08)",
+              borderLeft: "2px solid var(--accent)",
               marginBottom: "40px",
             }}
           >
@@ -90,7 +90,7 @@ function LoginForm() {
 
         {/* Heading */}
         <h1
-          className="font-poppins font-black text-[#f0ebe0] leading-none"
+          className="font-poppins font-black text-[rgb(var(--fg-rgb))] leading-none"
           style={{ fontSize: "48px" }}
         >
           Welcome back.
@@ -99,7 +99,7 @@ function LoginForm() {
           className="font-playfair italic"
           style={{
             fontSize: "18px",
-            color: "rgba(240,235,224,0.5)",
+            color: "rgba(var(--fg-rgb),0.5)",
             marginTop: "12px",
             marginBottom: "48px",
           }}
@@ -112,7 +112,7 @@ function LoginForm() {
           {/* Email */}
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <label
-              className="font-poppins font-light uppercase text-[rgba(240,235,224,0.3)]"
+              className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.3)]"
               style={{ fontSize: "10px", letterSpacing: "0.18em" }}
             >
               Email
@@ -125,15 +125,15 @@ function LoginForm() {
               placeholder="you@example.com"
               required
               style={inputStyle}
-              onFocus={(e) => (e.target.style.borderColor = "#c0392b")}
-              onBlur={(e) => (e.target.style.borderColor = "rgba(240,235,224,0.15)")}
+              onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
+              onBlur={(e) => (e.target.style.borderColor = "rgba(var(--fg-rgb),0.15)")}
             />
           </div>
 
           {/* Password */}
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <label
-              className="font-poppins font-light uppercase text-[rgba(240,235,224,0.3)]"
+              className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.3)]"
               style={{ fontSize: "10px", letterSpacing: "0.18em" }}
             >
               Password
@@ -147,13 +147,13 @@ function LoginForm() {
                 placeholder="••••••••"
                 required
                 style={{ ...inputStyle, paddingRight: "48px" }}
-                onFocus={(e) => (e.target.style.borderColor = "#c0392b")}
-                onBlur={(e) => (e.target.style.borderColor = "rgba(240,235,224,0.15)")}
+                onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
+                onBlur={(e) => (e.target.style.borderColor = "rgba(var(--fg-rgb),0.15)")}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="font-poppins font-light uppercase text-[rgba(240,235,224,0.3)] hover:text-[rgba(240,235,224,0.6)] transition-colors"
+                className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.3)] hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors"
                 style={{
                   position: "absolute",
                   right: "14px",
@@ -175,9 +175,9 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading || !email || !password}
-            className="font-poppins uppercase text-[#0a0a0a]"
+            className="font-poppins uppercase text-[var(--bg-primary)]"
             style={{
-              background: "#f0ebe0",
+              background: "rgb(var(--fg-rgb))",
               fontSize: "12px",
               fontWeight: 500,
               letterSpacing: "0.15em",
@@ -196,7 +196,7 @@ function LoginForm() {
           {/* Error */}
           {error && (
             <p
-              className="font-poppins font-light text-[#c0392b]"
+              className="font-poppins font-light text-[var(--accent)]"
               style={{ fontSize: "12px" }}
             >
               {error}
@@ -206,13 +206,13 @@ function LoginForm() {
 
         {/* Footer link */}
         <p
-          className="font-poppins font-light text-[rgba(240,235,224,0.3)]"
+          className="font-poppins font-light text-[rgba(var(--fg-rgb),0.3)]"
           style={{ fontSize: "12px", marginTop: "28px" }}
         >
           Don&apos;t have an account?{" "}
           <a
             href="/onboarding/step-1"
-            className="text-[rgba(240,235,224,0.5)] hover:text-[#f0ebe0] transition-colors underline underline-offset-4"
+            className="text-[rgba(var(--fg-rgb),0.5)] hover:text-[rgb(var(--fg-rgb))] transition-colors underline underline-offset-4"
           >
             Apply for access
           </a>

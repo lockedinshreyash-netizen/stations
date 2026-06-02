@@ -2,7 +2,53 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import type { User } from "@/types";
+
+function ThemeToggle({ collapsed }: { collapsed: boolean }) {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    const t = document.documentElement.getAttribute("data-theme") as "dark" | "light" | null;
+    if (t) setTheme(t);
+  }, []);
+
+  function toggle() {
+    const next = theme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("stations-theme", next); } catch {}
+    setTheme(next);
+  }
+
+  return (
+    <button
+      onClick={toggle}
+      title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        width: "100%",
+        justifyContent: collapsed ? "center" : "flex-start",
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        color: "rgba(var(--fg-rgb),0.35)",
+        padding: 0,
+        transition: "color 150ms",
+      }}
+    >
+      <span style={{ fontSize: "14px", lineHeight: 1 }}>
+        {theme === "dark" ? "☾" : "☀"}
+      </span>
+      {!collapsed && (
+        <span className="font-poppins font-light uppercase" style={{ fontSize: "10px", letterSpacing: "0.15em" }}>
+          {theme === "dark" ? "Dark" : "Light"}
+        </span>
+      )}
+    </button>
+  );
+}
 
 const NAV = [
   { number: "01", label: "WINS", href: "/wins" },
@@ -15,10 +61,10 @@ const NAV = [
 function TierLabel({ tier }: { tier: User["membership_tier"] }) {
   const color =
     tier === "founding"
-      ? "#c0392b"
+      ? "var(--accent)"
       : tier === "paid"
-      ? "rgba(240,235,224,0.4)"
-      : "rgba(240,235,224,0.2)";
+      ? "rgba(var(--fg-rgb),0.4)"
+      : "rgba(var(--fg-rgb),0.2)";
   const label = tier === "founding" ? "FOUNDING" : tier === "paid" ? "MEMBER" : "FREE";
   return (
     <span
@@ -44,8 +90,8 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
       className="shrink-0 h-screen sticky top-0 flex flex-col overflow-hidden"
       style={{
         width: collapsed ? "64px" : "200px",
-        background: "#0d0d0d",
-        borderRight: "0.5px solid rgba(240,235,224,0.08)",
+        background: "var(--sidebar-bg)",
+        borderRight: "0.5px solid rgba(var(--fg-rgb),0.08)",
         transition: "width 250ms ease",
       }}
     >
@@ -56,21 +102,21 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
       >
         <div className="flex flex-col" style={{ gap: "6px" }}>
           <span
-            className="font-poppins font-black text-[#f0ebe0] uppercase leading-none whitespace-nowrap"
+            className="font-poppins font-black text-[rgb(var(--fg-rgb))] uppercase leading-none whitespace-nowrap"
             style={{ fontSize: "18px", letterSpacing: "0.25em" }}
           >
             {collapsed ? "S" : "STATIONS"}
           </span>
           {/* Red underline accent */}
-          <div style={{ width: "24px", height: "0.5px", background: "#c0392b" }} />
+          <div style={{ width: "24px", height: "0.5px", background: "var(--accent)" }} />
         </div>
 
         {/* Collapse toggle */}
         <button
           onClick={onToggle}
-          className="shrink-0 flex items-center justify-center transition-colors hover:text-[#f0ebe0]"
+          className="shrink-0 flex items-center justify-center transition-colors hover:text-[rgb(var(--fg-rgb))]"
           style={{
-            color: "rgba(240,235,224,0.3)",
+            color: "rgba(var(--fg-rgb),0.3)",
             marginTop: "2px",
             padding: "2px",
             background: "none",
@@ -117,7 +163,7 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
                 paddingRight: "12px",
                 gap: "3px",
                 alignItems: collapsed ? "center" : "flex-start",
-                borderLeft: active ? "2px solid #c0392b" : "2px solid transparent",
+                borderLeft: active ? "2px solid var(--accent)" : "2px solid transparent",
                 transition: "border-color 150ms ease",
               }}
             >
@@ -127,7 +173,7 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
                   className="font-playfair italic"
                   style={{
                     fontSize: "11px",
-                    color: active ? "#c0392b" : "rgba(240,235,224,0.35)",
+                    color: active ? "var(--accent)" : "rgba(var(--fg-rgb),0.35)",
                     lineHeight: 1,
                     transition: "color 150ms ease",
                   }}
@@ -141,7 +187,7 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
                     className="font-playfair italic"
                     style={{
                       fontSize: "10px",
-                      color: active ? "#c0392b" : "rgba(240,235,224,0.3)",
+                      color: active ? "var(--accent)" : "rgba(var(--fg-rgb),0.3)",
                       lineHeight: 1,
                       transition: "color 150ms ease",
                     }}
@@ -155,8 +201,8 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
                       letterSpacing: "0.2em",
                       lineHeight: 1.1,
                       color: active
-                        ? "#f0ebe0"
-                        : "rgba(240,235,224,0.4)",
+                        ? "rgb(var(--fg-rgb))"
+                        : "rgba(var(--fg-rgb),0.4)",
                       transition: "color 150ms ease",
                     }}
                   >
@@ -169,10 +215,20 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
         })}
       </nav>
 
+      {/* Theme toggle */}
+      <div style={{
+        borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)",
+        padding: collapsed ? "12px 0" : "12px 20px",
+        display: "flex",
+        justifyContent: collapsed ? "center" : "flex-start",
+      }}>
+        <ThemeToggle collapsed={collapsed} />
+      </div>
+
       {/* User footer */}
       <div
         style={{
-          borderTop: "0.5px solid rgba(240,235,224,0.08)",
+          borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)",
           padding: collapsed ? "16px 0" : "16px 20px",
           display: "flex",
           alignItems: "center",
@@ -183,7 +239,7 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
         {/* Avatar */}
         <div
           className="shrink-0 flex items-center justify-center overflow-hidden"
-          style={{ width: "28px", height: "28px", background: "#1a1a1a", borderRadius: "50%" }}
+          style={{ width: "28px", height: "28px", background: "var(--bg-surface)", borderRadius: "50%" }}
         >
           {user.avatar_url ? (
             <img
@@ -193,7 +249,7 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
             />
           ) : (
             <span
-              className="font-poppins uppercase text-[rgba(240,235,224,0.5)]"
+              className="font-poppins uppercase text-[rgba(var(--fg-rgb),0.5)]"
               style={{ fontSize: "11px", fontWeight: 500 }}
             >
               {user.username[0]}
@@ -205,7 +261,7 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
         {!collapsed && (
           <div className="flex flex-col min-w-0" style={{ gap: "3px" }}>
             <span
-              className="font-poppins font-light text-[#f0ebe0] truncate"
+              className="font-poppins font-light text-[rgb(var(--fg-rgb))] truncate"
               style={{ fontSize: "12px" }}
             >
               {user.username}
