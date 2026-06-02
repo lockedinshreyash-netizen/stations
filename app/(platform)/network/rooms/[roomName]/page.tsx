@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import ChatRoom from "@/components/stations/ChatRoom";
-import { isRoomName, type RoomName } from "@/lib/firebase/rooms";
+import { isRoomName, type RoomName } from "@/lib/firebase/rooms.server";
 import { createClient } from "@/lib/supabase/server";
 import type { User } from "@/types";
 

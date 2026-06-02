@@ -14,23 +14,16 @@ import {
   type DataSnapshot,
 } from "firebase/database";
 import { db, isFirebaseConfigured } from "./config";
+import { ROOM_NAMES, COLLECTIVE, isRoomName, type RoomName } from "./rooms.server";
 import type { UserCategory } from "@/types";
+
+// Re-export the server-safe primitives so existing client imports from
+// "@/lib/firebase/rooms" keep working unchanged.
+export { ROOM_NAMES, COLLECTIVE, isRoomName, type RoomName };
 
 /* ------------------------------------------------------------------ */
 /* Room catalogue                                                      */
 /* ------------------------------------------------------------------ */
-
-export const ROOM_NAMES = [
-  "scholar",
-  "builder",
-  "creator",
-  "athlete",
-  "collective",
-] as const;
-
-export type RoomName = (typeof ROOM_NAMES)[number];
-
-export const COLLECTIVE: RoomName = "collective";
 
 export interface RoomMeta {
   name: RoomName;
@@ -65,10 +58,6 @@ export const ROOM_META: Record<RoomName, RoomMeta> = {
     description: "All ambitious people. Cross-category collaboration and connection.",
   },
 };
-
-export function isRoomName(value: string): value is RoomName {
-  return (ROOM_NAMES as readonly string[]).includes(value);
-}
 
 /** Maps a user's capitalized category to its room name, if one exists. */
 export function categoryRoom(category: UserCategory): RoomName | null {
