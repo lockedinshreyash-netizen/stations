@@ -59,8 +59,56 @@ export interface User {
   total_focus_minutes: number;
   total_sessions: number;
   streak_days: number;
+  // Work station (04) focus stats — added by supabase/work_sessions.sql
+  total_focus_hours: number;
+  total_sessions_completed: number;
+  focus_streak_days: number;
+  last_focus_session_date: string | null;
   last_active_at: string | null;
   created_at: string;
+}
+
+// ============================================================
+// WORK STATION (04) — scheduled co-working sessions
+// ============================================================
+export type WorkCategory = "scholar" | "builder" | "creator" | "athlete";
+export type WorkSessionStatus =
+  | "scheduled"
+  | "active"
+  | "completed"
+  | "cancelled";
+
+export interface WorkSession {
+  id: string;
+  host_id: string;
+  title: string;
+  category: WorkCategory;
+  duration_minutes: number;
+  scheduled_start_time: string;
+  scheduled_end_time: string;
+  actual_start_time: string | null;
+  actual_end_time: string | null;
+  status: WorkSessionStatus;
+  chat_closed: boolean;
+  created_at: string;
+}
+
+export interface WorkSessionMember {
+  id: string;
+  session_id: string;
+  user_id: string;
+  joined_at: string;
+  left_early: boolean;
+  leave_reason: string | null;
+  left_at: string | null;
+  focus_quality_rating: number | null;
+}
+
+/** A session row enriched with its live member count + host display info. */
+export interface WorkSessionWithMeta extends WorkSession {
+  member_count: number;
+  host_username: string;
+  host_avatar_url: string | null;
 }
 
 export interface Application {

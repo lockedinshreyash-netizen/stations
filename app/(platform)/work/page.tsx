@@ -1,18 +1,69 @@
+import { redirect } from "next/navigation";
 import StationHeader from "@/components/layout/StationHeader";
+import WorkStation from "@/components/stations/WorkStation";
+import { createClient } from "@/lib/supabase/server";
+import type { User, WorkSession, WorkSessionWithMeta } from "@/types";
 
-export default function WorkPage() {
+const SESSION_SELECT =
+  "*, host:users!work_sessions_host_id_fkey(username, avatar_url), members:work_session_members(count)";
+
+export default async function WorkPage() {
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  if (!authUser) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", authUser.id)
+    .single();
+
+  if (!profile) redirect("/onboarding/step-2");
+
+  const [{ data: rows }, { data: memberships }] = await Promise.all([
+    supabase
+      .from("work_sessions")
+      .select(SESSION_SELECT)
+      .in("status", ["active", "scheduled"])
+      .order("scheduled_start_time", { ascending: true }),
+    supabase
+      .from("work_session_members")
+      .select("session_id")
+      .eq("user_id", authUser.id),
+  ]);
+
+  type Row = WorkSession & {
+    host: { username: string; avatar_url: string | null } | null;
+    members: { count: number }[] | null;
+  };
+  const initialSessions: WorkSessionWithMeta[] = ((rows as Row[]) ?? []).map(
+    ({ host, members, ...rest }) => ({
+      ...(rest as WorkSession),
+      member_count: members?.[0]?.count ?? 0,
+      host_username: host?.username ?? "unknown",
+      host_avatar_url: host?.avatar_url ?? null,
+    })
+  );
+
+  const initialMemberIds = ((memberships as { session_id: string }[]) ?? []).map(
+    (m) => m.session_id
+  );
+
   return (
     <div>
       <StationHeader
         number="04"
         name="WORK"
-        tagline="Live sessions. Build with other people in real time."
+        tagline="Focus together. Build accountability."
       />
-      <div className="px-10 py-12">
-        <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "15px" }}>
-          Sessions coming soon.
-        </p>
-      </div>
+      <WorkStation
+        user={profile as User}
+        initialSessions={initialSessions}
+        initialMemberIds={initialMemberIds}
+      />
     </div>
   );
 }
