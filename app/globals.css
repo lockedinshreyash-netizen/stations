@@ -2,8 +2,16 @@
 
 /* ============================================================
    THEME VARIABLES
+   NOTE: :root block intentionally absent — it would override
+   the [data-theme] blocks below since they share equal
+   specificity (0,1,0) and source order determines the winner.
+   The <html> element always has data-theme="dark" set as a
+   static attribute (in layout.tsx), so [data-theme="dark"]
+   always matches and provides the initial values without any
+   :root fallback needed.
+
    --fg-rgb stores raw RGB channels so ANY alpha works:
-     rgba(var(--fg-rgb), 0.08), rgba(var(--fg-rgb), 0.45) etc.
+     rgba(var(--fg-rgb), 0.08)  rgba(var(--fg-rgb), 0.45) etc.
    ============================================================ */
 
 [data-theme="dark"] {
@@ -26,38 +34,27 @@
   --accent-rgb:   192, 57, 43;
 }
 
-/* Fallback for SSR before JS sets data-theme */
-:root {
-  --bg-primary:   #0a0a0a;
-  --bg-secondary: #111111;
-  --bg-surface:   #1a1a1a;
-  --sidebar-bg:   #0d0d0d;
-  --fg-rgb:       240, 235, 224;
-  --accent:       #c0392b;
-  --accent-rgb:   192, 57, 43;
-}
-
 @theme inline {
-  --color-bg-primary:    var(--bg-primary);
-  --color-bg-secondary:  var(--bg-secondary);
-  --color-bg-surface:    var(--bg-surface);
-  --color-text-primary:  rgb(var(--fg-rgb));
-  --color-text-secondary:rgba(var(--fg-rgb), 0.5);
-  --color-text-muted:    rgba(var(--fg-rgb), 0.3);
-  --color-accent-red:    var(--accent);
-  --color-border:        rgba(var(--fg-rgb), 0.1);
-  --font-poppins:        var(--font-poppins);
-  --font-playfair:       var(--font-playfair);
+  --color-bg-primary:     var(--bg-primary);
+  --color-bg-secondary:   var(--bg-secondary);
+  --color-bg-surface:     var(--bg-surface);
+  --color-text-primary:   rgb(var(--fg-rgb));
+  --color-text-secondary: rgba(var(--fg-rgb), 0.5);
+  --color-text-muted:     rgba(var(--fg-rgb), 0.3);
+  --color-accent-red:     var(--accent);
+  --color-border:         rgba(var(--fg-rgb), 0.1);
+  --font-poppins:         var(--font-poppins);
+  --font-playfair:        var(--font-playfair);
 }
 
 * {
   border-color: rgba(var(--fg-rgb), 0.1);
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 
 body {
   background: var(--bg-primary);
   color: rgb(var(--fg-rgb));
-  transition: background-color 200ms ease, color 200ms ease;
 }
 
 ::selection {
