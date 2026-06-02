@@ -10,19 +10,19 @@ const config: Config = {
     extend: {
       colors: {
         bg: {
-          primary: "var(--bg-primary)",
-          secondary: "var(--bg-secondary)",
-          surface: "var(--bg-surface)",
+          primary: "#0a0a0a",
+          secondary: "#111111",
+          surface: "#1a1a1a",
         },
         text: {
-          primary: "rgb(var(--fg-rgb))",
-          secondary: "rgba(var(--fg-rgb), 0.5)",
-          muted: "rgba(var(--fg-rgb), 0.3)",
+          primary: "#f0ebe0",
+          secondary: "rgba(240,235,224,0.5)",
+          muted: "rgba(240,235,224,0.3)",
         },
         accent: {
-          red: "var(--accent)",
+          red: "#c0392b",
         },
-        border: "rgba(var(--fg-rgb), 0.1)",
+        border: "rgba(240,235,224,0.1)",
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],

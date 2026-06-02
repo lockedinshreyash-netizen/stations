@@ -107,10 +107,10 @@ export default function OnboardingStep4() {
 
   return (
     <div className="flex-1 flex flex-col justify-center px-8 py-16 max-w-lg mx-auto w-full">
-      <h1 className="font-playfair italic text-4xl md:text-5xl text-[rgb(var(--fg-rgb))] mb-3 leading-tight">
+      <h1 className="font-playfair italic text-4xl md:text-5xl text-[#f0ebe0] mb-3 leading-tight">
         Why do you want in?
       </h1>
-      <p className="text-[rgba(var(--fg-rgb),0.5)] font-light text-lg mb-12">
+      <p className="text-[rgba(240,235,224,0.5)] font-light text-lg mb-12">
         Be honest. This is for you as much as it is for us.
       </p>
 
@@ -119,20 +119,20 @@ export default function OnboardingStep4() {
           <textarea
             {...register("why_join")}
             rows={6}
-            className="bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] transition-colors placeholder:text-[rgba(var(--fg-rgb),0.2)] resize-none leading-relaxed"
+            className="bg-[#1a1a1a] text-[#f0ebe0] px-4 py-4 text-base outline-none border border-[rgba(240,235,224,0.1)] focus:border-[#c0392b] transition-colors placeholder:text-[rgba(240,235,224,0.2)] resize-none leading-relaxed"
             placeholder="What are you here to build, achieve, or become? What does ambition mean to you right now?"
           />
           <div className="flex justify-between items-center">
             {errors.why_join ? (
-              <span className="text-[var(--accent)] text-sm">{errors.why_join.message}</span>
+              <span className="text-[#c0392b] text-sm">{errors.why_join.message}</span>
             ) : (
               <span />
             )}
             <span
               className={`text-sm font-light ${
                 whyJoin.length >= 50
-                  ? "text-[rgba(var(--fg-rgb),0.5)]"
-                  : "text-[rgba(var(--fg-rgb),0.2)]"
+                  ? "text-[rgba(240,235,224,0.5)]"
+                  : "text-[rgba(240,235,224,0.2)]"
               }`}
             >
               {whyJoin.length} / 50 min
@@ -140,12 +140,12 @@ export default function OnboardingStep4() {
           </div>
         </div>
 
-        {serverError && <p className="text-[var(--accent)] text-sm">{serverError}</p>}
+        {serverError && <p className="text-[#c0392b] text-sm">{serverError}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white transition-colors disabled:opacity-40"
+          className="mt-4 bg-[#f0ebe0] text-[#0a0a0a] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white transition-colors disabled:opacity-40"
         >
           {loading ? "Joining Stations…" : "Join Stations"}
         </button>
@@ -154,7 +154,7 @@ export default function OnboardingStep4() {
       <button
         type="button"
         onClick={() => router.push("/onboarding/step-3")}
-        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-sm font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
+        className="mt-6 text-[rgba(240,235,224,0.3)] text-sm font-light hover:text-[rgba(240,235,224,0.6)] transition-colors text-left"
       >
         ← Back
       </button>

@@ -31,7 +31,7 @@ export default function PlatformShell({
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg-primary)]">
+    <div className="flex min-h-screen bg-[#0a0a0a]">
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
@@ -55,11 +55,11 @@ export default function PlatformShell({
         {/* Mobile top bar */}
         <div
           className="lg:hidden flex items-center gap-4 px-6 py-4"
-          style={{ borderBottom: "0.5px solid rgba(var(--fg-rgb),0.06)" }}
+          style={{ borderBottom: "0.5px solid rgba(240,235,224,0.06)" }}
         >
           <button
             onClick={() => setMobileOpen(true)}
-            className="text-[rgba(var(--fg-rgb),0.5)] hover:text-[rgb(var(--fg-rgb))] transition-colors"
+            className="text-[rgba(240,235,224,0.5)] hover:text-[#f0ebe0] transition-colors"
             aria-label="Open menu"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -72,7 +72,7 @@ export default function PlatformShell({
             </svg>
           </button>
           <span
-            className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
+            className="font-poppins font-black uppercase text-[#f0ebe0]"
             style={{ fontSize: "13px", letterSpacing: "0.25em" }}
           >
             STATIONS

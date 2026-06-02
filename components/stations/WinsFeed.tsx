@@ -81,7 +81,7 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
           onClick={() => setModalOpen(true)}
           className="wins-postbtn font-poppins"
           style={{
-            background: "rgb(var(--fg-rgb))", color: "var(--bg-primary)", fontSize: "11px", fontWeight: 500,
+            background: "#f0ebe0", color: "#0a0a0a", fontSize: "11px", fontWeight: 500,
             letterSpacing: "0.15em", textTransform: "uppercase", padding: "10px 20px",
             border: "none", cursor: "pointer", borderRadius: 0, order: -1,
           }}
@@ -100,8 +100,8 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
                 style={{
                   fontSize: "11px", letterSpacing: "0.15em", padding: "6px 14px 8px",
                   background: "none", border: "none",
-                  borderBottom: active ? "2px solid var(--accent)" : "2px solid transparent",
-                  color: active ? "rgb(var(--fg-rgb))" : "rgba(var(--fg-rgb),0.35)",
+                  borderBottom: active ? "2px solid #c0392b" : "2px solid transparent",
+                  color: active ? "#f0ebe0" : "rgba(240,235,224,0.35)",
                   cursor: "pointer", transition: "color 150ms, border-color 150ms",
                   whiteSpace: "nowrap",
                 }}
@@ -114,24 +114,20 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
       </div>
 
       {loading ? (
-        <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "15px" }}>Loading…</p>
+        <p className="font-playfair italic text-[rgba(240,235,224,0.2)]" style={{ fontSize: "15px" }}>Loading…</p>
       ) : wins.length === 0 ? (
-        <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "15px" }}>
+        <p className="font-playfair italic text-[rgba(240,235,224,0.2)]" style={{ fontSize: "15px" }}>
           {filter === "all" ? "No wins yet. Be the first." : `No ${filter} wins yet.`}
         </p>
       ) : (
         <div>
-          <div style={{ borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)" }} />
+          <div style={{ borderTop: "0.5px solid rgba(240,235,224,0.08)" }} />
           {wins.map((win) => (
             <WinCard
               key={win.id}
               win={win}
               currentUserId={currentUserId}
               userReactions={reactionMap[win.id] ?? new Set()}
-              onDeleted={(id) => setWins((prev) => prev.filter((w) => w.id !== id))}
-              onUpdated={(updated) =>
-                setWins((prev) => prev.map((w) => (w.id === updated.id ? updated : w)))
-              }
             />
           ))}
         </div>
