@@ -51,6 +51,7 @@ export interface User {
   role: UserRole;
   goals: string[];
   category: UserCategory;
+  room_memberships: string[];
   bio: string | null;
   status: UserStatus;
   membership_tier: MembershipTier;

@@ -1,6 +1,25 @@
+import { redirect } from "next/navigation";
 import StationHeader from "@/components/layout/StationHeader";
+import NetworkRooms from "@/components/stations/NetworkRooms";
+import { createClient } from "@/lib/supabase/server";
+import type { User } from "@/types";
 
-export default function NetworkPage() {
+export default async function NetworkPage() {
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  if (!authUser) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", authUser.id)
+    .single();
+
+  if (!profile) redirect("/onboarding/step-2");
+
   return (
     <div>
       <StationHeader
@@ -8,11 +27,7 @@ export default function NetworkPage() {
         name="NETWORK"
         tagline="Meet ambitious people working toward meaningful goals."
       />
-      <div className="px-10 py-12">
-        <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "15px" }}>
-          Member directory coming soon.
-        </p>
-      </div>
+      <NetworkRooms user={profile as User} />
     </div>
   );
 }

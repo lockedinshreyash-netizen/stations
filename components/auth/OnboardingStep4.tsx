@@ -63,6 +63,14 @@ export default function OnboardingStep4() {
     const goals: string[] = step3.goals ?? [];
     const category = categorizeUser(roles, goals);
 
+    // Network rooms: always in Collective + their category's room (if one
+    // exists — Grinders only get Collective). Lowercased to match room names.
+    const categoryRoomName = category.toLowerCase();
+    const KNOWN_CATEGORY_ROOMS = ["scholar", "builder", "creator", "athlete"];
+    const room_memberships = KNOWN_CATEGORY_ROOMS.includes(categoryRoomName)
+      ? ["collective", categoryRoomName]
+      : ["collective"];
+
     const { error: userError } = await supabase.from("users").insert({
       id: user.id,
       username: step2.username,
@@ -71,6 +79,7 @@ export default function OnboardingStep4() {
       role: roles,           // text[] — see migration note above
       goals,
       category,
+      room_memberships,
       status: "active",
       membership_tier: "free",
       is_admin: false,
