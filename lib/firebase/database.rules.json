@@ -1,9 +1,28 @@
 {
-  "//": "Paste into Firebase console → Realtime Database → Rules. These are DEV rules.",
-  "//security": "We authenticate with Supabase, not Firebase Auth, so `auth` is always null here. The spec's `auth != null` rule would block ALL writes. These rules are open (write: true) for the MVP. BEFORE PRODUCTION: mint a Firebase custom token from the Supabase session (server route) and tighten writes to `auth != null` plus per-room checks.",
   "rules": {
+    "//": "DEV rules. We authenticate with Supabase (not Firebase Auth), so `auth` is always null here — `auth != null` would block ALL writes. Open (write: true) for the MVP. BEFORE PRODUCTION: mint a Firebase custom token from the Supabase session and tighten writes to `auth != null` plus per-room checks.",
     "chat_rooms": {
       "$room": {
+        "messages": {
+          ".read": true,
+          ".write": true,
+          ".indexOn": ["created_at"],
+          "$messageId": {
+            ".validate": "newData.hasChildren(['user_id','username','content','created_at']) && newData.child('content').isString() && newData.child('content').val().length <= 500"
+          }
+        },
+        "members": {
+          ".read": true,
+          ".write": true
+        },
+        "presence": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    "work_sessions": {
+      "$session": {
         "messages": {
           ".read": true,
           ".write": true,

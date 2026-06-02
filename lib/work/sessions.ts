@@ -166,9 +166,9 @@ export async function createSession(
 }
 
 /**
- * Joins a session. Sessions lock once they leave the 'scheduled' state, so
- * this refuses to join active/completed/cancelled sessions (host already
- * joined at creation). Idempotent on the unique (session_id, user_id).
+ * Joins a session as a member. Works for both scheduled and live (active)
+ * sessions so people can drop into an in-progress co-working room. Idempotent
+ * on the unique (session_id, user_id) — re-joining is a no-op.
  */
 export async function joinSession(
   sessionId: string,

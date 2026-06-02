@@ -9,6 +9,7 @@ import {
   getSessionMembers,
   updateSessionStatus,
   cancelSession,
+  joinSession,
 } from "@/lib/work/sessions";
 import { markSessionPresent } from "@/lib/firebase/work-chat";
 import SessionTimer from "@/components/stations/SessionTimer";
@@ -61,6 +62,7 @@ export default function SessionRoom({
   const [error, setError] = useState<string | null>(null);
   const [chatMinimized, setChatMinimized] = useState(false);
   const [unread, setUnread] = useState(0);
+  const [joining, setJoining] = useState(false);
 
   const isHost = session.host_id === user.id;
   const ownMembership = members.find((m) => m.user_id === user.id) ?? null;
@@ -137,6 +139,20 @@ export default function SessionRoom({
       updateSessionStatus(session.id, "completed").catch(() => {});
     }
   }, [status, session.status, session.id, isHost]);
+
+  async function handleJoin() {
+    if (joining) return;
+    setJoining(true);
+    setError(null);
+    try {
+      await joinSession(session.id, user.id);
+      await refetch();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to join.");
+    } finally {
+      setJoining(false);
+    }
+  }
 
   async function handleCancel() {
     if (cancelling) return;
@@ -268,6 +284,23 @@ export default function SessionRoom({
           >
             {session.title}
           </p>
+          {!isMember && (status === "active" || status === "scheduled") && (
+            <button
+              type="button"
+              onClick={handleJoin}
+              disabled={joining}
+              className="font-poppins font-bold uppercase disabled:opacity-50"
+              style={{
+                fontSize: "11px",
+                letterSpacing: "0.1em",
+                background: "var(--accent)",
+                color: "var(--bg-primary)",
+                padding: "10px 22px",
+              }}
+            >
+              {joining ? "Joining…" : "Join session"}
+            </button>
+          )}
           {isMember && !leftEarly && status === "active" && (
             <button
               type="button"

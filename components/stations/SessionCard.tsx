@@ -50,7 +50,10 @@ export default function SessionCard({
     }
   }
 
-  const canJoin = session.status === "scheduled" && !isMember;
+  // Joinable while scheduled OR live — a co-working room you can't enter is
+  // useless. Completed/cancelled sessions are not joinable.
+  const canJoin =
+    (session.status === "scheduled" || session.status === "active") && !isMember;
 
   return (
     <div
