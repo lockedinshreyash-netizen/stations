@@ -14,6 +14,8 @@ interface SessionTimerProps {
   warnUnderMs?: number;
   /** Fired once when the countdown crosses zero (target reached). */
   onReachZero?: () => void;
+  /** Enlarges the clock for the full-screen (chat-minimized) layout. */
+  big?: boolean;
 }
 
 export default function SessionTimer({
@@ -22,6 +24,7 @@ export default function SessionTimer({
   ended,
   warnUnderMs = 0,
   onReachZero,
+  big = false,
 }: SessionTimerProps) {
   const [now, setNow] = useState(() => Date.now());
   const firedRef = useRef(false);
@@ -58,7 +61,9 @@ export default function SessionTimer({
         <span
           className="font-playfair leading-none tabular-nums"
           style={{
-            fontSize: "clamp(56px, 9vw, 96px)",
+            fontSize: big
+              ? "clamp(96px, 16vw, 144px)"
+              : "clamp(56px, 9vw, 96px)",
             color: warn ? "var(--accent)" : "rgb(var(--fg-rgb))",
           }}
         >

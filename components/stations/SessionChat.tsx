@@ -9,7 +9,7 @@ import {
   type WorkChatMessage,
 } from "@/lib/firebase/work-chat";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
-import { closeChat } from "@/lib/work/sessions";
+import { updateSessionChatStatus } from "@/lib/work/sessions";
 import type { User } from "@/types";
 
 interface SessionChatProps {
@@ -20,6 +20,12 @@ interface SessionChatProps {
   /** Whether this user is allowed to post (member, not left early, session live). */
   canSend: boolean;
   isHost: boolean;
+  /** Collapses the chat to a mini button when true (parent-controlled). */
+  minimized?: boolean;
+  /** Fired when the host clicks the minimize control. */
+  onMinimize?: () => void;
+  /** Reports the running unread count while minimized (for the mini badge). */
+  onUnreadChange?: (count: number) => void;
 }
 
 export default function SessionChat({
@@ -28,29 +34,54 @@ export default function SessionChat({
   chatClosed,
   canSend,
   isHost,
+  minimized = false,
+  onMinimize,
+  onUnreadChange,
 }: SessionChatProps) {
   const [messages, setMessages] = useState<WorkChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
-  const [closing, setClosing] = useState(false);
-  // Locally-set close (host action) ORed with the persisted prop, so we don't
-  // need an effect to mirror the prop into state.
-  const [locallyClosed, setLocallyClosed] = useState(false);
+  const [toggling, setToggling] = useState(false);
+  // Optimistic override for the host's lock/unlock action. Null means "defer to
+  // the persisted prop"; it's cleared once the realtime prop catches up.
+  const [pendingClosed, setPendingClosed] = useState<boolean | null>(null);
+  const [unread, setUnread] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const closed = chatClosed || locallyClosed;
+  const closed = pendingClosed ?? chatClosed;
 
   const seenIds = useRef<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
+  const minimizedRef = useRef(minimized);
+
+  // Once the persisted flag matches our optimistic guess, drop the override.
+  useEffect(() => {
+    setPendingClosed((p) => (p === null || p === chatClosed ? null : p));
+  }, [chatClosed]);
+
+  // Track minimized in a ref so the message listener can read it without
+  // re-subscribing, and clear unread the moment the chat is expanded again.
+  useEffect(() => {
+    minimizedRef.current = minimized;
+    if (!minimized) setUnread(0);
+  }, [minimized]);
+
+  useEffect(() => {
+    onUnreadChange?.(unread);
+  }, [unread, onUnreadChange]);
 
   useEffect(() => {
     const unsub = subscribeSessionMessages(sessionId, (msg) => {
       if (seenIds.current.has(msg.id)) return;
       seenIds.current.add(msg.id);
       setMessages((prev) => [...prev, msg]);
+      // Count messages from others that arrive while collapsed.
+      if (minimizedRef.current && !msg.system && msg.user_id !== user.id) {
+        setUnread((n) => n + 1);
+      }
     });
     return unsub;
-  }, [sessionId]);
+  }, [sessionId, user.id]);
 
   const sorted = useMemo(
     () => [...messages].sort((a, b) => a.created_at - b.created_at),
@@ -91,16 +122,19 @@ export default function SessionChat({
     }
   }
 
-  async function handleCloseChat() {
-    if (closing) return;
-    setClosing(true);
+  async function handleToggleLock() {
+    if (toggling) return;
+    const next = !closed;
+    setToggling(true);
+    setError(null);
+    setPendingClosed(next); // optimistic
     try {
-      await closeChat(sessionId);
-      setLocallyClosed(true);
+      await updateSessionChatStatus(sessionId, next);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to close chat.");
+      setPendingClosed(null); // revert
+      setError(e instanceof Error ? e.message : "Failed to update chat.");
     } finally {
-      setClosing(false);
+      setToggling(false);
     }
   }
 
@@ -117,25 +151,64 @@ export default function SessionChat({
         >
           Session Chat
         </h2>
-        {isHost && !closed && (
-          <button
-            type="button"
-            onClick={handleCloseChat}
-            disabled={closing}
-            className="font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.4)] hover:text-[var(--accent)] transition-colors disabled:opacity-50"
-            style={{ fontSize: "10px", letterSpacing: "0.1em" }}
-          >
-            {closing ? "Closing…" : "Close chat"}
-          </button>
-        )}
-        {closed && (
-          <span
-            className="font-poppins uppercase text-[rgba(var(--fg-rgb),0.3)]"
-            style={{ fontSize: "10px", letterSpacing: "0.1em" }}
-          >
-            Read-only
-          </span>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Non-host read-only indicator. */}
+          {!isHost && closed && (
+            <span
+              className="font-poppins uppercase text-[rgba(var(--fg-rgb),0.3)]"
+              style={{ fontSize: "10px", letterSpacing: "0.1em" }}
+            >
+              Read-only
+            </span>
+          )}
+          {/* Host-only lock/unlock toggle. */}
+          {isHost && (
+            <button
+              type="button"
+              onClick={handleToggleLock}
+              disabled={toggling}
+              className="font-poppins font-bold uppercase transition-colors disabled:opacity-50"
+              style={{
+                fontSize: "10px",
+                letterSpacing: "0.1em",
+                color: closed ? "var(--accent)" : "rgba(var(--fg-rgb),0.4)",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            >
+              {toggling ? "…" : closed ? "Unlock chat" : "Lock chat"}
+            </button>
+          )}
+          {/* Minimize the chat → timer goes full-screen. */}
+          {onMinimize && (
+            <button
+              type="button"
+              onClick={onMinimize}
+              aria-label="Minimize chat"
+              className="flex items-center gap-1 font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.4)] transition-colors"
+              style={{ fontSize: "10px", letterSpacing: "0.1em" }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                {/* collapse arrows pointing inward */}
+                <path d="M6 2 L3 5 M3 5 L6 5 M3 5 L3 2" />
+                <path d="M10 14 L13 11 M13 11 L10 11 M13 11 L13 14" />
+              </svg>
+              Minimize
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Messages */}

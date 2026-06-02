@@ -59,6 +59,8 @@ export default function SessionRoom({
   const [showLeave, setShowLeave] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [chatMinimized, setChatMinimized] = useState(false);
+  const [unread, setUnread] = useState(0);
 
   const isHost = session.host_id === user.id;
   const ownMembership = members.find((m) => m.user_id === user.id) ?? null;
@@ -238,10 +240,18 @@ export default function SessionRoom({
       )}
 
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
-        {/* Timer (left) */}
+        {/* Timer (left, or full-screen when chat is minimized) */}
         <div
-          className="lg:w-[30%] flex flex-col items-center justify-center gap-8 p-8 shrink-0"
-          style={{ borderRight: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+          className={
+            chatMinimized
+              ? "flex-1 flex flex-col items-center justify-center gap-8 p-8 transition-all duration-300"
+              : "lg:w-[30%] flex flex-col items-center justify-center gap-8 p-8 shrink-0 transition-all duration-300"
+          }
+          style={
+            chatMinimized
+              ? undefined
+              : { borderRight: "0.5px solid rgba(var(--fg-rgb),0.08)" }
+          }
         >
           <SessionTimer
             key={timerProps.key}
@@ -250,6 +260,7 @@ export default function SessionRoom({
             ended={timerProps.ended}
             warnUnderMs={timerProps.warnUnderMs}
             onReachZero={refetch}
+            big={chatMinimized}
           />
           <p
             className="font-poppins text-[rgba(var(--fg-rgb),0.35)] text-center"
@@ -275,21 +286,29 @@ export default function SessionRoom({
           )}
         </div>
 
-        {/* Chat (center) */}
-        <div className="flex-1 min-h-0 min-w-0">
+        {/* Chat (center) — stays mounted while minimized so it keeps
+            receiving messages and tracking the unread count. */}
+        <div className={chatMinimized ? "hidden" : "flex-1 min-h-0 min-w-0"}>
           <SessionChat
             sessionId={session.id}
             user={user}
             chatClosed={session.chat_closed}
             canSend={canSend}
             isHost={isHost}
+            minimized={chatMinimized}
+            onMinimize={() => setChatMinimized(true)}
+            onUnreadChange={setUnread}
           />
         </div>
 
-        {/* Members (right) */}
+        {/* Members (right) — hidden when chat is minimized. */}
         <div
-          className="lg:w-[25%] shrink-0 min-h-0"
-          style={{ borderLeft: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+          className={chatMinimized ? "hidden" : "lg:w-[25%] shrink-0 min-h-0"}
+          style={
+            chatMinimized
+              ? undefined
+              : { borderLeft: "0.5px solid rgba(var(--fg-rgb),0.08)" }
+          }
         >
           <SessionMemberList
             sessionId={session.id}
@@ -298,6 +317,66 @@ export default function SessionRoom({
           />
         </div>
       </div>
+
+      {/* Mini chat button — restores the full chat layout. */}
+      {chatMinimized && (
+        <button
+          type="button"
+          onClick={() => {
+            setChatMinimized(false);
+            setUnread(0);
+          }}
+          aria-label="Expand chat"
+          className="fixed z-50 flex items-center justify-center rounded-full transition-transform hover:scale-105"
+          style={{
+            bottom: "24px",
+            right: "24px",
+            width: "60px",
+            height: "60px",
+            background: "#1a1a1a",
+            border: "0.5px solid rgba(255,255,255,0.15)",
+            color: "#f5f5f0",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.borderColor = "var(--accent)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)")
+          }
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 0 1-.9-3.8A8.38 8.38 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" />
+          </svg>
+          {unread > 0 && (
+            <span
+              className="absolute flex items-center justify-center rounded-full font-poppins font-bold"
+              style={{
+                top: "-2px",
+                right: "-2px",
+                minWidth: "20px",
+                height: "20px",
+                padding: "0 5px",
+                fontSize: "11px",
+                background: "var(--accent)",
+                color: "#fff",
+                border: "2px solid #1a1a1a",
+              }}
+            >
+              {unread > 99 ? "99+" : unread}
+            </span>
+          )}
+        </button>
+      )}
 
       {showLeave && (
         <LeaveEarlyModal

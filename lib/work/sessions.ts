@@ -147,6 +147,8 @@ export async function createSession(
     scheduled_end_time: end.toISOString(),
     status: (input.startNow ? "active" : "scheduled") as WorkSessionStatus,
     actual_start_time: input.startNow ? start.toISOString() : null,
+    // Chat is open by default; the host can lock it from within the room.
+    chat_closed: false,
   };
 
   const { data, error } = await supabase
@@ -187,12 +189,19 @@ export async function joinSession(
   await addSessionMember(sessionId, userId).catch(() => {});
 }
 
-/** Host-only: flip chat to read-only for everyone. */
-export async function closeChat(sessionId: string): Promise<void> {
+/**
+ * Host-only: toggle chat read-only state for everyone. Pass true to lock
+ * (read-only), false to unlock. Propagates to all clients via the realtime
+ * work_sessions subscription.
+ */
+export async function updateSessionChatStatus(
+  sessionId: string,
+  chatClosed: boolean
+): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase
     .from("work_sessions")
-    .update({ chat_closed: true })
+    .update({ chat_closed: chatClosed })
     .eq("id", sessionId);
   if (error) throw new Error(error.message);
 }
