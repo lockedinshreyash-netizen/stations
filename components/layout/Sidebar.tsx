@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import type { User } from "@/types";
+import ProfileModal from "./ProfileModal";
 
 function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -84,8 +85,10 @@ interface SidebarProps {
 
 export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const [profileOpen, setProfileOpen] = useState(false);
 
   return (
+    <>
     <aside
       className="shrink-0 h-screen sticky top-0 flex flex-col overflow-hidden"
       style={{
@@ -236,10 +239,21 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
           gap: "10px",
         }}
       >
-        {/* Avatar */}
-        <div
-          className="shrink-0 flex items-center justify-center overflow-hidden"
-          style={{ width: "28px", height: "28px", background: "var(--bg-surface)", borderRadius: "50%" }}
+        {/* Avatar — click to open profile */}
+        <button
+          type="button"
+          onClick={() => setProfileOpen(true)}
+          className="shrink-0 flex items-center justify-center overflow-hidden transition-opacity hover:opacity-70"
+          style={{
+            width: "28px",
+            height: "28px",
+            background: "var(--bg-surface)",
+            borderRadius: "50%",
+            border: "none",
+            cursor: "pointer",
+            padding: 0,
+          }}
+          title="Profile settings"
         >
           {user.avatar_url ? (
             <img
@@ -255,7 +269,7 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
               {user.username[0]}
             </span>
           )}
-        </div>
+        </button>
 
         {/* Username + tier — hidden when collapsed */}
         {!collapsed && (
@@ -271,5 +285,10 @@ export default function Sidebar({ user, collapsed, onToggle }: SidebarProps) {
         )}
       </div>
     </aside>
+
+    {profileOpen && (
+      <ProfileModal user={user} onClose={() => setProfileOpen(false)} />
+    )}
+    </>
   );
 }

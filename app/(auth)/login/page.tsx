@@ -34,6 +34,7 @@ function LoginForm() {
 
     if (authError) {
       setError("Invalid email or password.");
+      setPassword("");
       setLoading(false);
       return;
     }
