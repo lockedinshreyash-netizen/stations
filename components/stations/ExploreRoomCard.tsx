@@ -41,7 +41,7 @@ export default function ExploreRoomCard({
 
   return (
     <div
-      className="flex flex-col p-5"
+      className="st-card st-card-hover flex flex-col p-5 overflow-hidden"
       style={{
         background: "var(--bg-surface)",
         border: "0.5px solid rgba(var(--fg-rgb),0.1)",
@@ -85,7 +85,7 @@ export default function ExploreRoomCard({
         type="button"
         onClick={handleJoin}
         disabled={joining}
-        className="mt-4 w-full font-poppins font-bold uppercase disabled:opacity-50"
+        className="st-btn mt-4 w-full font-poppins font-bold uppercase disabled:opacity-50"
         style={{
           fontSize: "11px",
           letterSpacing: "0.1em",

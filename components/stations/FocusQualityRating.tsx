@@ -54,11 +54,11 @@ export default function FocusQualityRating({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.8)" }}
+      className="st-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.6)" }}
     >
       <div
-        className="w-full max-w-md flex flex-col items-center gap-6 p-10 text-center"
+        className="st-modal w-full max-w-md flex flex-col items-center gap-6 p-10 text-center"
         style={{ background: "var(--bg-secondary)", border: "0.5px solid rgba(var(--fg-rgb),0.12)" }}
       >
         {recap ? (
@@ -87,7 +87,7 @@ export default function FocusQualityRating({
             <button
               type="button"
               onClick={onDone}
-              className="font-poppins font-bold uppercase mt-2"
+              className="st-btn font-poppins font-bold uppercase mt-2"
               style={{
                 fontSize: "12px",
                 letterSpacing: "0.12em",
@@ -144,7 +144,7 @@ export default function FocusQualityRating({
               type="button"
               onClick={handleSubmit}
               disabled={submitting || selected === 0}
-              className="font-poppins font-bold uppercase disabled:opacity-40"
+              className="st-btn font-poppins font-bold uppercase disabled:opacity-40"
               style={{
                 fontSize: "12px",
                 letterSpacing: "0.12em",

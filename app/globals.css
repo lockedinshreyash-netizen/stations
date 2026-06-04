@@ -22,6 +22,16 @@
   --fg-rgb:       240, 235, 224;
   --accent:       #c0392b;
   --accent-rgb:   192, 57, 43;
+
+  /* Depth — deeper on dark so cards read against near-black */
+  --shadow-rgb: 0, 0, 0;
+  --shadow-1:   0.45;
+  --shadow-2:   0.55;
+  --shadow-3:   0.65;
+
+  /* Glass — light tint floating over dark surfaces */
+  --glass-bg:     rgba(26, 26, 26, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.12);
 }
 
 [data-theme="light"] {
@@ -32,6 +42,34 @@
   --fg-rgb:       10, 10, 10;
   --accent:       #c0392b;
   --accent-rgb:   192, 57, 43;
+
+  /* Depth — soft per the spec's light-mode shadow scale */
+  --shadow-rgb: 0, 0, 0;
+  --shadow-1:   0.08;
+  --shadow-2:   0.12;
+  --shadow-3:   0.15;
+
+  /* Glass — frosted warm-white over the paper background */
+  --glass-bg:     rgba(245, 240, 232, 0.6);
+  --glass-border: rgba(10, 10, 10, 0.08);
+}
+
+/* ------------------------------------------------------------
+   DESIGN TOKENS (theme-independent)
+   ------------------------------------------------------------ */
+:root {
+  --radius-card: 16px;
+  --radius-md:   12px;
+  --radius-btn:  10px;
+  --radius-sm:   8px;
+
+  --shadow-sm: 0 2px 8px  rgba(var(--shadow-rgb), var(--shadow-1));
+  --shadow-md: 0 4px 16px rgba(var(--shadow-rgb), var(--shadow-2));
+  --shadow-lg: 0 8px 24px rgba(var(--shadow-rgb), var(--shadow-3));
+
+  --ease:     cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast:   150ms;
+  --t-base:   300ms;
 }
 
 @theme inline {
@@ -49,7 +87,11 @@
 
 * {
   border-color: rgba(var(--fg-rgb), 0.1);
-  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+  transition:
+    background-color 200ms var(--ease),
+    color            200ms var(--ease),
+    border-color     200ms var(--ease),
+    box-shadow       var(--t-base) var(--ease);
 }
 
 body {
@@ -60,4 +102,106 @@ body {
 ::selection {
   background: var(--accent);
   color: var(--bg-primary);
+}
+
+/* ============================================================
+   PREMIUM UI UTILITIES
+   Plain (unlayered) classes so they sit above Tailwind's
+   utility layer. They never set `background` (components own
+   that via inline styles), so existing colors are preserved.
+   ============================================================ */
+
+/* Surface card — rounded + soft depth. */
+.st-card {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Interactive card — lifts and deepens its shadow on hover. */
+.st-card-hover {
+  transition:
+    transform  var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    background-color 200ms var(--ease),
+    border-color     200ms var(--ease);
+  will-change: transform;
+}
+.st-card-hover:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: var(--shadow-lg);
+}
+@media (hover: none) {
+  .st-card-hover:hover { transform: none; }
+}
+
+/* Button — gentle scale + shadow on hover/press. */
+.st-btn {
+  border-radius: var(--radius-btn);
+  transition:
+    transform  var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    background-color 200ms var(--ease),
+    color            200ms var(--ease),
+    border-color     200ms var(--ease),
+    opacity          200ms var(--ease);
+}
+.st-btn:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+.st-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Small pill button (filters, chips, reactions) — rounds + tints,
+   no lift so dense rows stay calm. */
+.st-pill {
+  border-radius: var(--radius-sm);
+  transition:
+    transform  200ms var(--ease),
+    background-color 200ms var(--ease),
+    color            200ms var(--ease),
+    border-color     200ms var(--ease);
+}
+.st-pill:hover:not(:disabled) { transform: translateY(-1px); }
+
+/* Glass surface — frosted, translucent, layered. */
+.st-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border-color: var(--glass-border);
+}
+
+/* Modal shell + blurred overlay. */
+.st-modal {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
+}
+.st-overlay {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Form fields — rounded, with a soft accent focus ring instead
+   of a hard outline. Opt-in via the class so underline-style
+   inputs are unaffected. */
+.st-field {
+  border-radius: var(--radius-sm);
+  transition: border-color var(--t-fast) var(--ease),
+              box-shadow   var(--t-fast) var(--ease);
+}
+.st-field:focus {
+  outline: none;
+  border-color: rgba(var(--accent-rgb), 0.5);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-card-hover:hover,
+  .st-btn:hover:not(:disabled),
+  .st-btn:active:not(:disabled),
+  .st-pill:hover:not(:disabled) {
+    transform: none;
+  }
 }

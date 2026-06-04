@@ -6,7 +6,7 @@ interface StatCardProps {
 
 export default function StatCard({ label, value, unit }: StatCardProps) {
   return (
-    <div className="bg-[var(--bg-surface)] px-6 py-5 flex flex-col gap-1 min-w-0">
+    <div className="st-card st-card-hover bg-[var(--bg-surface)] px-6 py-5 flex flex-col gap-1 min-w-0">
       <span className="text-[rgba(var(--fg-rgb),0.3)] text-xs tracking-widest uppercase font-light">
         {label}
       </span>

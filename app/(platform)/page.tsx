@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import StatCard from "@/components/ui/StatCard";
+import LeafShadow from "@/components/layout/LeafShadow";
 import type { User } from "@/types";
 
 export default async function PlatformHome() {
@@ -27,7 +28,7 @@ export default async function PlatformHome() {
   return (
     <div>
       {/* Editorial header — same treatment as station pages */}
-      <div className="px-10 border-b border-[rgba(var(--fg-rgb),0.06)]" style={{ paddingTop: "64px", paddingBottom: "48px" }}>
+      <div className="px-5 md:px-10 pt-12 pb-10 md:pt-16 md:pb-12 border-b border-[rgba(var(--fg-rgb),0.06)]">
         <p
           className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]"
           style={{ fontSize: "12px", marginBottom: "8px" }}
@@ -35,8 +36,8 @@ export default async function PlatformHome() {
           Welcome back —
         </p>
         <h1
-          className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] leading-none"
-          style={{ fontSize: "clamp(96px, 12vw, 140px)", letterSpacing: "0.03em" }}
+          className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] leading-none break-words"
+          style={{ fontSize: "clamp(48px, 12vw, 140px)", letterSpacing: "0.03em" }}
         >
           {user.username.toUpperCase()}
           <span className="text-[var(--accent)]">.</span>
@@ -50,7 +51,7 @@ export default async function PlatformHome() {
       </div>
 
       {/* Dashboard content */}
-      <div className="px-10 py-12 max-w-3xl flex flex-col" style={{ gap: "56px" }}>
+      <div className="px-5 md:px-10 py-12 max-w-3xl flex flex-col" style={{ gap: "56px" }}>
 
         {/* Stats */}
         <div>

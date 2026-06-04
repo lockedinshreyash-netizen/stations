@@ -93,12 +93,12 @@ export default function CreateSessionModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.7)" }}
+      className="st-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.6)" }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg flex flex-col gap-6 p-8 max-h-[90vh] overflow-y-auto"
+        className="st-modal w-full max-w-lg flex flex-col gap-6 p-8 max-h-[90vh] overflow-y-auto"
         style={{ background: "var(--bg-secondary)", border: "0.5px solid rgba(var(--fg-rgb),0.12)" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -144,7 +144,7 @@ export default function CreateSessionModal({
                 key={c.value}
                 type="button"
                 onClick={() => setCategory(c.value)}
-                className="font-poppins font-medium uppercase transition-colors"
+                className="st-pill font-poppins font-medium uppercase"
                 style={{
                   fontSize: "11px",
                   letterSpacing: "0.08em",
@@ -171,7 +171,7 @@ export default function CreateSessionModal({
                   setIsCustom(false);
                   setDuration(d);
                 }}
-                className="font-poppins font-medium transition-colors"
+                className="st-pill font-poppins font-medium"
                 style={{
                   fontSize: "11px",
                   padding: "8px 16px",
@@ -186,7 +186,7 @@ export default function CreateSessionModal({
             <button
               type="button"
               onClick={() => setIsCustom(true)}
-              className="font-poppins font-medium transition-colors"
+              className="st-pill font-poppins font-medium"
               style={{
                 fontSize: "11px",
                 padding: "8px 16px",
@@ -254,7 +254,7 @@ export default function CreateSessionModal({
           type="button"
           onClick={handleSubmit}
           disabled={submitting}
-          className="font-poppins font-bold uppercase disabled:opacity-50"
+          className="st-btn font-poppins font-bold uppercase disabled:opacity-50"
           style={{
             fontSize: "12px",
             letterSpacing: "0.12em",
@@ -297,7 +297,7 @@ function Toggle({
     <button
       type="button"
       onClick={onClick}
-      className="font-poppins font-medium uppercase transition-colors"
+      className="st-pill font-poppins font-medium uppercase"
       style={{
         fontSize: "11px",
         letterSpacing: "0.08em",

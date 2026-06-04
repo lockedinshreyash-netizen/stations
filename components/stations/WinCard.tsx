@@ -166,12 +166,16 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
 
   return (
     <article
-      className="flex flex-col relative"
-      style={{ padding: "24px 0", borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+      className="st-card st-card-hover flex flex-col relative"
+      style={{
+        padding: "22px 24px",
+        background: "var(--bg-surface)",
+        border: "0.5px solid rgba(var(--fg-rgb),0.08)",
+      }}
     >
       {/* Owner ··· menu */}
       {isOwner && (
-        <div ref={menuRef} style={{ position: "absolute", top: "20px", right: 0, zIndex: 10 }}>
+        <div ref={menuRef} style={{ position: "absolute", top: "18px", right: "18px", zIndex: 10 }}>
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuOpen((v) => !v); setConfirmingDelete(false); }}
             aria-label="Win options"
@@ -181,7 +185,7 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
           </button>
 
           {menuOpen && (
-            <div style={{ position: "absolute", top: "26px", right: 0, minWidth: "180px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--fg-rgb),0.1)", borderRadius: 0, zIndex: 20, display: "flex", flexDirection: "column" }}>
+            <div style={{ position: "absolute", top: "26px", right: 0, minWidth: "180px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--fg-rgb),0.1)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-lg)", overflow: "hidden", zIndex: 20, display: "flex", flexDirection: "column" }}>
               {!confirmingDelete ? (
                 <>
                   <button
@@ -206,13 +210,15 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
                     <button
                       onClick={handleDelete}
                       disabled={deleting}
-                      style={{ background: "var(--accent)", color: "rgb(var(--fg-rgb))", border: "none", cursor: deleting ? "default" : "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 0, opacity: deleting ? 0.6 : 1, fontFamily: "inherit" }}
+                      className="st-btn"
+                      style={{ background: "var(--accent)", color: "rgb(var(--fg-rgb))", border: "none", cursor: deleting ? "default" : "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", opacity: deleting ? 0.6 : 1, fontFamily: "inherit" }}
                     >
                       {deleting ? "…" : "Delete"}
                     </button>
                     <button
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmingDelete(false); }}
-                      style={{ background: "none", border: "0.5px solid rgba(var(--fg-rgb),0.15)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 0, fontFamily: "inherit" }}
+                      className="st-btn"
+                      style={{ background: "none", border: "0.5px solid rgba(var(--fg-rgb),0.15)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", fontFamily: "inherit" }}
                     >
                       Cancel
                     </button>
@@ -248,7 +254,7 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
         </p>
 
         {win.image_urls && win.image_urls.length > 0 && (
-          <div style={{ marginTop: "14px", maxHeight: "240px", overflow: "hidden" }}>
+          <div style={{ marginTop: "14px", maxHeight: "240px", overflow: "hidden", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-sm)" }}>
             <img src={win.image_urls[0]} alt={win.title} className="w-full object-cover" style={{ maxHeight: "240px" }} />
           </div>
         )}
@@ -278,7 +284,7 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
             <button
               key={type}
               onClick={(e) => toggleReaction(type, e)}
-              className="reaction-btn font-poppins flex items-center transition-colors"
+              className="reaction-btn st-pill font-poppins flex items-center"
               style={{
                 gap: "5px",
                 background: active ? "rgb(var(--fg-rgb))" : "transparent",
@@ -287,7 +293,6 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
                 cursor: busy.has(type) ? "default" : "pointer",
                 fontSize: "13px",
                 lineHeight: 1,
-                borderRadius: 0,
               }}
               title={label}
             >

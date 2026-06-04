@@ -21,10 +21,10 @@ export default function NetworkRooms({ user }: { user: User }) {
   const exploreRooms = ROOM_NAMES.filter((r) => !isMine(r));
 
   return (
-    <div className="px-10 py-12 flex flex-col gap-16">
+    <div className="px-5 md:px-10 py-12 flex flex-col gap-16">
       {!isFirebaseConfigured && (
         <div
-          className="p-4 font-poppins"
+          className="st-card p-4 font-poppins"
           style={{
             fontSize: "12px",
             border: "0.5px solid var(--accent)",

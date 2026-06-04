@@ -80,7 +80,7 @@ export default function WorkStation({
   );
 
   return (
-    <div className="px-10 py-12 flex flex-col gap-12">
+    <div className="px-5 md:px-10 py-12 flex flex-col gap-12">
       {/* Stats + action bar */}
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div className="flex gap-8">
@@ -91,7 +91,7 @@ export default function WorkStation({
         <button
           type="button"
           onClick={() => setShowCreate(true)}
-          className="font-poppins font-bold uppercase"
+          className="st-btn font-poppins font-bold uppercase"
           style={{
             fontSize: "12px",
             letterSpacing: "0.12em",
@@ -106,7 +106,7 @@ export default function WorkStation({
 
       {!isFirebaseConfigured && (
         <div
-          className="p-4 font-poppins"
+          className="st-card p-4 font-poppins"
           style={{ fontSize: "12px", border: "0.5px solid var(--accent)", color: "var(--accent)" }}
         >
           Realtime chat isn&apos;t configured yet. Add your Firebase keys to{" "}
@@ -149,7 +149,7 @@ export default function WorkStation({
             <button
               type="button"
               onClick={() => setShowCreate(true)}
-              className="self-start font-poppins font-bold uppercase"
+              className="st-btn self-start font-poppins font-bold uppercase"
               style={{
                 fontSize: "11px",
                 letterSpacing: "0.1em",

@@ -95,7 +95,7 @@ export default function OnboardingStep2() {
   }
 
   return (
-    <div className="flex-1 flex flex-col justify-center px-8 py-16 max-w-lg mx-auto w-full">
+    <div className="flex-1 flex flex-col justify-center px-6 md:px-8 py-16 max-w-lg mx-auto w-full">
       <h1 className="font-playfair italic text-4xl md:text-5xl text-[rgb(var(--fg-rgb))] mb-3 leading-tight">
         Set up your profile.
       </h1>
@@ -112,7 +112,7 @@ export default function OnboardingStep2() {
           <div className="flex items-center gap-4">
             <div
               onClick={() => fileRef.current?.click()}
-              className="w-16 h-16 bg-[var(--bg-surface)] border border-[rgba(var(--fg-rgb),0.1)] flex items-center justify-center cursor-pointer hover:border-[var(--accent)] transition-colors overflow-hidden"
+              className="w-16 h-16 rounded-full bg-[var(--bg-surface)] border border-[rgba(var(--fg-rgb),0.1)] flex items-center justify-center cursor-pointer hover:border-[var(--accent)] transition-colors overflow-hidden"
             >
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
@@ -142,7 +142,7 @@ export default function OnboardingStep2() {
             {...register("full_name")}
             type="text"
             autoComplete="name"
-            className="bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] transition-colors placeholder:text-[rgba(var(--fg-rgb),0.2)]"
+            className="st-field bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] placeholder:text-[rgba(var(--fg-rgb),0.2)]"
             placeholder="Your full name"
           />
           {errors.full_name && (
@@ -159,7 +159,7 @@ export default function OnboardingStep2() {
             {...register("username")}
             type="text"
             autoComplete="username"
-            className="bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] transition-colors placeholder:text-[rgba(var(--fg-rgb),0.2)]"
+            className="st-field bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] placeholder:text-[rgba(var(--fg-rgb),0.2)]"
             placeholder="lowercase_only"
           />
           {errors.username && (
@@ -172,7 +172,7 @@ export default function OnboardingStep2() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white transition-colors disabled:opacity-40"
+          className="st-btn mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white disabled:opacity-40"
         >
           {loading ? "Saving…" : "Continue"}
         </button>

@@ -51,13 +51,13 @@ function LoginForm() {
     outline: "none",
     width: "100%",
     fontFamily: "inherit",
-    borderRadius: 0,
+    borderRadius: "var(--radius-sm)",
   };
 
   return (
     <div
-      className="min-h-screen flex flex-col"
-      style={{ background: "var(--bg-primary)", padding: "40px 48px" }}
+      className="min-h-screen flex flex-col px-6 py-10 md:px-12"
+      style={{ background: "var(--bg-primary)" }}
     >
       {/* Wordmark */}
       <div>
@@ -125,6 +125,7 @@ function LoginForm() {
               autoComplete="email"
               placeholder="you@example.com"
               required
+              className="st-field"
               style={inputStyle}
               onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
               onBlur={(e) => (e.target.style.borderColor = "rgba(var(--fg-rgb),0.15)")}
@@ -147,6 +148,7 @@ function LoginForm() {
                 autoComplete="current-password"
                 placeholder="••••••••"
                 required
+                className="st-field"
                 style={{ ...inputStyle, paddingRight: "48px" }}
                 onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
                 onBlur={(e) => (e.target.style.borderColor = "rgba(var(--fg-rgb),0.15)")}
@@ -176,7 +178,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading || !email || !password}
-            className="font-poppins uppercase text-[var(--bg-primary)]"
+            className="st-btn font-poppins uppercase text-[var(--bg-primary)]"
             style={{
               background: "rgb(var(--fg-rgb))",
               fontSize: "12px",
@@ -186,9 +188,7 @@ function LoginForm() {
               border: "none",
               cursor: loading ? "not-allowed" : "pointer",
               opacity: loading || !email || !password ? 0.5 : 1,
-              transition: "opacity 150ms",
               marginTop: "8px",
-              borderRadius: 0,
             }}
           >
             {loading ? "SIGNING IN..." : "SIGN IN"}

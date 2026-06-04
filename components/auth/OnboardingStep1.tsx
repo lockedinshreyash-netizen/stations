@@ -48,7 +48,7 @@ export default function OnboardingStep1() {
   }
 
   return (
-    <div className="flex-1 flex flex-col justify-center px-8 py-16 max-w-lg mx-auto w-full">
+    <div className="flex-1 flex flex-col justify-center px-6 md:px-8 py-16 max-w-lg mx-auto w-full">
       <h1 className="font-playfair italic text-4xl md:text-5xl text-[rgb(var(--fg-rgb))] mb-3 leading-tight">
         Create your account.
       </h1>
@@ -65,7 +65,7 @@ export default function OnboardingStep1() {
             {...register("email")}
             type="email"
             autoComplete="email"
-            className="bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] transition-colors placeholder:text-[rgba(var(--fg-rgb),0.2)]"
+            className="st-field bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] placeholder:text-[rgba(var(--fg-rgb),0.2)]"
             placeholder="you@example.com"
           />
           {errors.email && (
@@ -81,7 +81,7 @@ export default function OnboardingStep1() {
             {...register("password")}
             type="password"
             autoComplete="new-password"
-            className="bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] transition-colors placeholder:text-[rgba(var(--fg-rgb),0.2)]"
+            className="st-field bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] placeholder:text-[rgba(var(--fg-rgb),0.2)]"
             placeholder="Min. 8 characters"
           />
           {errors.password && (
@@ -94,7 +94,7 @@ export default function OnboardingStep1() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white transition-colors disabled:opacity-40"
+          className="st-btn mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white disabled:opacity-40"
         >
           {loading ? "Creating account…" : "Continue"}
         </button>

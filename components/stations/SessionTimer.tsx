@@ -50,7 +50,10 @@ export default function SessionTimer({
   const warn = !isEnded && warnUnderMs > 0 && remaining < warnUnderMs;
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 text-center">
+    <div
+      className="st-glass flex flex-col items-center justify-center gap-4 text-center px-10 py-8"
+      style={{ borderRadius: "var(--radius-card)", boxShadow: "var(--shadow-md)" }}
+    >
       <span
         className="font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.35)]"
         style={{ fontSize: "11px", letterSpacing: "0.25em" }}

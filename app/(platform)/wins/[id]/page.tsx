@@ -34,7 +34,7 @@ export default async function WinDetailPage({
   );
 
   return (
-    <div className="px-10 py-12 max-w-2xl">
+    <div className="px-5 md:px-10 py-12 max-w-2xl">
       <WinDetail
         win={win}
         currentUserId={authUser.id}

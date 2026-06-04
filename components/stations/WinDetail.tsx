@@ -144,7 +144,7 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
             ···
           </button>
           {menuOpen && (
-            <div style={{ position: "absolute", top: "28px", right: 0, minWidth: "190px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--fg-rgb),0.1)", borderRadius: 0, zIndex: 20, display: "flex", flexDirection: "column" }}>
+            <div style={{ position: "absolute", top: "28px", right: 0, minWidth: "190px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--fg-rgb),0.1)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-lg)", overflow: "hidden", zIndex: 20, display: "flex", flexDirection: "column" }}>
               {!confirmingDelete ? (
                 <>
                   <button
@@ -169,13 +169,15 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
                     <button
                       onClick={handleDelete}
                       disabled={deleting}
-                      style={{ background: "var(--accent)", color: "rgb(var(--fg-rgb))", border: "none", cursor: deleting ? "default" : "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 0, opacity: deleting ? 0.6 : 1, fontFamily: "inherit" }}
+                      className="st-btn"
+                      style={{ background: "var(--accent)", color: "rgb(var(--fg-rgb))", border: "none", cursor: deleting ? "default" : "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", opacity: deleting ? 0.6 : 1, fontFamily: "inherit" }}
                     >
                       {deleting ? "…" : "Delete"}
                     </button>
                     <button
                       onClick={() => setConfirmingDelete(false)}
-                      style={{ background: "none", border: "0.5px solid rgba(var(--fg-rgb),0.15)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 0, fontFamily: "inherit" }}
+                      className="st-btn"
+                      style={{ background: "none", border: "0.5px solid rgba(var(--fg-rgb),0.15)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", fontFamily: "inherit" }}
                     >
                       Cancel
                     </button>
@@ -217,7 +219,7 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
 
       {/* Images */}
       {images.length === 1 && (
-        <div style={{ marginTop: "28px" }}>
+        <div style={{ marginTop: "28px", borderRadius: "var(--radius-md)", overflow: "hidden", boxShadow: "var(--shadow-md)" }}>
           <img
             src={images[0]}
             alt={win.title}
@@ -236,7 +238,7 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
               alt={win.title}
               onClick={() => window.open(url, "_blank")}
               className="object-cover"
-              style={{ flex: 1, maxHeight: "360px", minWidth: 0, cursor: "pointer" }}
+              style={{ flex: 1, maxHeight: "360px", minWidth: 0, cursor: "pointer", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-sm)" }}
             />
           ))}
         </div>
@@ -269,14 +271,14 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
             <button
               key={type}
               onClick={(e) => toggleReaction(type, e)}
-              className="font-poppins flex items-center transition-colors"
+              className="st-pill font-poppins flex items-center"
               style={{
                 gap: "6px", padding: "8px 14px",
                 background: active ? "rgb(var(--fg-rgb))" : "transparent",
                 color: active ? "var(--bg-primary)" : "rgba(var(--fg-rgb),0.35)",
                 border: active ? "none" : "0.5px solid rgba(var(--fg-rgb),0.12)",
                 cursor: busy.has(type) ? "default" : "pointer",
-                fontSize: "14px", borderRadius: 0,
+                fontSize: "14px",
               }}
               title={label}
             >

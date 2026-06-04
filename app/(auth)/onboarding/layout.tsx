@@ -21,7 +21,7 @@ export default function OnboardingLayout({
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
       {/* Header */}
-      <header className="px-8 pt-8 pb-0 flex items-center justify-between">
+      <header className="px-6 md:px-8 pt-8 pb-0 flex items-center justify-between">
         <span className="font-poppins font-black text-xl tracking-widest uppercase text-[rgb(var(--fg-rgb))]">
           STATIONS
         </span>
@@ -31,12 +31,12 @@ export default function OnboardingLayout({
       </header>
 
       {/* Progress bar */}
-      <div className="px-8 mt-6">
+      <div className="px-6 md:px-8 mt-6">
         <div className="flex gap-2">
           {STEPS.map((_, i) => (
             <div
               key={i}
-              className="h-[2px] flex-1 transition-all duration-500"
+              className="h-[3px] flex-1 rounded-full transition-all duration-500"
               style={{
                 background:
                   i < stepNumber

@@ -227,7 +227,14 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
               ))}
             </div>
           )}
-          <div className="flex items-end gap-3">
+          <div
+            className="flex items-end gap-3 px-3 py-1.5"
+            style={{
+              background: "var(--bg-surface)",
+              border: "0.5px solid rgba(var(--fg-rgb),0.1)",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
             <button
               type="button"
               onClick={() => setShowEmoji((v) => !v)}
@@ -245,11 +252,11 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
               placeholder="Message the room..."
               rows={1}
               maxLength={MAX_MESSAGE_LENGTH}
-              className="flex-1 resize-none bg-transparent font-poppins font-light text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none"
+              className="flex-1 resize-none bg-transparent font-poppins font-light text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none py-2"
               style={{ fontSize: "13px", maxHeight: "120px", lineHeight: 1.5 }}
             />
             <span
-              className="font-poppins text-[rgba(var(--fg-rgb),0.25)] pb-2"
+              className="font-poppins text-[rgba(var(--fg-rgb),0.25)] pb-2.5"
               style={{ fontSize: "10px" }}
             >
               {draft.length}/{MAX_MESSAGE_LENGTH}
@@ -258,11 +265,11 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
               type="button"
               onClick={handleSend}
               disabled={sending || !draft.trim()}
-              className="font-poppins font-bold uppercase disabled:opacity-40"
+              className="st-btn font-poppins font-bold uppercase disabled:opacity-40 my-1"
               style={{
                 fontSize: "11px",
                 letterSpacing: "0.1em",
-                background: "rgb(var(--fg-rgb))",
+                background: "var(--accent)",
                 color: "var(--bg-primary)",
                 padding: "8px 16px",
               }}
@@ -286,7 +293,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
             type="button"
             onClick={handleJoin}
             disabled={joining}
-            className="font-poppins font-bold uppercase disabled:opacity-50"
+            className="st-btn font-poppins font-bold uppercase disabled:opacity-50"
             style={{
               fontSize: "11px",
               letterSpacing: "0.1em",

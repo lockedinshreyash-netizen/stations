@@ -42,12 +42,12 @@ export default function LeaveEarlyModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.7)" }}
+      className="st-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.6)" }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md flex flex-col gap-5 p-8"
+        className="st-modal w-full max-w-md flex flex-col gap-5 p-8"
         style={{ background: "var(--bg-secondary)", border: "0.5px solid rgba(var(--fg-rgb),0.12)" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -66,7 +66,7 @@ export default function LeaveEarlyModal({
           onChange={(e) => setReason(e.target.value)}
           rows={4}
           placeholder="Something came up…"
-          className="w-full resize-none bg-transparent font-poppins font-light text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none p-3"
+          className="st-field w-full resize-none bg-transparent font-poppins font-light text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none p-3"
           style={{ fontSize: "13px", border: "0.5px solid rgba(var(--fg-rgb),0.15)", lineHeight: 1.5 }}
         />
 
@@ -81,7 +81,7 @@ export default function LeaveEarlyModal({
             type="button"
             onClick={handleLeave}
             disabled={submitting || reason.trim().length < MIN_REASON}
-            className="font-poppins font-bold uppercase disabled:opacity-40 flex-1"
+            className="st-btn font-poppins font-bold uppercase disabled:opacity-40 flex-1"
             style={{
               fontSize: "12px",
               letterSpacing: "0.12em",

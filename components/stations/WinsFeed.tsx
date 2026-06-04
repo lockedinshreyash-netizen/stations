@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import WinCard, { type WinCardData } from "@/components/stations/WinCard";
 import PostWinModal from "@/components/stations/PostWinModal";
+import { markWinsSeen } from "@/lib/wins/useWinsUnread";
 import type { WinCategory, ReactionType } from "@/types";
 
 const CATEGORIES: { value: WinCategory | "all"; label: string }[] = [
@@ -38,6 +39,9 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
     const { data } = await query;
     const winRows = (data as unknown as WinCardData[]) ?? [];
     setWins(winRows);
+    markWinsSeen(); // viewing the feed clears the nav badge for everyone
+
+
 
     if (winRows.length > 0) {
       const ids = winRows.map((w) => w.id);
@@ -63,7 +67,7 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
   useEffect(() => { fetchWins(); }, [fetchWins]);
 
   return (
-    <div className="px-10 py-8">
+    <div className="px-5 md:px-10 py-8">
       <style>{`
         .wins-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .wins-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
@@ -79,11 +83,11 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
       <div className="wins-topbar mb-8">
         <button
           onClick={() => setModalOpen(true)}
-          className="wins-postbtn font-poppins"
+          className="wins-postbtn st-btn font-poppins"
           style={{
             background: "rgb(var(--fg-rgb))", color: "var(--bg-primary)", fontSize: "11px", fontWeight: 500,
             letterSpacing: "0.15em", textTransform: "uppercase", padding: "10px 20px",
-            border: "none", cursor: "pointer", borderRadius: 0, order: -1,
+            border: "none", cursor: "pointer", order: -1,
           }}
         >
           Post a Win
@@ -120,8 +124,7 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
           {filter === "all" ? "No wins yet. Be the first." : `No ${filter} wins yet.`}
         </p>
       ) : (
-        <div>
-          <div style={{ borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)" }} />
+        <div className="flex flex-col gap-4">
           {wins.map((win) => (
             <WinCard
               key={win.id}

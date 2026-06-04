@@ -52,7 +52,7 @@ const fieldStyle: React.CSSProperties = {
   outline: "none",
   width: "100%",
   fontFamily: "inherit",
-  borderRadius: 0,
+  borderRadius: "var(--radius-sm)",
   resize: "none" as const,
 };
 
@@ -163,7 +163,8 @@ export default function ProfileModal({ user, onClose }: Props) {
           flexDirection: "column",
           background: "var(--bg-secondary)",
           border: "0.5px solid rgba(var(--fg-rgb),0.12)",
-          boxShadow: "0 24px 80px rgba(0,0,0,0.6)",
+          borderRadius: "var(--radius-card)",
+          boxShadow: "var(--shadow-lg), 0 24px 80px rgba(0,0,0,0.5)",
           overflowY: "auto",
         }}
       >
@@ -320,8 +321,8 @@ export default function ProfileModal({ user, onClose }: Props) {
                       border: `0.5px solid ${active ? "var(--accent)" : "rgba(var(--fg-rgb),0.15)"}`,
                       color: active ? "#fff" : "rgba(var(--fg-rgb),0.5)",
                       cursor: "pointer",
-                      borderRadius: 0,
-                      transition: "all 150ms",
+                      borderRadius: "var(--radius-sm)",
+                      transition: "all 150ms var(--ease)",
                     }}
                   >
                     {label}
@@ -361,9 +362,9 @@ export default function ProfileModal({ user, onClose }: Props) {
                       border: `0.5px solid ${active ? "var(--accent)" : "rgba(var(--fg-rgb),0.15)"}`,
                       color: active ? "#fff" : maxed ? "rgba(var(--fg-rgb),0.15)" : "rgba(var(--fg-rgb),0.5)",
                       cursor: maxed ? "default" : "pointer",
-                      borderRadius: 0,
+                      borderRadius: "var(--radius-sm)",
                       opacity: maxed ? 0.4 : 1,
-                      transition: "all 150ms",
+                      transition: "all 150ms var(--ease)",
                     }}
                   >
                     {g}
@@ -416,7 +417,7 @@ export default function ProfileModal({ user, onClose }: Props) {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="font-poppins uppercase"
+            className="st-btn font-poppins uppercase"
             style={{
               fontSize: "11px",
               letterSpacing: "0.15em",
@@ -426,8 +427,6 @@ export default function ProfileModal({ user, onClose }: Props) {
               color: "var(--bg-primary)",
               border: "none",
               cursor: saving ? "not-allowed" : "pointer",
-              transition: "background 150ms",
-              borderRadius: 0,
             }}
           >
             {saving ? "Saving..." : "Save changes"}

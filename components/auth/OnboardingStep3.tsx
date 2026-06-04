@@ -97,7 +97,7 @@ export default function OnboardingStep3() {
   const atGoalLimit = goals.length >= GOAL_MAX;
 
   return (
-    <div className="flex-1 flex flex-col justify-center px-8 py-16 max-w-lg mx-auto w-full">
+    <div className="flex-1 flex flex-col justify-center px-6 md:px-8 py-16 max-w-lg mx-auto w-full">
       <h1 className="font-playfair italic text-4xl md:text-5xl text-[rgb(var(--fg-rgb))] mb-3 leading-tight">
         Tell us about yourself.
       </h1>
@@ -128,7 +128,7 @@ export default function OnboardingStep3() {
                   type="button"
                   onClick={() => toggleRole(r.value)}
                   disabled={dimmed}
-                  className={`px-4 py-2 text-sm border transition-colors ${
+                  className={`st-pill px-4 py-2 text-sm border ${
                     selected
                       ? "bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] border-[rgb(var(--fg-rgb))]"
                       : dimmed
@@ -168,7 +168,7 @@ export default function OnboardingStep3() {
                   type="button"
                   onClick={() => toggleGoal(g.value)}
                   disabled={dimmed}
-                  className={`px-4 py-2 text-sm border transition-colors ${
+                  className={`st-pill px-4 py-2 text-sm border ${
                     selected
                       ? "bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] border-[rgb(var(--fg-rgb))]"
                       : dimmed
@@ -202,7 +202,7 @@ export default function OnboardingStep3() {
                     setAvailability(a);
                     setErrors((e) => ({ ...e, availability: "" }));
                   }}
-                  className={`px-4 py-2 text-sm border transition-colors ${
+                  className={`st-pill px-4 py-2 text-sm border ${
                     selected
                       ? "bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] border-[rgb(var(--fg-rgb))]"
                       : "bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] border-[rgba(var(--fg-rgb),0.2)] hover:border-[rgba(var(--fg-rgb),0.5)]"
@@ -221,7 +221,7 @@ export default function OnboardingStep3() {
         <button
           type="button"
           onClick={handleSubmit}
-          className="bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white transition-colors"
+          className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white"
         >
           Continue
         </button>

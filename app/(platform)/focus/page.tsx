@@ -8,7 +8,7 @@ export default function FocusPage() {
         name="FOCUS"
         tagline="Deep work. No chat. No distractions. Just output."
       />
-      <div className="px-10 py-12">
+      <div className="px-5 md:px-10 py-12">
         <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "15px" }}>
           Focus rooms coming soon.
         </p>

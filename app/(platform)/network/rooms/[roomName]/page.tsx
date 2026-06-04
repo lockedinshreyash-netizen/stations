@@ -30,8 +30,8 @@ export default async function RoomPage({
     <div className="flex flex-col" style={{ height: "100dvh" }}>
       {/* Back bar */}
       <div
-        className="shrink-0 px-6 py-4"
-        style={{ borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+        className="st-glass shrink-0 px-6 py-4 sticky top-0 z-10"
+        style={{ borderBottom: "0.5px solid var(--glass-border)" }}
       >
         <Link
           href="/network"

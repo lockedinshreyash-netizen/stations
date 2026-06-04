@@ -289,7 +289,7 @@ export default function SessionRoom({
               type="button"
               onClick={handleJoin}
               disabled={joining}
-              className="font-poppins font-bold uppercase disabled:opacity-50"
+              className="st-btn font-poppins font-bold uppercase disabled:opacity-50"
               style={{
                 fontSize: "11px",
                 letterSpacing: "0.1em",
@@ -305,7 +305,7 @@ export default function SessionRoom({
             <button
               type="button"
               onClick={() => setShowLeave(true)}
-              className="font-poppins font-bold uppercase"
+              className="st-btn font-poppins font-bold uppercase"
               style={{
                 fontSize: "10px",
                 letterSpacing: "0.1em",
@@ -432,8 +432,8 @@ function Shell({
   return (
     <div className="flex flex-col" style={{ height: "100dvh" }}>
       <div
-        className="shrink-0 px-6 py-4 flex items-center justify-between"
-        style={{ borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+        className="st-glass shrink-0 px-6 py-4 flex items-center justify-between sticky top-0 z-10"
+        style={{ borderBottom: "0.5px solid var(--glass-border)" }}
       >
         <Link
           href="/work"

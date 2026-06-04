@@ -39,7 +39,7 @@ export default function SessionMemberList({
   const onlineCount = sorted.filter((m) => onlineIds.has(m.user_id)).length;
 
   return (
-    <div className="flex flex-col h-full min-h-0">
+    <div className="st-glass flex flex-col h-full min-h-0">
       <div
         className="shrink-0 px-5 py-4"
         style={{ borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)" }}

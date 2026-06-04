@@ -63,7 +63,7 @@ export default function SessionCard({
       onKeyDown={(e) => {
         if (e.key === "Enter") open();
       }}
-      className="group flex flex-col gap-4 p-5 cursor-pointer transition-colors hover:bg-[rgba(var(--fg-rgb),0.03)]"
+      className="st-card st-card-hover group flex flex-col gap-4 p-5 cursor-pointer overflow-hidden hover:bg-[rgba(var(--fg-rgb),0.03)]"
       style={{
         background: "var(--bg-surface)",
         border: "0.5px solid rgba(var(--fg-rgb),0.1)",
@@ -119,7 +119,7 @@ export default function SessionCard({
             type="button"
             onClick={handleJoin}
             disabled={joining}
-            className="font-poppins font-bold uppercase disabled:opacity-50"
+            className="st-btn font-poppins font-bold uppercase disabled:opacity-50"
             style={{
               fontSize: "11px",
               letterSpacing: "0.1em",
@@ -134,7 +134,7 @@ export default function SessionCard({
           <button
             type="button"
             onClick={open}
-            className="font-poppins font-bold uppercase"
+            className="st-btn font-poppins font-bold uppercase"
             style={{
               fontSize: "11px",
               letterSpacing: "0.1em",

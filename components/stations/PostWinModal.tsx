@@ -37,7 +37,7 @@ const fieldStyle: React.CSSProperties = {
   outline: "none",
   width: "100%",
   fontFamily: "inherit",
-  borderRadius: 0,
+  borderRadius: "var(--radius-sm)",
 };
 
 const labelStyle: React.CSSProperties = {
@@ -174,19 +174,18 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: "rgba(0,0,0,0.85)" }}
+      className="st-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.6)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="w-full flex flex-col"
+        className="st-modal w-full flex flex-col"
         style={{
           maxWidth: "560px",
           maxHeight: "90vh",
           overflowY: "auto",
           background: "var(--bg-secondary)",
           border: "0.5px solid rgba(var(--fg-rgb),0.1)",
-          borderRadius: 0,
         }}
       >
         {/* Header */}
@@ -216,13 +215,13 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
                 const active = selectedCategory === c.value;
                 return (
                   <button key={c.value} type="button" onClick={() => setValue("category", c.value)}
-                    className="font-poppins font-light uppercase transition-colors"
+                    className="st-pill font-poppins font-light uppercase"
                     style={{
                       fontSize: "10px", letterSpacing: "0.15em", padding: "6px 12px",
                       background: active ? "rgb(var(--fg-rgb))" : "var(--bg-surface)",
                       color: active ? "var(--bg-primary)" : "rgba(var(--fg-rgb),0.45)",
                       border: active ? "none" : "0.5px solid rgba(var(--fg-rgb),0.15)",
-                      cursor: "pointer", borderRadius: 0,
+                      cursor: "pointer",
                     }}
                   >
                     {c.label}
@@ -241,7 +240,7 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
               </span>
             </div>
             <input {...register("title")} type="text" placeholder="Keep it sharp."
-              className="font-poppins text-[rgb(var(--fg-rgb))] outline-none" style={fieldStyle} maxLength={80} />
+              className="st-field font-poppins text-[rgb(var(--fg-rgb))] outline-none" style={fieldStyle} maxLength={80} />
             {errors.title && <span className="text-[var(--accent)]" style={{ fontSize: "11px" }}>{errors.title.message}</span>}
           </div>
 
@@ -255,7 +254,7 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
             </div>
             <textarea {...register("description")} rows={5}
               placeholder="What happened? What does it mean? Be honest."
-              className="font-poppins text-[rgb(var(--fg-rgb))] outline-none resize-none"
+              className="st-field font-poppins text-[rgb(var(--fg-rgb))] outline-none resize-none"
               style={{ ...fieldStyle, lineHeight: 1.7 }} maxLength={500} />
             {errors.description && <span className="text-[var(--accent)]" style={{ fontSize: "11px" }}>{errors.description.message}</span>}
           </div>
@@ -275,7 +274,7 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
                         {slot.uploading ? (
                           <div
                             className="flex items-center justify-center"
-                            style={{ width: "120px", height: "120px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--fg-rgb),0.12)" }}
+                            style={{ width: "120px", height: "120px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--fg-rgb),0.12)", borderRadius: "var(--radius-md)" }}
                           >
                             <span className="font-poppins font-light text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "10px" }}>
                               Uploading…
@@ -284,12 +283,12 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
                         ) : slot.error ? (
                           <div
                             className="flex flex-col items-center justify-center"
-                            style={{ width: "120px", height: "120px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--accent-rgb),0.4)", gap: "4px" }}
+                            style={{ width: "120px", height: "120px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--accent-rgb),0.4)", gap: "4px", borderRadius: "var(--radius-md)" }}
                           >
                             <span className="text-[var(--accent)]" style={{ fontSize: "10px", textAlign: "center", padding: "4px" }}>{slot.error}</span>
                           </div>
                         ) : (
-                          <img src={slot.preview} alt="" className="object-cover" style={{ width: "120px", height: "120px" }} />
+                          <img src={slot.preview} alt="" className="object-cover" style={{ width: "120px", height: "120px", borderRadius: "var(--radius-md)" }} />
                         )}
                         {/* Remove button */}
                         <button
@@ -297,12 +296,12 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
                           onClick={() => removeImage(slotIndex)}
                           className="font-poppins"
                           style={{
-                            position: "absolute", top: "4px", right: "4px",
-                            width: "20px", height: "20px",
-                            background: "rgba(0,0,0,0.7)", color: "rgb(var(--fg-rgb))",
+                            position: "absolute", top: "6px", right: "6px",
+                            width: "22px", height: "22px",
+                            background: "rgba(0,0,0,0.7)", color: "#fff",
                             border: "none", cursor: "pointer", fontSize: "14px", lineHeight: 1,
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            borderRadius: 0,
+                            borderRadius: "50%",
                           }}
                         >
                           ×
@@ -312,12 +311,12 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
                       <button
                         type="button"
                         onClick={() => fileRefs[slotIndex].current?.click()}
-                        className="flex flex-col items-center justify-center transition-colors"
+                        className="flex flex-col items-center justify-center transition-colors hover:border-[rgba(var(--fg-rgb),0.4)]"
                         style={{
                           width: "120px", height: "120px",
                           background: "transparent",
                           border: "1px dashed rgba(var(--fg-rgb),0.2)",
-                          cursor: "pointer", gap: "6px", borderRadius: 0,
+                          cursor: "pointer", gap: "6px", borderRadius: "var(--radius-md)",
                         }}
                       >
                         <span style={{ fontSize: "20px", color: "rgba(var(--fg-rgb),0.2)", lineHeight: 1 }}>+</span>
@@ -343,7 +342,7 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <label className="font-poppins" style={labelStyle}>Project Link <span style={{ opacity: 0.5 }}>(optional)</span></label>
             <input {...register("media_url")} type="url" placeholder="Link to what you built — site, repo, demo…"
-              className="font-poppins text-[rgb(var(--fg-rgb))] outline-none" style={fieldStyle} />
+              className="st-field font-poppins text-[rgb(var(--fg-rgb))] outline-none" style={fieldStyle} />
             {errors.media_url && <span className="text-[var(--accent)]" style={{ fontSize: "11px" }}>{errors.media_url.message}</span>}
           </div>
 
@@ -353,12 +352,12 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
           <button
             type="submit"
             disabled={loading}
-            className="font-poppins font-black uppercase text-[var(--bg-primary)]"
+            className="st-btn font-poppins font-black uppercase text-[var(--bg-primary)]"
             style={{
               background: "rgb(var(--fg-rgb))", fontSize: "12px", letterSpacing: "0.15em",
               padding: "16px", border: "none",
               cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.5 : 1, transition: "opacity 150ms", borderRadius: 0,
+              opacity: loading ? 0.5 : 1,
             }}
           >
             {loading ? "Posting…" : "POST IT"}

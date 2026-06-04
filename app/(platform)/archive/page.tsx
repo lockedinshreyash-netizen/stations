@@ -8,7 +8,7 @@ export default function ArchivePage() {
         name="ARCHIVE"
         tagline="Ideas, frameworks, and resources curated for people who build."
       />
-      <div className="px-10 py-12">
+      <div className="px-5 md:px-10 py-12">
         <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "15px" }}>
           Resources coming soon.
         </p>

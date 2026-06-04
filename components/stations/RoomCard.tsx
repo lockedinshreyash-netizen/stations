@@ -12,7 +12,7 @@ export default function RoomCard({ roomName }: { roomName: RoomName }) {
   return (
     <Link
       href={`/network/rooms/${roomName}`}
-      className="group relative block p-5 transition-colors hover:bg-[rgba(var(--fg-rgb),0.03)]"
+      className="st-card st-card-hover group relative block p-5 overflow-hidden hover:bg-[rgba(var(--fg-rgb),0.03)]"
       style={{
         background: "var(--bg-surface)",
         border: "0.5px solid rgba(var(--fg-rgb),0.1)",
