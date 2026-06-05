@@ -137,12 +137,15 @@ body {
    ============================================================ */
 .st-atmosphere {
   position: fixed;
-  inset: 0;
+  /* Oversized so the gyroscope parallax shift never exposes an edge. */
+  inset: -60px;
   z-index: 0;
   pointer-events: none;
   background:
     radial-gradient(120% 90% at 12% 0%, var(--halo), transparent 55%),
     radial-gradient(140% 120% at 50% 50%, transparent 60%, var(--vignette));
+  transform: translate3d(var(--gyro-bx, 0px), var(--gyro-by, 0px), 0);
+  will-change: transform;
 }
 
 .st-grain {

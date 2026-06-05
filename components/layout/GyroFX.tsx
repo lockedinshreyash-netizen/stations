@@ -9,7 +9,8 @@ import { isMotionEnabled, MOTION_EVENT } from "@/lib/motion";
  * so the whole feed subtly leans as you move the device. One style write per
  * frame on <html>; cards inherit. Toggled live via MOTION_EVENT.
  */
-const MAX = 7; // max degrees of lean
+const MAX = 14; // max degrees of card lean
+const BG_MAX = 36; // max px the background shifts (parallax depth)
 
 function clamp(n: number, lo: number, hi: number) {
   return Math.max(lo, Math.min(hi, n));
@@ -29,10 +30,15 @@ export default function GyroFX() {
       if (!last) return;
       const beta = last.beta ?? 0; // front-back tilt (~45° when held naturally)
       const gamma = last.gamma ?? 0; // left-right tilt
-      const rx = clamp((beta - 45) / 6, -MAX, MAX);
-      const ry = clamp(gamma / 6, -MAX, MAX);
+      const rx = clamp((beta - 45) / 3, -MAX, MAX);
+      const ry = clamp(gamma / 3, -MAX, MAX);
       root.style.setProperty("--gyro-rx", `${rx.toFixed(2)}deg`);
       root.style.setProperty("--gyro-ry", `${ry.toFixed(2)}deg`);
+      // Background drifts opposite the lean for a parallax depth illusion.
+      const bx = clamp(gamma * 1.6, -BG_MAX, BG_MAX);
+      const by = clamp((beta - 45) * 1.6, -BG_MAX, BG_MAX);
+      root.style.setProperty("--gyro-bx", `${(-bx).toFixed(1)}px`);
+      root.style.setProperty("--gyro-by", `${(-by).toFixed(1)}px`);
     }
 
     function onOrient(e: DeviceOrientationEvent) {
@@ -52,6 +58,8 @@ export default function GyroFX() {
       raf = null;
       root.style.removeProperty("--gyro-rx");
       root.style.removeProperty("--gyro-ry");
+      root.style.removeProperty("--gyro-bx");
+      root.style.removeProperty("--gyro-by");
     }
 
     function sync() {
