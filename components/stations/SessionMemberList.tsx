@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { subscribeSessionOnlineIds } from "@/lib/firebase/work-chat";
 import type { WorkSessionMember } from "@/types";
 import FounderMark from "@/components/ui/FounderMark";
+import { openUserProfile } from "@/lib/userProfile";
 
 export type SessionMemberRow = WorkSessionMember & {
   username: string;
@@ -66,7 +67,15 @@ export default function SessionMemberList({
         {sorted.map((m) => {
           const online = onlineIds.has(m.user_id);
           return (
-            <div key={m.id} className="flex items-center gap-3">
+            <div
+              key={m.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => openUserProfile(m.user_id)}
+              onKeyDown={(e) => { if (e.key === "Enter") openUserProfile(m.user_id); }}
+              className="flex items-center gap-3 rounded-[var(--radius-sm)] hover:bg-[rgba(var(--fg-rgb),0.04)] transition-colors"
+              style={{ cursor: "pointer", padding: "4px", margin: "-4px" }}
+            >
               <div className="relative shrink-0">
                 <Avatar url={m.avatar_url} username={m.username} />
                 {online && (

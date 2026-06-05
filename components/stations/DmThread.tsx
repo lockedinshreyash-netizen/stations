@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
+import DateSeparator from "@/components/stations/DateSeparator";
+import { openUserProfile } from "@/lib/userProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
   getMessages,
@@ -191,11 +193,19 @@ export default function DmThread({
         >
           ←
         </Link>
-        <Avatar url={peer.avatar_url} username={peer.username} />
-        <span className="font-poppins font-medium text-[rgb(var(--fg-rgb))] flex items-center gap-1.5" style={{ fontSize: "17px" }}>
-          {peer.username}
-          <FounderMark founderNumber={peer.founder_number} />
-        </span>
+        <button
+          type="button"
+          onClick={() => openUserProfile(peer.id)}
+          className="flex items-center gap-3"
+          style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+          aria-label={`View ${peer.username}'s profile`}
+        >
+          <Avatar url={peer.avatar_url} username={peer.username} />
+          <span className="font-poppins font-medium text-[rgb(var(--fg-rgb))] hover:text-[var(--accent)] transition-colors flex items-center gap-1.5" style={{ fontSize: "17px" }}>
+            {peer.username}
+            <FounderMark founderNumber={peer.founder_number} />
+          </span>
+        </button>
       </div>
 
       {/* Messages */}
@@ -205,11 +215,18 @@ export default function DmThread({
             This is the beginning of your conversation with {peer.username}.
           </p>
         )}
-        {messages.map((m) => {
+        {messages.flatMap((m, i) => {
           const mine = m.sender_id === user.id;
 
+          // WhatsApp-style day divider before the first message of each day.
+          const prev = messages[i - 1];
+          const nodes: ReactNode[] = [];
+          if (!prev || !isSameDay(new Date(prev.created_at), new Date(m.created_at))) {
+            nodes.push(<DateSeparator key={`s-${m.id}`} date={m.created_at} />);
+          }
+
           if (mine && editingId === m.id) {
-            return (
+            nodes.push(
               <div key={m.id} className="flex justify-end">
                 <div className="flex flex-col gap-2" style={{ maxWidth: "78%", width: "100%" }}>
                   <textarea
@@ -259,9 +276,10 @@ export default function DmThread({
                 </div>
               </div>
             );
+            return nodes;
           }
 
-          return (
+          nodes.push(
             <div key={m.id} className={`group flex items-center gap-1.5 ${mine ? "justify-end" : "justify-start"}`}>
               {/* Own-message actions (left of the bubble) */}
               {mine && (
@@ -353,6 +371,7 @@ export default function DmThread({
               </div>
             </div>
           );
+          return nodes;
         })}
         <div ref={bottomRef} />
 

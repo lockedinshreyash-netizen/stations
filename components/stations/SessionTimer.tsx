@@ -54,7 +54,7 @@ export default function SessionTimer({
 
   return (
     <div
-      className="st-glass flex flex-col items-center justify-center gap-4 text-center px-10 py-8"
+      className="st-glass flex flex-col items-center justify-center gap-4 text-center px-6 py-6 sm:px-10 sm:py-8 max-w-full"
       style={{ borderRadius: "var(--radius-card)", boxShadow: "var(--shadow-md)" }}
     >
       <span

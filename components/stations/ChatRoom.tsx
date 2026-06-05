@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { format } from "date-fns";
+import { useState, useEffect, useRef, useCallback, useMemo, type ReactNode } from "react";
+import { format, isSameDay } from "date-fns";
+import DateSeparator from "@/components/stations/DateSeparator";
+import { openUserProfile } from "@/lib/userProfile";
 import {
   subscribeMessages,
   subscribeMemberCount,
@@ -191,9 +193,15 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
           </p>
         ) : (
           <div className="flex flex-col gap-4">
-            {sorted.map((m) => (
-              <MessageRow key={m.id} message={m} />
-            ))}
+            {sorted.flatMap((m, i) => {
+              const prev = sorted[i - 1];
+              const out: ReactNode[] = [];
+              if (!prev || !isSameDay(prev.created_at, m.created_at)) {
+                out.push(<DateSeparator key={`s-${m.id}`} date={new Date(m.created_at)} />);
+              }
+              out.push(<MessageRow key={m.id} message={m} />);
+              return out;
+            })}
           </div>
         )}
       </div>
@@ -315,12 +323,21 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
 function MessageRow({ message }: { message: ChatMessage }) {
   return (
     <div className="flex gap-3">
-      <Avatar url={message.avatar_url} username={message.username} />
+      <button
+        type="button"
+        onClick={() => openUserProfile(message.user_id)}
+        className="shrink-0"
+        style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+        aria-label={`View ${message.username}'s profile`}
+      >
+        <Avatar url={message.avatar_url} username={message.username} />
+      </button>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
           <span
-            className="font-poppins font-medium text-[rgb(var(--fg-rgb))]"
-            style={{ fontSize: "15px" }}
+            className="font-poppins font-medium text-[rgb(var(--fg-rgb))] hover:text-[var(--accent)] transition-colors"
+            style={{ fontSize: "15px", cursor: "pointer" }}
+            onClick={() => openUserProfile(message.user_id)}
           >
             {message.username}
           </span>

@@ -137,15 +137,12 @@ body {
    ============================================================ */
 .st-atmosphere {
   position: fixed;
-  /* Oversized so the gyroscope parallax shift never exposes an edge. */
-  inset: -60px;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
     radial-gradient(120% 90% at 12% 0%, var(--halo), transparent 55%),
     radial-gradient(140% 120% at 50% 50%, transparent 60%, var(--vignette));
-  transform: translate3d(var(--gyro-bx, 0px), var(--gyro-by, 0px), 0);
-  will-change: transform;
 }
 
 .st-grain {
@@ -208,59 +205,22 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* Animatable transform pieces so tilt (JS) + lift (hover) + reveal compose
-   cleanly and tween smoothly. @property lets custom props transition. */
-@property --rx { syntax: "<angle>";  inherits: false; initial-value: 0deg; }
-@property --ry { syntax: "<angle>";  inherits: false; initial-value: 0deg; }
-@property --ty { syntax: "<length>"; inherits: false; initial-value: 0px;  }
-@property --sc { syntax: "<number>"; inherits: false; initial-value: 1;    }
-
-/* Interactive card — cursor-driven 3D tilt + a light that tracks the pointer,
-   plus the lift/shadow on hover. CardFX sets --rx/--ry/--mx/--my. */
+/* Interactive card — a clean lift + deeper shadow on hover. */
 .st-card-hover {
   position: relative;
-  transform:
-    perspective(900px)
-    rotateX(calc(var(--rx, 0deg) + var(--gyro-rx, 0deg)))
-    rotateY(calc(var(--ry, 0deg) + var(--gyro-ry, 0deg)))
-    translateY(var(--ty, 0px))
-    scale(var(--sc, 1));
-  transform-style: preserve-3d;
   transition:
-    --rx 160ms var(--ease),
-    --ry 160ms var(--ease),
-    --ty var(--t-base) var(--ease),
-    --sc var(--t-base) var(--ease),
+    transform  var(--t-base) var(--ease),
     box-shadow var(--t-base) var(--ease),
     background-color 200ms var(--ease),
     border-color     200ms var(--ease);
   will-change: transform;
 }
 .st-card-hover:hover {
-  --ty: -3px;
-  --sc: 1.012;
+  transform: translateY(-3px) scale(1.01);
   box-shadow: var(--shadow-lg);
 }
-/* Pointer-tracking sheen. */
-.st-card-hover::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.35s var(--ease);
-  background: radial-gradient(
-    240px circle at var(--mx, 50%) var(--my, 50%),
-    rgba(var(--accent-2-rgb), 0.13),
-    transparent 60%
-  );
-}
-@media (hover: hover) {
-  .st-card-hover:hover::after { opacity: 1; }
-}
 @media (hover: none) {
-  .st-card-hover:hover { --ty: 0px; --sc: 1; }
+  .st-card-hover:hover { transform: none; }
 }
 
 /* Button — gentle scale + shadow on hover/press. */

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { WinCategory, ReactionCounts, ReactionType } from "@/types";
 import { REACTIONS, getCounts } from "@/lib/utils/reactions";
 import { pop } from "@/lib/feedback";
+import { openUserProfile } from "@/lib/userProfile";
 import { formatDistanceToNow } from "date-fns";
 import EditWinModal, { type EditableWin } from "@/components/stations/EditWinModal";
 import FounderMark from "@/components/ui/FounderMark";
@@ -252,7 +253,15 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
       <Link href={`/wins/${win.id}`} className="flex flex-col" style={{ gap: 0, textDecoration: "none" }}>
         {/* Top row */}
         <div className="flex items-center" style={{ gap: "10px", marginBottom: "8px", paddingRight: isOwner ? "28px" : 0 }}>
-          <span className="font-poppins text-[rgb(var(--fg-rgb))]" style={{ fontSize: "15px", fontWeight: 500 }}>
+          <span
+            className="font-poppins text-[rgb(var(--fg-rgb))] hover:text-[var(--accent)] transition-colors"
+            style={{ fontSize: "15px", fontWeight: 500, cursor: "pointer" }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              openUserProfile(win.user_id);
+            }}
+          >
             {username}
           </span>
           <FounderMark founderNumber={win.users?.founder_number} />

@@ -261,12 +261,7 @@ export default function SessionRoom({
           className={
             chatMinimized
               ? "flex-1 flex flex-col items-center justify-center gap-8 p-8 transition-all duration-300"
-              : "lg:w-[30%] flex flex-col items-center justify-center gap-8 p-8 shrink-0 transition-all duration-300"
-          }
-          style={
-            chatMinimized
-              ? undefined
-              : { borderRight: "0.5px solid rgba(var(--fg-rgb),0.08)" }
+              : "lg:w-[30%] flex flex-col items-center justify-center gap-4 p-5 lg:gap-8 lg:p-8 shrink-0 border-b lg:border-b-0 lg:border-r border-[rgba(var(--fg-rgb),0.08)] transition-all duration-300"
           }
         >
           <SessionTimer
@@ -334,13 +329,13 @@ export default function SessionRoom({
           />
         </div>
 
-        {/* Members (right) — hidden when chat is minimized. */}
+        {/* Members — capped strip on mobile, right column on desktop.
+            Hidden when chat is minimized. */}
         <div
-          className={chatMinimized ? "hidden" : "lg:w-[25%] shrink-0 min-h-0"}
-          style={
+          className={
             chatMinimized
-              ? undefined
-              : { borderLeft: "0.5px solid rgba(var(--fg-rgb),0.08)" }
+              ? "hidden"
+              : "order-last max-h-[22vh] lg:max-h-none lg:w-[25%] shrink-0 min-h-0 overflow-y-auto border-t lg:border-t-0 lg:border-l border-[rgba(var(--fg-rgb),0.08)]"
           }
         >
           <SessionMemberList
