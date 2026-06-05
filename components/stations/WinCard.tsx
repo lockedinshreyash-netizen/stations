@@ -5,9 +5,13 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { WinCategory, ReactionCounts, ReactionType } from "@/types";
 import { REACTIONS, getCounts } from "@/lib/utils/reactions";
+import { pop } from "@/lib/feedback";
 import { formatDistanceToNow } from "date-fns";
 import EditWinModal, { type EditableWin } from "@/components/stations/EditWinModal";
 import FounderMark from "@/components/ui/FounderMark";
+
+// Directions (degrees) the burst particles fly out toward.
+const BURST_ANGLES = [270, 310, 350, 30, 230, 190];
 
 export interface WinCardData {
   id: string;
@@ -57,6 +61,8 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
   const [counts, setCounts] = useState<ReactionCounts>(getCounts(winProp.reaction_counts));
   const [myReactions, setMyReactions] = useState<Set<ReactionType>>(new Set(userReactions));
   const [busy, setBusy] = useState<Set<ReactionType>>(new Set());
+  // Transient burst state — which reaction just popped (keyed to retrigger).
+  const [burst, setBurst] = useState<{ type: ReactionType; key: number } | null>(null);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -89,6 +95,12 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
     if (busy.has(type)) return;
 
     const reacted = myReactions.has(type);
+    // Reacting (not un-reacting) fires the celebratory pop + particle burst.
+    if (!reacted) {
+      pop();
+      setBurst({ type, key: Date.now() });
+      setTimeout(() => setBurst((b) => (b?.type === type ? null : b)), 650);
+    }
     setBusy((b) => new Set(b).add(type));
     setMyReactions((prev) => {
       const next = new Set(prev);
@@ -286,12 +298,14 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
         {REACTIONS.map(({ type, emoji, label }) => {
           const active = myReactions.has(type);
           const count = counts[type];
+          const bursting = burst?.type === type;
           return (
             <button
-              key={type}
+              key={`${type}-${bursting ? burst!.key : "idle"}`}
               onClick={(e) => toggleReaction(type, e)}
-              className="reaction-btn st-pill font-poppins flex items-center"
+              className={`reaction-btn st-pill font-poppins flex items-center${bursting ? " st-pop" : ""}`}
               style={{
+                position: "relative",
                 gap: "5px",
                 background: active ? "rgb(var(--fg-rgb))" : "transparent",
                 color: active ? "var(--bg-primary)" : "rgba(var(--fg-rgb),0.35)",
@@ -304,6 +318,27 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
             >
               <span style={{ fontSize: "16px" }}>{emoji}</span>
               {count > 0 && <span style={{ fontSize: "14px", fontWeight: 500 }}>{count}</span>}
+              {bursting &&
+                BURST_ANGLES.map((deg, i) => {
+                  const dist = 26;
+                  const tx = Math.cos((deg * Math.PI) / 180) * dist;
+                  const ty = Math.sin((deg * Math.PI) / 180) * dist;
+                  return (
+                    <span
+                      key={i}
+                      aria-hidden
+                      className="st-burst-p"
+                      style={{
+                        // @ts-expect-error custom props
+                        "--tx": `${tx}px`,
+                        "--ty": `${ty}px`,
+                        animationDelay: `${i * 12}ms`,
+                      }}
+                    >
+                      {emoji}
+                    </span>
+                  );
+                })}
             </button>
           );
         })}

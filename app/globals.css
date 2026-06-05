@@ -438,6 +438,35 @@ body {
   transition: width 0.2s var(--ease), opacity 0.3s var(--ease);
 }
 
+/* Reaction burst — particles fly outward + the pill pops when you react. */
+.st-pop { animation: st-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes st-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+.st-burst-p {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  font-size: 12px;
+  will-change: transform, opacity;
+  animation: st-burst 0.62s var(--ease) forwards;
+}
+@keyframes st-burst {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.4); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.5);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-pop { animation: none; }
+  .st-burst-p { display: none; }
+}
+
 /* Per-page entrance — fires on every navigation via template.tsx. */
 .st-page-enter {
   animation: st-page-enter 0.45s var(--ease) both;

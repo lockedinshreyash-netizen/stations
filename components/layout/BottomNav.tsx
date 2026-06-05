@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Trophy, Users, Archive, Clock, MessageCircle, Moon, Sun } from "lucide-react";
 import type { User } from "@/types";
 import ProfileModal from "./ProfileModal";
@@ -52,6 +52,33 @@ export default function BottomNav({ user }: { user: User }) {
     if (t === "light" || t === "dark") setTheme(t);
   }, []);
 
+  // Sliding active indicator — measures the active tab and glides a glowing
+  // pill behind it on every navigation.
+  const navRef = useRef<HTMLDivElement>(null);
+  const [ind, setInd] = useState({ left: 0, top: 0, width: 0, height: 0, show: false });
+
+  useLayoutEffect(() => {
+    const root = navRef.current;
+    if (!root) return;
+    const measure = () => {
+      const el = root.querySelector<HTMLElement>('[data-nav-active="true"]');
+      if (!el) {
+        setInd((p) => ({ ...p, show: false }));
+        return;
+      }
+      setInd({
+        left: el.offsetLeft,
+        top: el.offsetTop,
+        width: el.offsetWidth,
+        height: el.offsetHeight,
+        show: true,
+      });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [pathname]);
+
   function toggleTheme() {
     tap();
     const next = theme === "dark" ? "light" : "dark";
@@ -68,35 +95,57 @@ export default function BottomNav({ user }: { user: User }) {
           divider hide) so all seven controls fit comfortably on small phones;
           wider screens get the full labelled treatment. */}
       <style>{`
+        .st-navbar { gap: 2px; }
         .st-navitem {
           min-width: 44px;
           padding: 6px 8px 5px;
         }
         .st-navlabel { font-size: 11px; }
+        /* Compact, icon-only on small phones — but the bar still hugs its
+           content and floats; it never stretches edge-to-edge. */
         @media (max-width: 420px) {
-          .st-navbar { gap: 0; padding: 5px; }
-          .st-navitem { min-width: 0; flex: 1 1 0; padding: 8px 4px; }
+          .st-navbar { gap: 1px; }
+          .st-navitem { min-width: 40px; padding: 9px 6px; }
           .st-navlabel { display: none; }
           .st-navdivider { display: none !important; }
         }
-        @media (min-width: 421px) {
-          .st-navbar { gap: 2px; }
-        }
       `}</style>
       <nav
-        className="fixed inset-x-0 z-40 flex justify-center pointer-events-none px-2.5"
+        className="fixed inset-x-0 z-40 flex justify-center pointer-events-none px-3"
         style={{ bottom: "calc(16px + env(safe-area-inset-bottom))" }}
         aria-label="Primary"
       >
         <div
-          className="st-navbar st-glass pointer-events-auto flex items-center justify-center w-full px-1.5 py-1.5"
+          ref={navRef}
+          className="st-navbar st-glass pointer-events-auto flex items-center justify-center px-1.5 py-1.5"
           style={{
+            position: "relative",
             borderRadius: "9999px",
             boxShadow: "var(--shadow-lg)",
             border: "0.5px solid var(--glass-border)",
-            maxWidth: "560px",
+            maxWidth: "calc(100vw - 24px)",
           }}
         >
+          {/* Sliding active indicator — glides + glows beneath the active tab. */}
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: ind.left,
+              top: ind.top,
+              width: ind.width,
+              height: ind.height,
+              borderRadius: "14px",
+              background: "rgba(var(--accent-rgb),0.16)",
+              boxShadow:
+                "inset 0 0 0 0.5px rgba(var(--accent-rgb),0.35), 0 0 16px rgba(var(--accent-rgb),0.25)",
+              opacity: ind.show ? 1 : 0,
+              transition:
+                "left 0.42s cubic-bezier(0.34,1.4,0.5,1), top 0.42s cubic-bezier(0.34,1.4,0.5,1), width 0.42s cubic-bezier(0.34,1.4,0.5,1), height 0.3s var(--ease), opacity 0.3s var(--ease)",
+              pointerEvents: "none",
+              zIndex: 0,
+            }}
+          />
           {NAV.map(({ label, href, Icon }) => {
             const active = pathname.startsWith(href);
             return (
@@ -107,10 +156,13 @@ export default function BottomNav({ user }: { user: User }) {
                 aria-current={active ? "page" : undefined}
                 title={label}
                 onClick={() => tap()}
+                data-nav-active={active ? "true" : "false"}
                 className="st-navitem st-pill flex flex-col items-center justify-center gap-1 shrink-0"
                 style={{
+                  position: "relative",
+                  zIndex: 1,
                   borderRadius: "14px",
-                  background: active ? "rgba(var(--accent-rgb),0.14)" : "transparent",
+                  background: "transparent",
                   color: active ? "var(--accent)" : "rgba(var(--fg-rgb),0.5)",
                 }}
               >

@@ -126,12 +126,43 @@ export function testHaptics(): { supported: boolean; accepted: boolean } {
   return { supported, accepted };
 }
 
-/* Pulse lengths are kept >= ~25ms — shorter pulses don't physically register
+/* Pulse lengths are kept >= ~16ms — shorter pulses don't physically register
    on most Android vibration motors (they barely spin up). */
+
+/**
+ * Distinct haptic "textures", loosely mirroring iOS's impact styles so
+ * different interactions feel different under the thumb:
+ *   selection — the lightest crisp tick (general touches)
+ *   light / medium / heavy — escalating impact
+ *   rigid — a sharp double-tap
+ *   soft — a gentle longer pulse
+ */
+export type HapticStyle =
+  | "selection"
+  | "light"
+  | "medium"
+  | "heavy"
+  | "rigid"
+  | "soft";
+
+const HAPTICS: Record<HapticStyle, number | number[]> = {
+  selection: 16,
+  light: 22,
+  medium: 32,
+  heavy: 55,
+  rigid: [14, 16, 14],
+  soft: 45,
+};
+
+/** Fire a haptic by style. Gated by the shared sound/haptics preference. */
+export function haptic(style: HapticStyle = "selection"): void {
+  if (!isSoundEnabled()) return;
+  buzz(HAPTICS[style]);
+}
 
 /** Light tick — navigation, toggles, secondary taps. */
 export function tap(): void {
-  buzz(30);
+  // Haptic is handled globally on press (see HapticsProvider); here we add sound.
   play(() => tone(1250, 0, 0.06, 0.22, "triangle"));
 }
 
@@ -141,6 +172,14 @@ export function success(): void {
   play(() => {
     tone(660, 0, 0.13, 0.28, "sine");
     tone(990, 0.1, 0.24, 0.26, "sine");
+  });
+}
+
+/** Bright two-blip pop — reacting to a win. (Haptic handled globally on press.) */
+export function pop(): void {
+  play(() => {
+    tone(880, 0, 0.07, 0.2, "triangle");
+    tone(1320, 0.035, 0.09, 0.18, "triangle");
   });
 }
 
