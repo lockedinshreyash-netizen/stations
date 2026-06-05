@@ -28,23 +28,23 @@ export default async function PlatformHome() {
   return (
     <div>
       {/* Editorial header — same treatment as station pages */}
-      <div className="px-5 md:px-10 pt-12 pb-10 md:pt-16 md:pb-12 border-b border-[rgba(var(--fg-rgb),0.06)]">
+      <div className="px-5 md:px-10 pt-7 pb-5 md:pt-9 md:pb-6 border-b border-[rgba(var(--fg-rgb),0.06)]">
         <p
-          className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]"
-          style={{ fontSize: "15px", marginBottom: "8px" }}
+          className="font-playfair italic text-[rgba(var(--accent-2-rgb),0.55)]"
+          style={{ fontSize: "15px", marginBottom: "2px" }}
         >
           Welcome back —
         </p>
         <h1
-          className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] leading-none break-words"
-          style={{ fontSize: "clamp(48px, 12vw, 140px)", letterSpacing: "0.03em" }}
+          className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] break-words"
+          style={{ fontSize: "clamp(48px, 12vw, 140px)", letterSpacing: "-0.025em", lineHeight: 0.84 }}
         >
           {user.username.toUpperCase()}
           <span className="text-[var(--accent)]">.</span>
         </h1>
         <p
-          className="font-playfair italic text-[rgba(var(--fg-rgb),0.35)] mt-4"
-          style={{ fontSize: "19px", lineHeight: 1.5 }}
+          className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)] mt-3 md:mt-4 max-w-md md:ml-[14%]"
+          style={{ fontSize: "19px", lineHeight: 1.45 }}
         >
           {user.category} · {roles.join(", ")}
         </p>

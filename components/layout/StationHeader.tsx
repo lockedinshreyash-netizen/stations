@@ -8,7 +8,7 @@ interface StationHeaderProps {
 
 export default function StationHeader({ number, name, tagline }: StationHeaderProps) {
   return (
-    <div className="relative overflow-hidden px-5 md:px-10 pt-12 pb-10 md:pt-16 md:pb-12 border-b border-[rgba(var(--fg-rgb),0.06)]">
+    <div className="relative overflow-hidden px-5 md:px-10 pt-7 pb-5 md:pt-9 md:pb-6 border-b border-[rgba(var(--fg-rgb),0.06)]">
       {/* Subtle dappled foliage shadow */}
       <LeafShadow />
 
@@ -30,15 +30,16 @@ export default function StationHeader({ number, name, tagline }: StationHeaderPr
 
       {/* Foreground content */}
       <div className="relative z-10">
-        {/* Eyebrow */}
+        {/* Eyebrow — brass, tight to the headline */}
         <p
-          className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]"
-          style={{ fontSize: "15px", marginBottom: "8px" }}
+          className="font-playfair italic text-[rgba(var(--accent-2-rgb),0.55)]"
+          style={{ fontSize: "15px", marginBottom: "2px" }}
         >
           {number} —
         </p>
 
-        {/* Station name — scales down on mobile */}
+        {/* Station name — scales down on mobile. Tight leading + negative
+            tracking so big display type reads confident, not sprawling. */}
         <style>{`
           .station-name { font-size: clamp(96px, 12vw, 140px); }
           @media (max-width: 767px) {
@@ -46,17 +47,18 @@ export default function StationHeader({ number, name, tagline }: StationHeaderPr
           }
         `}</style>
         <h1
-          className="station-name font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] leading-none"
-          style={{ letterSpacing: "0.03em" }}
+          className="station-name font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
+          style={{ letterSpacing: "-0.025em", lineHeight: 0.84 }}
         >
           {name}
         </h1>
 
-        {/* Tagline */}
+        {/* Tagline — asymmetric: indented into a narrow column, sitting
+            close under the headline rather than floating far below. */}
         {tagline && (
           <p
-            className="font-playfair italic text-[rgba(var(--fg-rgb),0.35)] mt-12 md:mt-20"
-            style={{ fontSize: "20px", lineHeight: 1.6 }}
+            className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)] mt-3 md:mt-4 max-w-md md:ml-[14%]"
+            style={{ fontSize: "19px", lineHeight: 1.45 }}
           >
             {tagline}
           </p>
