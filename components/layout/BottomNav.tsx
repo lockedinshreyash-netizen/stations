@@ -9,6 +9,7 @@ import ProfileModal from "./ProfileModal";
 import { useWinsUnread } from "@/lib/wins/useWinsUnread";
 import { useNetworkUnread } from "@/lib/rooms/useNetworkUnread";
 import { useDmUnread } from "@/lib/dm/useDmUnread";
+import { tap } from "@/lib/feedback";
 
 const NAV = [
   { label: "Wins", href: "/wins", Icon: Trophy },
@@ -52,6 +53,7 @@ export default function BottomNav({ user }: { user: User }) {
   }, []);
 
   function toggleTheme() {
+    tap();
     const next = theme === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     try {
@@ -85,6 +87,7 @@ export default function BottomNav({ user }: { user: User }) {
                 aria-label={label}
                 aria-current={active ? "page" : undefined}
                 title={label}
+                onClick={() => tap()}
                 className="st-pill flex flex-col items-center justify-center gap-1 shrink-0"
                 style={{
                   minWidth: "40px",
@@ -168,7 +171,10 @@ export default function BottomNav({ user }: { user: User }) {
           {/* Profile */}
           <button
             type="button"
-            onClick={() => setProfileOpen(true)}
+            onClick={() => {
+              tap();
+              setProfileOpen(true);
+            }}
             aria-label="Profile settings"
             title="Profile settings"
             className="st-pill flex flex-col items-center justify-center gap-1 shrink-0"

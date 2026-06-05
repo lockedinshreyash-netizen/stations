@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import type { WinCategory } from "@/types";
+import { success, error as errorSound } from "@/lib/feedback";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -168,7 +169,8 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
       reaction_counts: { respect: 0, fire: 0, build: 0, focused: 0, strong: 0 },
     });
 
-    if (error) { setServerError(error.message); setLoading(false); return; }
+    if (error) { errorSound(); setServerError(error.message); setLoading(false); return; }
+    success();
     onPosted();
   }
 

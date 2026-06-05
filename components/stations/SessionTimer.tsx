@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { formatClock } from "@/lib/work/format";
+import { success } from "@/lib/feedback";
 
 interface SessionTimerProps {
   /** Eyebrow label, e.g. "Starts in" or "Time remaining". */
@@ -42,6 +43,7 @@ export default function SessionTimer({
     if (ended || !targetIso) return;
     if (remaining <= 0 && !firedRef.current) {
       firedRef.current = true;
+      success(); // session-complete chime + haptic
       onReachZero?.();
     }
   }, [remaining, ended, targetIso, onReachZero]);

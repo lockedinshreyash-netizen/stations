@@ -1,5 +1,3 @@
-import LeafShadow from "@/components/layout/LeafShadow";
-
 interface StationHeaderProps {
   number: string;
   name: string;
@@ -9,9 +7,6 @@ interface StationHeaderProps {
 export default function StationHeader({ number, name, tagline }: StationHeaderProps) {
   return (
     <div className="relative overflow-hidden px-5 md:px-10 pt-7 pb-5 md:pt-9 md:pb-6 border-b border-[rgba(var(--fg-rgb),0.06)]">
-      {/* Subtle dappled foliage shadow */}
-      <LeafShadow />
-
       {/* Oversized station number — supergraphic layered in front, very faint */}
       <span
         aria-hidden
@@ -57,7 +52,7 @@ export default function StationHeader({ number, name, tagline }: StationHeaderPr
             close under the headline rather than floating far below. */}
         {tagline && (
           <p
-            className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)] mt-3 md:mt-4 max-w-md md:ml-[14%]"
+            className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)] mt-3 md:mt-4 max-w-md"
             style={{ fontSize: "19px", lineHeight: 1.45 }}
           >
             {tagline}

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { User, UserRole } from "@/types";
 import MembershipBadge from "@/components/ui/MembershipBadge";
 import { addMember } from "@/lib/firebase/rooms";
+import { isSoundEnabled, setSoundEnabled, success, error as errorSound } from "@/lib/feedback";
 
 const ROLES: { value: UserRole; label: string }[] = [
   { value: "student",   label: "Student"   },
@@ -73,6 +74,10 @@ export default function ProfileModal({ user, onClose }: Props) {
   const [avatarError, setAvatarError] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [soundOn, setSoundOn] = useState(true);
+
+  // Reflect the stored sound preference once mounted (localStorage is client-only).
+  useEffect(() => { setSoundOn(isSoundEnabled()); }, []);
 
   // Founder-code redemption (for accounts created before/without a code).
   const [redeemCode, setRedeemCode] = useState("");
@@ -133,7 +138,8 @@ export default function ProfileModal({ user, onClose }: Props) {
       .update({ bio: bio.trim() || null, role: [role], goals, avatar_url })
       .eq("id", user.id);
 
-    if (updateError) { setError("Failed to save. Try again."); setSaving(false); return; }
+    if (updateError) { errorSound(); setError("Failed to save. Try again."); setSaving(false); return; }
+    success();
     router.refresh();
     onClose();
   }
@@ -478,6 +484,52 @@ export default function ProfileModal({ user, onClose }: Props) {
                 );
               })}
             </div>
+          </div>
+
+          {/* Preferences — sound & haptics */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <span className="font-poppins" style={labelStyle}>Sound &amp; haptics</span>
+              <span className="font-poppins font-light" style={{ fontSize: "14px", color: "rgba(var(--fg-rgb),0.3)" }}>
+                Subtle taps and chimes as you move through Stations.
+              </span>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={soundOn}
+              aria-label="Toggle sound and haptics"
+              onClick={() => {
+                const next = !soundOn;
+                setSoundOn(next);
+                setSoundEnabled(next); // persists + plays a confirm tap when enabling
+              }}
+              style={{
+                position: "relative",
+                width: "46px",
+                height: "26px",
+                flexShrink: 0,
+                borderRadius: "9999px",
+                border: "none",
+                cursor: "pointer",
+                background: soundOn ? "var(--accent)" : "rgba(var(--fg-rgb),0.18)",
+                transition: "background 200ms var(--ease)",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: "3px",
+                  left: soundOn ? "23px" : "3px",
+                  width: "20px",
+                  height: "20px",
+                  borderRadius: "50%",
+                  background: "#fff",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
+                  transition: "left 200ms var(--ease)",
+                }}
+              />
+            </button>
           </div>
 
           {error && (

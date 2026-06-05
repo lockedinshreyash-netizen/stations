@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import StatCard from "@/components/ui/StatCard";
-import LeafShadow from "@/components/layout/LeafShadow";
 import type { User } from "@/types";
 
 export default async function PlatformHome() {
@@ -43,7 +42,7 @@ export default async function PlatformHome() {
           <span className="text-[var(--accent)]">.</span>
         </h1>
         <p
-          className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)] mt-3 md:mt-4 max-w-md md:ml-[14%]"
+          className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)] mt-3 md:mt-4 max-w-md"
           style={{ fontSize: "19px", lineHeight: 1.45 }}
         >
           {user.category} · {roles.join(", ")}
