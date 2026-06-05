@@ -18,7 +18,10 @@ export default function NetworkRooms({ user }: { user: User }) {
     room === COLLECTIVE || room === homeRoom || memberships.includes(room);
 
   const myRooms = ROOM_NAMES.filter(isMine);
-  const exploreRooms = ROOM_NAMES.filter((r) => !isMine(r));
+  // The Founding Cohort room is private: it only ever appears under "My
+  // Stations" for members who were added on code redemption. Non-members must
+  // never see it offered in Explore.
+  const exploreRooms = ROOM_NAMES.filter((r) => r !== "founding" && !isMine(r));
 
   return (
     <div className="px-5 md:px-10 py-12 flex flex-col gap-16">

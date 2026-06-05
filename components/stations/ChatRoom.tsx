@@ -19,6 +19,7 @@ import { isFirebaseConfigured } from "@/lib/firebase/config";
 import { joinRoom } from "@/lib/rooms/membership";
 import { markRoomSeen } from "@/lib/rooms/useRoomStats";
 import type { User } from "@/types";
+import FounderMark from "@/components/ui/FounderMark";
 
 const EMOJIS = ["🔥", "💪", "🚀", "🎯", "👏", "🙌", "💡", "📈", "✅", "❤️", "😄", "🧠"];
 
@@ -108,6 +109,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
         username: user.username,
         avatar_url: user.avatar_url,
         category: user.category,
+        founder_number: user.founder_number,
         content,
       });
       setDraft("");
@@ -322,6 +324,7 @@ function MessageRow({ message }: { message: ChatMessage }) {
           >
             {message.username}
           </span>
+          <FounderMark founderNumber={message.founder_number} />
           <span
             className="font-poppins text-[rgba(var(--fg-rgb),0.25)] ml-auto"
             style={{ fontSize: "10px" }}

@@ -6,6 +6,7 @@ const STEPS = [
   { path: "/onboarding/step-1", label: "Account" },
   { path: "/onboarding/step-2", label: "Profile" },
   { path: "/onboarding/step-3", label: "About you" },
+  { path: "/onboarding/founder", label: "Founder code" },
   { path: "/onboarding/step-4", label: "Why Stations" },
 ];
 
@@ -26,7 +27,7 @@ export default function OnboardingLayout({
           STATIONS
         </span>
         <span className="text-[rgba(var(--fg-rgb),0.3)] text-sm font-light tracking-widest uppercase">
-          Step {stepNumber} of 4
+          Step {stepNumber} of {STEPS.length}
         </span>
       </header>
 

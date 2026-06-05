@@ -71,12 +71,18 @@ export async function getSessionById(
 /** All member rows for a session, host implicitly first via joined_at. */
 export async function getSessionMembers(
   sessionId: string
-): Promise<(WorkSessionMember & { username: string; avatar_url: string | null })[]> {
+): Promise<
+  (WorkSessionMember & {
+    username: string;
+    avatar_url: string | null;
+    founder_number: number | null;
+  })[]
+> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("work_session_members")
     .select(
-      "*, user:users!work_session_members_user_id_fkey(username, avatar_url)"
+      "*, user:users!work_session_members_user_id_fkey(username, avatar_url, founder_number)"
     )
     .eq("session_id", sessionId)
     .order("joined_at", { ascending: true });
@@ -84,12 +90,17 @@ export async function getSessionMembers(
   if (error) throw new Error(error.message);
   return (
     (data as (WorkSessionMember & {
-      user: { username: string; avatar_url: string | null } | null;
+      user: {
+        username: string;
+        avatar_url: string | null;
+        founder_number: number | null;
+      } | null;
     })[]) ?? []
   ).map((m) => ({
     ...m,
     username: m.user?.username ?? "unknown",
     avatar_url: m.user?.avatar_url ?? null,
+    founder_number: m.user?.founder_number ?? null,
   }));
 }
 

@@ -4,10 +4,12 @@ import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { subscribeSessionOnlineIds } from "@/lib/firebase/work-chat";
 import type { WorkSessionMember } from "@/types";
+import FounderMark from "@/components/ui/FounderMark";
 
 export type SessionMemberRow = WorkSessionMember & {
   username: string;
   avatar_url: string | null;
+  founder_number: number | null;
 };
 
 interface SessionMemberListProps {
@@ -87,6 +89,7 @@ export default function SessionMemberList({
                   >
                     {m.username}
                   </span>
+                  <FounderMark founderNumber={m.founder_number} />
                   {m.user_id === hostId && (
                     <span
                       className="font-poppins font-bold uppercase shrink-0"

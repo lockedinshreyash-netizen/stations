@@ -7,7 +7,7 @@ import type { User, WorkSession, WorkSessionWithMeta } from "@/types";
 const SESSION_SELECT =
   "*, host:users!work_sessions_host_id_fkey(username, avatar_url), members:work_session_members(count)";
 const MEMBER_SELECT =
-  "*, user:users!work_session_members_user_id_fkey(username, avatar_url)";
+  "*, user:users!work_session_members_user_id_fkey(username, avatar_url, founder_number)";
 
 export default async function SessionPage({
   params,
@@ -57,12 +57,17 @@ export default async function SessionPage({
 
   const initialMembers: SessionMemberRow[] = (
     (memberRows as (SessionMemberRow & {
-      user: { username: string; avatar_url: string | null } | null;
+      user: {
+        username: string;
+        avatar_url: string | null;
+        founder_number: number | null;
+      } | null;
     })[]) ?? []
   ).map((m) => ({
     ...m,
     username: m.user?.username ?? "unknown",
     avatar_url: m.user?.avatar_url ?? null,
+    founder_number: m.user?.founder_number ?? null,
   }));
 
   return (

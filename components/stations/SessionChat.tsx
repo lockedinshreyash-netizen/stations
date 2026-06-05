@@ -11,6 +11,7 @@ import {
 import { isFirebaseConfigured } from "@/lib/firebase/config";
 import { updateSessionChatStatus } from "@/lib/work/sessions";
 import type { User } from "@/types";
+import FounderMark from "@/components/ui/FounderMark";
 
 interface SessionChatProps {
   sessionId: string;
@@ -105,6 +106,7 @@ export default function SessionChat({
         user_id: user.id,
         username: user.username,
         avatar_url: user.avatar_url,
+        founder_number: user.founder_number,
         content: content.slice(0, MAX_MESSAGE_LENGTH),
       });
       setDraft("");
@@ -328,6 +330,7 @@ function MessageRow({ message }: { message: WorkChatMessage }) {
           >
             {message.username}
           </span>
+          <FounderMark founderNumber={message.founder_number} />
           <span
             className="font-poppins text-[rgba(var(--fg-rgb),0.25)] ml-auto"
             style={{ fontSize: "10px" }}

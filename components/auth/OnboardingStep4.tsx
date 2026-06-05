@@ -7,6 +7,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { step4Schema, type Step4Data } from "@/lib/validations/onboarding";
 import { categorizeUser } from "@/lib/utils/categorize";
+import { addMember } from "@/lib/firebase/rooms";
 
 // MIGRATION NOTE: users.role must be text[] in Supabase.
 // If originally created as text, run in SQL editor:
@@ -93,6 +94,24 @@ export default function OnboardingStep4() {
       setLoading(false);
       return;
     }
+
+    // Founder code (optional, set on the /onboarding/founder step). Redeem it
+    // now that the user row exists: claim_founder_code atomically marks the code
+    // used, assigns the next founding number, flips the tier to 'founding', and
+    // adds the private cohort room to room_memberships. Returns null if the code
+    // was claimed by someone else between steps — in that case they stay free.
+    const founderCode = localStorage.getItem("onboarding_founder_code");
+    if (founderCode) {
+      const { data: founderNumber, error: claimError } = await supabase.rpc(
+        "claim_founder_code",
+        { code: founderCode }
+      );
+      if (!claimError && typeof founderNumber === "number") {
+        // Mirror the membership into Firebase so the cohort chat lists them.
+        await addMember("founding", user.id).catch(() => {});
+      }
+    }
+    localStorage.removeItem("onboarding_founder_code");
 
     const { error: appError } = await supabase.from("applications").insert({
       user_id: user.id,

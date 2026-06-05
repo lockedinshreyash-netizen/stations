@@ -90,7 +90,7 @@ export default function OnboardingStep3() {
       availability: availability as Step3Data["availability"],
     };
     localStorage.setItem("onboarding_step3", JSON.stringify(data));
-    router.push("/onboarding/step-4");
+    router.push("/onboarding/founder");
   }
 
   const atRoleLimit = roles.length >= ROLE_MAX;

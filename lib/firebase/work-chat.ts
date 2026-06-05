@@ -29,6 +29,9 @@ export interface WorkChatMessage {
   user_id: string;
   username: string;
   avatar_url: string | null;
+  // Denormalized so the Founding Cohort marker renders in chat without a
+  // per-message user lookup. Null/absent for non-founders and system rows.
+  founder_number?: number | null;
   content: string;
   /** true for "X left early: …" system notices, rendered muted/italic. */
   system?: boolean;
@@ -53,6 +56,7 @@ function snapshotToMessage(snap: DataSnapshot): WorkChatMessage | null {
     user_id: v.user_id,
     username: v.username,
     avatar_url: v.avatar_url ?? null,
+    founder_number: typeof v.founder_number === "number" ? v.founder_number : null,
     content: v.content ?? "",
     system: v.system === true,
     created_at: typeof v.created_at === "number" ? v.created_at : Date.now(),
@@ -85,6 +89,7 @@ export async function sendSessionMessage(
     user_id: message.user_id,
     username: message.username,
     avatar_url: message.avatar_url ?? null,
+    founder_number: message.founder_number ?? null,
     content: message.content,
     system: message.system === true,
     created_at: serverTimestamp(),

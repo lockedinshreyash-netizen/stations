@@ -26,6 +26,15 @@ export default async function RoomPage({
     .single();
   if (!profile) redirect("/onboarding/step-2");
 
+  // The Founding Cohort room is private — block direct-URL access for anyone
+  // who isn't a member (the room is added on founder-code redemption).
+  if (
+    roomName === "founding" &&
+    !((profile as User).room_memberships ?? []).includes("founding")
+  ) {
+    notFound();
+  }
+
   return (
     <div className="flex flex-col" style={{ height: "100dvh" }}>
       {/* Back bar */}

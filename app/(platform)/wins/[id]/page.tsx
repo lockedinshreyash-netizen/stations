@@ -16,7 +16,7 @@ export default async function WinDetailPage({
 
   const { data: win } = await supabase
     .from("wins")
-    .select("*, users(username, avatar_url)")
+    .select("*, users(username, avatar_url, founder_number)")
     .eq("id", id)
     .single();
 

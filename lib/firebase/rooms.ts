@@ -57,6 +57,12 @@ export const ROOM_META: Record<RoomName, RoomMeta> = {
     title: "COLLECTIVE ROOM",
     description: "All ambitious people. Cross-category collaboration and connection.",
   },
+  founding: {
+    name: "founding",
+    title: "FOUNDING COHORT",
+    description:
+      "The first 100. Invite-only, sealed forever. The room nobody else can enter.",
+  },
 };
 
 /** Maps a user's capitalized category to its room name, if one exists. */
@@ -91,6 +97,9 @@ export interface ChatMessage {
   username: string;
   avatar_url: string | null;
   category: string | null;
+  // Denormalized so the Founding Cohort marker can render in chat without an
+  // extra per-message user lookup. Null/absent for non-founders.
+  founder_number: number | null;
   content: string;
   created_at: number; // ms epoch (resolved server timestamp)
 }
@@ -112,6 +121,7 @@ function snapshotToMessage(snap: DataSnapshot): ChatMessage | null {
     username: v.username,
     avatar_url: v.avatar_url ?? null,
     category: v.category ?? null,
+    founder_number: typeof v.founder_number === "number" ? v.founder_number : null,
     content: v.content ?? "",
     // serverTimestamp resolves to a number once written; pending writes can be
     // null briefly — treat those as "now" so optimistic ordering holds.
@@ -153,6 +163,7 @@ export async function sendMessage(
     username: message.username,
     avatar_url: message.avatar_url ?? null,
     category: message.category ?? null,
+    founder_number: message.founder_number ?? null,
     content: message.content,
     created_at: serverTimestamp(),
   });

@@ -55,6 +55,8 @@ export interface User {
   bio: string | null;
   status: UserStatus;
   membership_tier: MembershipTier;
+  // Permanent Founding Cohort number (#1…#100). Null for everyone else.
+  founder_number: number | null;
   is_admin: boolean;
   total_focus_minutes: number;
   total_sessions: number;

@@ -7,6 +7,7 @@ import type { WinCategory, ReactionCounts, ReactionType } from "@/types";
 import { REACTIONS, getCounts } from "@/lib/utils/reactions";
 import { formatDistanceToNow } from "date-fns";
 import EditWinModal, { type EditableWin } from "@/components/stations/EditWinModal";
+import FounderMark from "@/components/ui/FounderMark";
 
 export interface WinCardData {
   id: string;
@@ -20,7 +21,11 @@ export interface WinCardData {
   reactions_count: number;
   reaction_counts: ReactionCounts | null;
   created_at: string;
-  users: { username: string; avatar_url: string | null } | null;
+  users: {
+    username: string;
+    avatar_url: string | null;
+    founder_number: number | null;
+  } | null;
 }
 
 interface WinCardProps {
@@ -237,6 +242,7 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
           <span className="font-poppins text-[rgb(var(--fg-rgb))]" style={{ fontSize: "12px", fontWeight: 500 }}>
             {username}
           </span>
+          <FounderMark founderNumber={win.users?.founder_number} />
           <span className="font-poppins uppercase" style={{ fontSize: "9px", letterSpacing: "0.15em", color: CATEGORY_COLORS[win.category] }}>
             {win.category}
           </span>

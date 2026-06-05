@@ -8,6 +8,9 @@ export const ROOM_NAMES = [
   "creator",
   "athlete",
   "collective",
+  // Private — only Founding Cohort members are ever added (see
+  // claim_founder_code). Never surfaced in "Explore Stations".
+  "founding",
 ] as const;
 
 export type RoomName = (typeof ROOM_NAMES)[number];

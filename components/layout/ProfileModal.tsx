@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { User, UserRole } from "@/types";
+import MembershipBadge from "@/components/ui/MembershipBadge";
+import { addMember } from "@/lib/firebase/rooms";
 
 const ROLES: { value: UserRole; label: string }[] = [
   { value: "student",   label: "Student"   },
@@ -72,6 +74,12 @@ export default function ProfileModal({ user, onClose }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  // Founder-code redemption (for accounts created before/without a code).
+  const [redeemCode, setRedeemCode] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
+  const [redeemError, setRedeemError] = useState("");
+  const [redeemedNumber, setRedeemedNumber] = useState<number | null>(null);
+
   // Mount guard for portal + lock body scroll
   useEffect(() => {
     setMounted(true);
@@ -128,6 +136,37 @@ export default function ProfileModal({ user, onClose }: Props) {
     if (updateError) { setError("Failed to save. Try again."); setSaving(false); return; }
     router.refresh();
     onClose();
+  }
+
+  async function handleRedeem() {
+    const code = redeemCode.trim().toUpperCase();
+    if (!code) return;
+    setRedeeming(true);
+    setRedeemError("");
+    const supabase = createClient();
+    // Atomic: claims the code, assigns the next founding number, upgrades this
+    // account to the Founding Cohort, and adds the private room. Works for any
+    // logged-in user — including accounts that predate founder codes.
+    const { data: founderNo, error: rpcError } = await supabase.rpc(
+      "claim_founder_code",
+      { code }
+    );
+    if (rpcError) {
+      setRedeemError("Something went wrong. Try again.");
+      setRedeeming(false);
+      return;
+    }
+    if (typeof founderNo !== "number") {
+      setRedeemError("That code isn't valid or has already been claimed.");
+      setRedeeming(false);
+      return;
+    }
+    // Mirror cohort membership into Firebase so the chat lists them.
+    await addMember("founding", user.id).catch(() => {});
+    setRedeemedNumber(founderNo);
+    setRedeeming(false);
+    // Reflect the new tier/number/room everywhere on next paint.
+    router.refresh();
   }
 
   async function handleLogout() {
@@ -263,6 +302,12 @@ export default function ProfileModal({ user, onClose }: Props) {
               >
                 @{user.username}
               </span>
+              <span style={{ marginTop: "2px" }}>
+                <MembershipBadge
+                  tier={user.membership_tier}
+                  founderNumber={user.founder_number}
+                />
+              </span>
             </div>
 
             <input
@@ -278,6 +323,67 @@ export default function ProfileModal({ user, onClose }: Props) {
             <span className="font-poppins font-light" style={{ fontSize: "11px", color: "var(--accent)", marginTop: "-20px" }}>
               {avatarError}
             </span>
+          )}
+
+          {/* Founder code redemption — only for non-founders */}
+          {user.membership_tier !== "founding" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <span className="font-poppins" style={labelStyle}>Founder code</span>
+              {redeemedNumber !== null ? (
+                <span
+                  className="font-poppins"
+                  style={{ fontSize: "12px", color: "var(--accent)" }}
+                >
+                  ◆ Welcome to the Founding Cohort — you&apos;re No.{" "}
+                  {String(redeemedNumber).padStart(3, "0")}.
+                </span>
+              ) : (
+                <>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input
+                      value={redeemCode}
+                      onChange={(e) => {
+                        setRedeemCode(e.target.value);
+                        if (redeemError) setRedeemError("");
+                      }}
+                      placeholder="STN-7F3KQ2"
+                      autoComplete="off"
+                      spellCheck={false}
+                      style={{ ...fieldStyle, textTransform: "uppercase", letterSpacing: "0.15em" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRedeem}
+                      disabled={redeeming || !redeemCode.trim()}
+                      className="font-poppins font-black uppercase"
+                      style={{
+                        fontSize: "11px",
+                        letterSpacing: "0.12em",
+                        padding: "0 18px",
+                        whiteSpace: "nowrap",
+                        background: "rgb(var(--fg-rgb))",
+                        color: "var(--bg-primary)",
+                        border: "none",
+                        borderRadius: "var(--radius-sm)",
+                        cursor: redeeming ? "default" : "pointer",
+                        opacity: redeeming || !redeemCode.trim() ? 0.4 : 1,
+                      }}
+                    >
+                      {redeeming ? "…" : "Redeem"}
+                    </button>
+                  </div>
+                  {redeemError ? (
+                    <span className="font-poppins font-light" style={{ fontSize: "11px", color: "var(--accent)" }}>
+                      {redeemError}
+                    </span>
+                  ) : (
+                    <span className="font-poppins font-light" style={{ fontSize: "11px", color: "rgba(var(--fg-rgb),0.3)" }}>
+                      Got a code from the waitlist? Redeem it for free premium, forever.
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
           )}
 
           {/* Bio */}
