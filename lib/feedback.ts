@@ -103,24 +103,41 @@ function play(tones: () => void): void {
   void resume().then(tones);
 }
 
-function buzz(pattern: number | number[]): void {
-  if (typeof window === "undefined" || !("vibrate" in navigator)) return;
+function buzz(pattern: number | number[]): boolean {
+  if (typeof window === "undefined" || !("vibrate" in navigator)) return false;
   try {
-    navigator.vibrate(pattern);
+    // navigator.vibrate returns false if the call was blocked (no user
+    // activation, battery saver, DND, etc.) or unsupported.
+    return navigator.vibrate(pattern);
   } catch {
-    /* no-op */
+    return false;
   }
 }
 
+/**
+ * Diagnostic: a long, unmistakable buzz + a report of what the platform
+ * actually supports. Used by the "Test" control in settings so we can tell a
+ * code problem from a device/OS limitation.
+ */
+export function testHaptics(): { supported: boolean; accepted: boolean } {
+  const supported =
+    typeof navigator !== "undefined" && "vibrate" in navigator;
+  const accepted = buzz([120, 60, 120, 60, 200]);
+  return { supported, accepted };
+}
+
+/* Pulse lengths are kept >= ~25ms — shorter pulses don't physically register
+   on most Android vibration motors (they barely spin up). */
+
 /** Light tick — navigation, toggles, secondary taps. */
 export function tap(): void {
-  buzz(12);
+  buzz(30);
   play(() => tone(1250, 0, 0.06, 0.22, "triangle"));
 }
 
 /** Affirmative two-note rise — win posted, session completed, key wins. */
 export function success(): void {
-  buzz([14, 30, 22]);
+  buzz([35, 45, 70]);
   play(() => {
     tone(660, 0, 0.13, 0.28, "sine");
     tone(990, 0.1, 0.24, 0.26, "sine");
@@ -129,11 +146,11 @@ export function success(): void {
 
 /** Soft low thud — errors, destructive confirmations. */
 export function error(): void {
-  buzz([24, 40, 24]);
+  buzz([70, 50, 70]);
   play(() => tone(196, 0, 0.2, 0.3, "sine"));
 }
 
 /** Haptic-only nudge for press feedback where sound would be too much. */
 export function tick(): void {
-  buzz(10);
+  buzz(25);
 }

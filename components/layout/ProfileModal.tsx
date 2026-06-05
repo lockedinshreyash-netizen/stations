@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { User, UserRole } from "@/types";
 import MembershipBadge from "@/components/ui/MembershipBadge";
 import { addMember } from "@/lib/firebase/rooms";
-import { isSoundEnabled, setSoundEnabled, success, error as errorSound } from "@/lib/feedback";
+import { isSoundEnabled, setSoundEnabled, success, error as errorSound, testHaptics } from "@/lib/feedback";
 
 const ROLES: { value: UserRole; label: string }[] = [
   { value: "student",   label: "Student"   },
@@ -75,9 +75,21 @@ export default function ProfileModal({ user, onClose }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [soundOn, setSoundOn] = useState(true);
+  const [hapticMsg, setHapticMsg] = useState("");
 
   // Reflect the stored sound preference once mounted (localStorage is client-only).
   useEffect(() => { setSoundOn(isSoundEnabled()); }, []);
+
+  function runHapticTest() {
+    const { supported, accepted } = testHaptics();
+    if (!supported) {
+      setHapticMsg("This browser has no Vibration API (normal on iPhone & most desktops).");
+    } else if (accepted) {
+      setHapticMsg("Buzz sent. If you felt nothing, check battery saver / Do Not Disturb / system vibration.");
+    } else {
+      setHapticMsg("Vibration was blocked by the device (battery saver, DND, or vibration is off).");
+    }
+  }
 
   // Founder-code redemption (for accounts created before/without a code).
   const [redeemCode, setRedeemCode] = useState("");
@@ -493,6 +505,29 @@ export default function ProfileModal({ user, onClose }: Props) {
               <span className="font-poppins font-light" style={{ fontSize: "14px", color: "rgba(var(--fg-rgb),0.3)" }}>
                 Subtle taps and chimes as you move through Stations.
               </span>
+              <button
+                type="button"
+                onClick={runHapticTest}
+                className="font-poppins uppercase st-pill"
+                style={{
+                  alignSelf: "flex-start",
+                  marginTop: "6px",
+                  fontSize: "12px",
+                  letterSpacing: "0.12em",
+                  padding: "6px 12px",
+                  border: "0.5px solid rgba(var(--accent-2-rgb),0.5)",
+                  color: "rgba(var(--accent-2-rgb),0.9)",
+                  background: "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                Test buzz
+              </button>
+              {hapticMsg && (
+                <span className="font-poppins font-light" style={{ fontSize: "13px", color: "rgba(var(--fg-rgb),0.45)", maxWidth: "260px", lineHeight: 1.4 }}>
+                  {hapticMsg}
+                </span>
+              )}
             </div>
             <button
               type="button"
