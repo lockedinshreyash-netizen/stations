@@ -19,7 +19,11 @@ import type {
 
 /** Raw shape returned by the joined select below. */
 type SessionRow = WorkSession & {
-  host: { username: string; avatar_url: string | null } | null;
+  host: {
+    username: string;
+    avatar_url: string | null;
+    founder_number: number | null;
+  } | null;
   members: { count: number }[] | null;
 };
 
@@ -30,11 +34,12 @@ function toMeta(row: SessionRow): WorkSessionWithMeta {
     member_count: members?.[0]?.count ?? 0,
     host_username: host?.username ?? "unknown",
     host_avatar_url: host?.avatar_url ?? null,
+    host_founder_number: host?.founder_number ?? null,
   };
 }
 
 const SESSION_SELECT =
-  "*, host:users!work_sessions_host_id_fkey(username, avatar_url), members:work_session_members(count)";
+  "*, host:users!work_sessions_host_id_fkey(username, avatar_url, founder_number), members:work_session_members(count)";
 
 /**
  * Active + scheduled sessions for the feed. Active first, then scheduled

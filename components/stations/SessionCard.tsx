@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { joinSession } from "@/lib/work/sessions";
 import { formatDuration, formatStartsIn } from "@/lib/work/format";
 import type { WorkSessionWithMeta } from "@/types";
+import FounderMark from "@/components/ui/FounderMark";
 
 interface SessionCardProps {
   session: WorkSessionWithMeta;
@@ -91,10 +92,11 @@ export default function SessionCard({
       {/* Meta */}
       <div className="flex flex-col gap-1">
         <span
-          className="font-poppins text-[rgba(var(--fg-rgb),0.4)]"
+          className="font-poppins text-[rgba(var(--fg-rgb),0.4)] flex items-center gap-1.5"
           style={{ fontSize: "12px" }}
         >
           {session.host_username}
+          <FounderMark founderNumber={session.host_founder_number} />
         </span>
         <span
           className="font-poppins text-[rgba(var(--fg-rgb),0.4)]"

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { User, WorkSession, WorkSessionWithMeta } from "@/types";
 
 const SESSION_SELECT =
-  "*, host:users!work_sessions_host_id_fkey(username, avatar_url), members:work_session_members(count)";
+  "*, host:users!work_sessions_host_id_fkey(username, avatar_url, founder_number), members:work_session_members(count)";
 const MEMBER_SELECT =
   "*, user:users!work_session_members_user_id_fkey(username, avatar_url, founder_number)";
 
@@ -37,7 +37,11 @@ export default async function SessionPage({
   if (!row) notFound();
 
   type Row = WorkSession & {
-    host: { username: string; avatar_url: string | null } | null;
+    host: {
+      username: string;
+      avatar_url: string | null;
+      founder_number: number | null;
+    } | null;
     members: { count: number }[] | null;
   };
   const r = row as Row;
@@ -47,6 +51,7 @@ export default async function SessionPage({
     member_count: members?.[0]?.count ?? 0,
     host_username: host?.username ?? "unknown",
     host_avatar_url: host?.avatar_url ?? null,
+    host_founder_number: host?.founder_number ?? null,
   };
 
   const { data: memberRows } = await supabase

@@ -3,18 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Trophy, Users, Archive, Clock, Target, Moon, Sun } from "lucide-react";
+import { Trophy, Users, Archive, Clock, MessageCircle, Moon, Sun } from "lucide-react";
 import type { User } from "@/types";
 import ProfileModal from "./ProfileModal";
 import { useWinsUnread } from "@/lib/wins/useWinsUnread";
 import { useNetworkUnread } from "@/lib/rooms/useNetworkUnread";
+import { useDmUnread } from "@/lib/dm/useDmUnread";
 
 const NAV = [
   { label: "Wins", href: "/wins", Icon: Trophy },
   { label: "Network", href: "/network", Icon: Users },
   { label: "Archive", href: "/archive", Icon: Archive },
   { label: "Work", href: "/work", Icon: Clock },
-  { label: "Focus", href: "/focus", Icon: Target },
+  { label: "Messages", href: "/messages", Icon: MessageCircle },
 ] as const;
 
 /**
@@ -30,6 +31,7 @@ export default function BottomNav({ user }: { user: User }) {
   // Unread/notification state for the Wins and Network tabs.
   const { hasNew: winsHasNew, markSeen: markWinsSeen } = useWinsUnread(user.id);
   const networkUnread = useNetworkUnread(user);
+  const dmUnread = useDmUnread(user.id);
   const onWins = pathname.startsWith("/wins");
 
   // Reaching the Wins feed (by any route) clears its badge.
@@ -40,6 +42,7 @@ export default function BottomNav({ user }: { user: User }) {
   const badgeFor = (href: string): boolean => {
     if (href === "/wins") return winsHasNew && !onWins;
     if (href === "/network") return networkUnread;
+    if (href === "/messages") return dmUnread;
     return false;
   };
 

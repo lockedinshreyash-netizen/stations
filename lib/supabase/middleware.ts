@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Protected platform routes
-  const platformRoutes = ["/wins", "/network", "/archive", "/work", "/focus"];
+  const platformRoutes = ["/wins", "/network", "/archive", "/work", "/messages"];
   const isProtected = platformRoutes.some((r) => pathname.startsWith(r));
 
   if (!user && isProtected) {

@@ -8,6 +8,7 @@ import { type WinCardData, storagePathFromUrl } from "@/components/stations/WinC
 import EditWinModal from "@/components/stations/EditWinModal";
 import type { ReactionType, ReactionCounts } from "@/types";
 import { REACTIONS, getCounts } from "@/lib/utils/reactions";
+import FounderMark from "@/components/ui/FounderMark";
 import { formatDistanceToNow } from "date-fns";
 
 interface WinDetailProps {
@@ -201,6 +202,7 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
       {/* Meta */}
       <div className="flex items-center flex-wrap" style={{ gap: "10px", marginBottom: "16px" }}>
         <span className="font-poppins text-[rgb(var(--fg-rgb))]" style={{ fontSize: "12px", fontWeight: 500 }}>{username}</span>
+        <FounderMark founderNumber={win.users?.founder_number} />
         <span className="font-poppins uppercase" style={{ fontSize: "9px", letterSpacing: "0.15em", color: "rgba(var(--fg-rgb),0.4)" }}>
           {win.category}
         </span>

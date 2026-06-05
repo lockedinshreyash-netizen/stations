@@ -111,6 +111,36 @@ export interface WorkSessionWithMeta extends WorkSession {
   member_count: number;
   host_username: string;
   host_avatar_url: string | null;
+  host_founder_number: number | null;
+}
+
+// ============================================================
+// DIRECT MESSAGES (private 1:1) — supabase/direct_messages.sql
+// ============================================================
+export interface DirectMessage {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  read_at: string | null;
+}
+
+/** Minimal public profile of the other person in a conversation. */
+export interface DmParticipant {
+  id: string;
+  username: string;
+  avatar_url: string | null;
+  founder_number: number | null;
+}
+
+/** A conversation row enriched with the other participant + preview, for the inbox. */
+export interface ConversationSummary {
+  id: string;
+  last_message_at: string;
+  other: DmParticipant;
+  last_message: string | null;
+  unread: boolean;
 }
 
 export interface Application {
