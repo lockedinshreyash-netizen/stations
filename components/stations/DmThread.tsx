@@ -187,12 +187,12 @@ export default function DmThread({
         <Link
           href="/messages"
           className="font-poppins font-medium uppercase text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))] transition-colors"
-          style={{ fontSize: "11px", letterSpacing: "0.15em" }}
+          style={{ fontSize: "14px", letterSpacing: "0.15em" }}
         >
           ←
         </Link>
         <Avatar url={peer.avatar_url} username={peer.username} />
-        <span className="font-poppins font-medium text-[rgb(var(--fg-rgb))] flex items-center gap-1.5" style={{ fontSize: "14px" }}>
+        <span className="font-poppins font-medium text-[rgb(var(--fg-rgb))] flex items-center gap-1.5" style={{ fontSize: "17px" }}>
           {peer.username}
           <FounderMark founderNumber={peer.founder_number} />
         </span>
@@ -201,7 +201,7 @@ export default function DmThread({
       {/* Messages */}
       <div className="flex-1 min-h-0 overflow-y-auto px-5 py-5 flex flex-col gap-2.5 max-w-2xl mx-auto w-full">
         {messages.length === 0 && (
-          <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.25)] text-center mt-8" style={{ fontSize: "14px" }}>
+          <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.25)] text-center mt-8" style={{ fontSize: "17px" }}>
             This is the beginning of your conversation with {peer.username}.
           </p>
         )}
@@ -232,7 +232,7 @@ export default function DmThread({
                       type="button"
                       onClick={cancelEdit}
                       className="font-poppins uppercase text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))]"
-                      style={{ fontSize: "10px", letterSpacing: "0.1em" }}
+                      style={{ fontSize: "13px", letterSpacing: "0.1em" }}
                     >
                       Cancel
                     </button>
@@ -242,7 +242,7 @@ export default function DmThread({
                       disabled={!editDraft.trim()}
                       className="font-poppins font-black uppercase"
                       style={{
-                        fontSize: "10px",
+                        fontSize: "13px",
                         letterSpacing: "0.1em",
                         padding: "5px 12px",
                         background: "rgb(var(--fg-rgb))",
@@ -276,7 +276,7 @@ export default function DmThread({
                       border: "none",
                       cursor: "pointer",
                       color: "rgba(var(--fg-rgb),0.35)",
-                      fontSize: "15px",
+                      fontSize: "18px",
                       lineHeight: 1,
                       padding: "2px 4px",
                       opacity: menuFor === m.id ? 1 : undefined,
@@ -304,7 +304,7 @@ export default function DmThread({
                         type="button"
                         onClick={() => startEdit(m)}
                         className="font-poppins text-left hover:bg-[rgba(var(--fg-rgb),0.05)]"
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.7)", fontSize: "12px", padding: "10px 14px", fontWeight: 300 }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.7)", fontSize: "15px", padding: "10px 14px", fontWeight: 300 }}
                       >
                         Edit
                       </button>
@@ -312,7 +312,7 @@ export default function DmThread({
                         type="button"
                         onClick={() => handleDelete(m)}
                         className="font-poppins text-left hover:bg-[rgba(var(--fg-rgb),0.05)]"
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: "12px", padding: "10px 14px", fontWeight: 300, borderTop: "0.5px solid rgba(var(--fg-rgb),0.06)" }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: "15px", padding: "10px 14px", fontWeight: 300, borderTop: "0.5px solid rgba(var(--fg-rgb),0.06)" }}
                       >
                         Delete
                       </button>
@@ -327,7 +327,7 @@ export default function DmThread({
                   maxWidth: "78%",
                   padding: "9px 13px",
                   borderRadius: "16px",
-                  fontSize: "13px",
+                  fontSize: "16px",
                   lineHeight: 1.5,
                   whiteSpace: "pre-wrap",
                   wordBreak: "break-word",
@@ -341,7 +341,7 @@ export default function DmThread({
                 {m.edited_at && (
                   <span
                     style={{
-                      fontSize: "9px",
+                      fontSize: "12px",
                       marginLeft: "6px",
                       opacity: 0.6,
                       fontStyle: "italic",
@@ -391,7 +391,7 @@ export default function DmThread({
           disabled={!draft.trim() || sending}
           className="st-btn font-poppins font-black uppercase shrink-0"
           style={{
-            fontSize: "11px",
+            fontSize: "14px",
             letterSpacing: "0.12em",
             padding: "11px 18px",
             background: "rgb(var(--fg-rgb))",
@@ -406,7 +406,7 @@ export default function DmThread({
         </button>
       </form>
       {error && (
-        <p className="px-5 pb-2 font-poppins text-center" style={{ color: "var(--accent)", fontSize: "11px" }}>
+        <p className="px-5 pb-2 font-poppins text-center" style={{ color: "var(--accent)", fontSize: "14px" }}>
           {error}
         </p>
       )}
@@ -418,13 +418,13 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
   if (url) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={url} alt={username} className="rounded-full object-cover shrink-0" style={{ width: "30px", height: "30px" }} />
+      <img src={url} alt={username} className="rounded-full object-cover shrink-0" style={{ width: "42px", height: "42px" }} />
     );
   }
   return (
     <div
       className="rounded-full flex items-center justify-center font-poppins font-bold shrink-0"
-      style={{ width: "30px", height: "30px", fontSize: "12px", background: "rgba(var(--fg-rgb),0.1)", color: "rgba(var(--fg-rgb),0.6)" }}
+      style={{ width: "42px", height: "42px", fontSize: "15px", background: "rgba(var(--fg-rgb),0.1)", color: "rgba(var(--fg-rgb),0.6)" }}
     >
       {username.charAt(0).toUpperCase()}
     </div>

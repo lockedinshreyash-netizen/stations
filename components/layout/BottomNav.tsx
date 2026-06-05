@@ -115,7 +115,7 @@ export default function BottomNav({ user }: { user: User }) {
                 </span>
                 <span
                   className="font-poppins uppercase"
-                  style={{ fontSize: "8px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500 }}
+                  style={{ fontSize: "11px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500 }}
                 >
                   {label}
                 </span>
@@ -159,7 +159,7 @@ export default function BottomNav({ user }: { user: User }) {
             )}
             <span
               className="font-poppins uppercase"
-              style={{ fontSize: "8px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500 }}
+              style={{ fontSize: "11px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500 }}
             >
               Theme
             </span>
@@ -201,7 +201,7 @@ export default function BottomNav({ user }: { user: User }) {
               ) : (
                 <span
                   className="font-poppins uppercase"
-                  style={{ fontSize: "9px", fontWeight: 500, color: "rgba(var(--fg-rgb),0.6)" }}
+                  style={{ fontSize: "12px", fontWeight: 500, color: "rgba(var(--fg-rgb),0.6)" }}
                 >
                   {user.username[0]}
                 </span>
@@ -209,7 +209,7 @@ export default function BottomNav({ user }: { user: User }) {
             </span>
             <span
               className="font-poppins uppercase"
-              style={{ fontSize: "8px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500, color: "rgba(var(--fg-rgb),0.5)" }}
+              style={{ fontSize: "11px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500, color: "rgba(var(--fg-rgb),0.5)" }}
             >
               Profile
             </span>

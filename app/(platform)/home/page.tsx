@@ -31,7 +31,7 @@ export default async function PlatformHome() {
       <div className="px-5 md:px-10 pt-12 pb-10 md:pt-16 md:pb-12 border-b border-[rgba(var(--fg-rgb),0.06)]">
         <p
           className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]"
-          style={{ fontSize: "12px", marginBottom: "8px" }}
+          style={{ fontSize: "15px", marginBottom: "8px" }}
         >
           Welcome back —
         </p>
@@ -44,7 +44,7 @@ export default async function PlatformHome() {
         </h1>
         <p
           className="font-playfair italic text-[rgba(var(--fg-rgb),0.35)] mt-4"
-          style={{ fontSize: "16px", lineHeight: 1.5 }}
+          style={{ fontSize: "19px", lineHeight: 1.5 }}
         >
           {user.category} · {roles.join(", ")}
         </p>
@@ -57,7 +57,7 @@ export default async function PlatformHome() {
         <div>
           <p
             className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.25)] mb-5"
-            style={{ fontSize: "11px", letterSpacing: "0.2em" }}
+            style={{ fontSize: "14px", letterSpacing: "0.2em" }}
           >
             Your stats
           </p>
@@ -73,13 +73,13 @@ export default async function PlatformHome() {
         <div>
           <p
             className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.25)] mb-5"
-            style={{ fontSize: "11px", letterSpacing: "0.2em" }}
+            style={{ fontSize: "14px", letterSpacing: "0.2em" }}
           >
             Active challenges
           </p>
           <p
             className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]"
-            style={{ fontSize: "15px" }}
+            style={{ fontSize: "18px" }}
           >
             No active challenges.
           </p>
@@ -89,13 +89,13 @@ export default async function PlatformHome() {
         <div>
           <p
             className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.25)] mb-5"
-            style={{ fontSize: "11px", letterSpacing: "0.2em" }}
+            style={{ fontSize: "14px", letterSpacing: "0.2em" }}
           >
             Recent wins
           </p>
           <p
             className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]"
-            style={{ fontSize: "15px" }}
+            style={{ fontSize: "18px" }}
           >
             No wins yet.{" "}
             <a

@@ -74,7 +74,7 @@ export default function SessionCard({
       <div className="flex items-center justify-between">
         <span
           className="font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.35)]"
-          style={{ fontSize: "10px", letterSpacing: "0.18em" }}
+          style={{ fontSize: "13px", letterSpacing: "0.18em" }}
         >
           {session.category}
         </span>
@@ -84,7 +84,7 @@ export default function SessionCard({
       {/* Title */}
       <h3
         className="font-poppins font-bold text-[rgb(var(--fg-rgb))] leading-snug"
-        style={{ fontSize: "16px" }}
+        style={{ fontSize: "19px" }}
       >
         {session.title}
       </h3>
@@ -93,14 +93,14 @@ export default function SessionCard({
       <div className="flex flex-col gap-1">
         <span
           className="font-poppins text-[rgba(var(--fg-rgb),0.4)] flex items-center gap-1.5"
-          style={{ fontSize: "12px" }}
+          style={{ fontSize: "15px" }}
         >
           {session.host_username}
           <FounderMark founderNumber={session.host_founder_number} />
         </span>
         <span
           className="font-poppins text-[rgba(var(--fg-rgb),0.4)]"
-          style={{ fontSize: "12px" }}
+          style={{ fontSize: "15px" }}
         >
           {formatDuration(session.duration_minutes)} ·{" "}
           {session.member_count}{" "}
@@ -109,7 +109,7 @@ export default function SessionCard({
       </div>
 
       {error && (
-        <span className="font-poppins" style={{ fontSize: "11px", color: "var(--accent)" }}>
+        <span className="font-poppins" style={{ fontSize: "14px", color: "var(--accent)" }}>
           {error}
         </span>
       )}
@@ -123,7 +123,7 @@ export default function SessionCard({
             disabled={joining}
             className="st-btn font-poppins font-bold uppercase disabled:opacity-50"
             style={{
-              fontSize: "11px",
+              fontSize: "14px",
               letterSpacing: "0.1em",
               background: "var(--accent)",
               color: "var(--bg-primary)",
@@ -138,7 +138,7 @@ export default function SessionCard({
             onClick={open}
             className="st-btn font-poppins font-bold uppercase"
             style={{
-              fontSize: "11px",
+              fontSize: "14px",
               letterSpacing: "0.1em",
               background: "transparent",
               color: "rgba(var(--fg-rgb),0.6)",
@@ -165,7 +165,7 @@ function StatusPill({
     return (
       <span
         className="font-poppins font-black uppercase flex items-center gap-1.5"
-        style={{ fontSize: "10px", letterSpacing: "0.12em", color: "var(--accent)" }}
+        style={{ fontSize: "13px", letterSpacing: "0.12em", color: "var(--accent)" }}
       >
         <span
           className="inline-block rounded-full"
@@ -179,7 +179,7 @@ function StatusPill({
     return (
       <span
         className="font-poppins uppercase text-[rgba(var(--fg-rgb),0.3)]"
-        style={{ fontSize: "10px", letterSpacing: "0.12em" }}
+        style={{ fontSize: "13px", letterSpacing: "0.12em" }}
       >
         Completed
       </span>
@@ -189,7 +189,7 @@ function StatusPill({
     return (
       <span
         className="font-poppins uppercase text-[rgba(var(--fg-rgb),0.3)]"
-        style={{ fontSize: "10px", letterSpacing: "0.12em" }}
+        style={{ fontSize: "13px", letterSpacing: "0.12em" }}
       >
         Cancelled
       </span>
@@ -199,7 +199,7 @@ function StatusPill({
   return (
     <span
       className="font-poppins text-[rgba(var(--fg-rgb),0.5)]"
-      style={{ fontSize: "11px" }}
+      style={{ fontSize: "14px" }}
     >
       {formatStartsIn(session.scheduled_start_time, now)}
     </span>

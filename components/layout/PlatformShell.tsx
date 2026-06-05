@@ -23,7 +23,7 @@ export default function PlatformShell({
     /\/messages\/[^/]+/.test(pathname);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
+    <div className="min-h-screen">
       {/* Bottom padding clears the floating nav on normal scrollable pages. */}
       <main className={immersive ? "" : "pb-28"}>{children}</main>
 

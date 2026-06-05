@@ -29,7 +29,7 @@ export default function NetworkRooms({ user }: { user: User }) {
         <div
           className="st-card p-4 font-poppins"
           style={{
-            fontSize: "12px",
+            fontSize: "15px",
             border: "0.5px solid var(--accent)",
             color: "var(--accent)",
           }}
@@ -45,7 +45,7 @@ export default function NetworkRooms({ user }: { user: User }) {
         {myRooms.length === 0 ? (
           <p
             className="font-playfair italic text-[rgba(var(--fg-rgb),0.3)]"
-            style={{ fontSize: "14px" }}
+            style={{ fontSize: "17px" }}
           >
             You&apos;re in Collective. Explore other stations.
           </p>
@@ -83,7 +83,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <h2
       className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] mb-6"
-      style={{ fontSize: "13px", letterSpacing: "0.25em" }}
+      style={{ fontSize: "16px", letterSpacing: "0.25em" }}
     >
       {children}
     </h2>

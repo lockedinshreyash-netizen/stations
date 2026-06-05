@@ -152,12 +152,12 @@ export default function OnboardingStep4() {
           />
           <div className="flex justify-between items-center">
             {errors.why_join ? (
-              <span className="text-[var(--accent)] text-sm">{errors.why_join.message}</span>
+              <span className="text-[var(--accent)] text-base">{errors.why_join.message}</span>
             ) : (
               <span />
             )}
             <span
-              className={`text-sm font-light ${
+              className={`text-base font-light ${
                 whyJoin.length >= 50
                   ? "text-[rgba(var(--fg-rgb),0.5)]"
                   : "text-[rgba(var(--fg-rgb),0.2)]"
@@ -168,12 +168,12 @@ export default function OnboardingStep4() {
           </div>
         </div>
 
-        {serverError && <p className="text-[var(--accent)] text-sm">{serverError}</p>}
+        {serverError && <p className="text-[var(--accent)] text-base">{serverError}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="st-btn mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white disabled:opacity-40"
+          className="st-btn mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white disabled:opacity-40"
         >
           {loading ? "Joining Stations…" : "Join Stations"}
         </button>
@@ -182,7 +182,7 @@ export default function OnboardingStep4() {
       <button
         type="button"
         onClick={() => router.push("/onboarding/step-3")}
-        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-sm font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
+        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
       >
         ← Back
       </button>

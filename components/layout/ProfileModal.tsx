@@ -38,7 +38,7 @@ interface Props {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontSize: "10px",
+  fontSize: "13px",
   letterSpacing: "0.18em",
   color: "rgba(var(--fg-rgb),0.3)",
   textTransform: "uppercase" as const,
@@ -49,7 +49,7 @@ const fieldStyle: React.CSSProperties = {
   background: "var(--bg-surface)",
   border: "0.5px solid rgba(var(--fg-rgb),0.12)",
   color: "rgb(var(--fg-rgb))",
-  fontSize: "13px",
+  fontSize: "16px",
   padding: "12px 14px",
   outline: "none",
   width: "100%",
@@ -220,7 +220,7 @@ export default function ProfileModal({ user, onClose }: Props) {
         >
           <span
             className="font-poppins font-black uppercase"
-            style={{ fontSize: "12px", letterSpacing: "0.22em", color: "rgb(var(--fg-rgb))" }}
+            style={{ fontSize: "15px", letterSpacing: "0.22em", color: "rgb(var(--fg-rgb))" }}
           >
             Account Settings
           </span>
@@ -231,7 +231,7 @@ export default function ProfileModal({ user, onClose }: Props) {
               border: "none",
               cursor: "pointer",
               color: "rgba(var(--fg-rgb),0.3)",
-              fontSize: "20px",
+              fontSize: "23px",
               lineHeight: 1,
               padding: "2px 4px",
               transition: "color 150ms",
@@ -274,7 +274,7 @@ export default function ProfileModal({ user, onClose }: Props) {
               ) : (
                 <span
                   className="font-poppins uppercase"
-                  style={{ fontSize: "20px", fontWeight: 500, color: "rgba(var(--fg-rgb),0.4)" }}
+                  style={{ fontSize: "23px", fontWeight: 500, color: "rgba(var(--fg-rgb),0.4)" }}
                 >
                   {user.username[0]}
                 </span>
@@ -283,7 +283,7 @@ export default function ProfileModal({ user, onClose }: Props) {
                 className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 style={{ background: "rgba(0,0,0,0.6)" }}
               >
-                <span className="font-poppins uppercase text-white" style={{ fontSize: "8px", letterSpacing: "0.12em" }}>
+                <span className="font-poppins uppercase text-white" style={{ fontSize: "11px", letterSpacing: "0.12em" }}>
                   Change
                 </span>
               </div>
@@ -292,13 +292,13 @@ export default function ProfileModal({ user, onClose }: Props) {
             <div style={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}>
               <span
                 className="font-poppins font-black"
-                style={{ fontSize: "16px", color: "rgb(var(--fg-rgb))", lineHeight: 1.2 }}
+                style={{ fontSize: "19px", color: "rgb(var(--fg-rgb))", lineHeight: 1.2 }}
               >
                 {user.full_name}
               </span>
               <span
                 className="font-poppins font-light"
-                style={{ fontSize: "12px", color: "rgba(var(--fg-rgb),0.4)" }}
+                style={{ fontSize: "15px", color: "rgba(var(--fg-rgb),0.4)" }}
               >
                 @{user.username}
               </span>
@@ -320,7 +320,7 @@ export default function ProfileModal({ user, onClose }: Props) {
           </div>
 
           {avatarError && (
-            <span className="font-poppins font-light" style={{ fontSize: "11px", color: "var(--accent)", marginTop: "-20px" }}>
+            <span className="font-poppins font-light" style={{ fontSize: "14px", color: "var(--accent)", marginTop: "-20px" }}>
               {avatarError}
             </span>
           )}
@@ -332,7 +332,7 @@ export default function ProfileModal({ user, onClose }: Props) {
               {redeemedNumber !== null ? (
                 <span
                   className="font-poppins"
-                  style={{ fontSize: "12px", color: "var(--accent)" }}
+                  style={{ fontSize: "15px", color: "var(--accent)" }}
                 >
                   ◆ Welcome to the Founding Cohort — you&apos;re No.{" "}
                   {String(redeemedNumber).padStart(3, "0")}.
@@ -357,7 +357,7 @@ export default function ProfileModal({ user, onClose }: Props) {
                       disabled={redeeming || !redeemCode.trim()}
                       className="font-poppins font-black uppercase"
                       style={{
-                        fontSize: "11px",
+                        fontSize: "14px",
                         letterSpacing: "0.12em",
                         padding: "0 18px",
                         whiteSpace: "nowrap",
@@ -373,11 +373,11 @@ export default function ProfileModal({ user, onClose }: Props) {
                     </button>
                   </div>
                   {redeemError ? (
-                    <span className="font-poppins font-light" style={{ fontSize: "11px", color: "var(--accent)" }}>
+                    <span className="font-poppins font-light" style={{ fontSize: "14px", color: "var(--accent)" }}>
                       {redeemError}
                     </span>
                   ) : (
-                    <span className="font-poppins font-light" style={{ fontSize: "11px", color: "rgba(var(--fg-rgb),0.3)" }}>
+                    <span className="font-poppins font-light" style={{ fontSize: "14px", color: "rgba(var(--fg-rgb),0.3)" }}>
                       Got a code from the waitlist? Redeem it for free premium, forever.
                     </span>
                   )}
@@ -401,7 +401,7 @@ export default function ProfileModal({ user, onClose }: Props) {
             />
             <span
               className="font-poppins font-light"
-              style={{ fontSize: "10px", color: "rgba(var(--fg-rgb),0.2)", alignSelf: "flex-end" }}
+              style={{ fontSize: "13px", color: "rgba(var(--fg-rgb),0.2)", alignSelf: "flex-end" }}
             >
               {bio.length}/200
             </span>
@@ -420,7 +420,7 @@ export default function ProfileModal({ user, onClose }: Props) {
                     onClick={() => setRole(value)}
                     className="font-poppins font-light uppercase"
                     style={{
-                      fontSize: "10px",
+                      fontSize: "13px",
                       letterSpacing: "0.12em",
                       padding: "7px 14px",
                       background: active ? "var(--accent)" : "transparent",
@@ -444,7 +444,7 @@ export default function ProfileModal({ user, onClose }: Props) {
               <span className="font-poppins" style={labelStyle}>Goals</span>
               <span
                 className="font-poppins font-light"
-                style={{ fontSize: "10px", color: "rgba(var(--fg-rgb),0.2)", letterSpacing: "0.08em" }}
+                style={{ fontSize: "13px", color: "rgba(var(--fg-rgb),0.2)", letterSpacing: "0.08em" }}
               >
                 {goals.length} / 5
               </span>
@@ -461,7 +461,7 @@ export default function ProfileModal({ user, onClose }: Props) {
                     disabled={maxed}
                     className="font-poppins font-light uppercase"
                     style={{
-                      fontSize: "10px",
+                      fontSize: "13px",
                       letterSpacing: "0.1em",
                       padding: "7px 14px",
                       background: active ? "var(--accent)" : "transparent",
@@ -481,7 +481,7 @@ export default function ProfileModal({ user, onClose }: Props) {
           </div>
 
           {error && (
-            <span className="font-poppins font-light" style={{ fontSize: "12px", color: "var(--accent)" }}>
+            <span className="font-poppins font-light" style={{ fontSize: "15px", color: "var(--accent)" }}>
               {error}
             </span>
           )}
@@ -504,7 +504,7 @@ export default function ProfileModal({ user, onClose }: Props) {
             onClick={handleLogout}
             className="font-poppins uppercase"
             style={{
-              fontSize: "10px",
+              fontSize: "13px",
               letterSpacing: "0.15em",
               color: "rgba(var(--fg-rgb),0.3)",
               background: "none",
@@ -525,7 +525,7 @@ export default function ProfileModal({ user, onClose }: Props) {
             disabled={saving}
             className="st-btn font-poppins uppercase"
             style={{
-              fontSize: "11px",
+              fontSize: "14px",
               letterSpacing: "0.15em",
               fontWeight: 500,
               padding: "11px 28px",

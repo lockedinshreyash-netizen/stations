@@ -109,11 +109,11 @@ export default function OnboardingStep3() {
         {/* Roles — multi-select, max 3 */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+            <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
               I am a —
             </label>
             {roleLimitHit && (
-              <span className="text-[rgba(var(--fg-rgb),0.4)] text-xs font-light">
+              <span className="text-[rgba(var(--fg-rgb),0.4)] text-sm font-light">
                 Maximum 3 roles
               </span>
             )}
@@ -128,7 +128,7 @@ export default function OnboardingStep3() {
                   type="button"
                   onClick={() => toggleRole(r.value)}
                   disabled={dimmed}
-                  className={`st-pill px-4 py-2 text-sm border ${
+                  className={`st-pill px-4 py-2 text-base border ${
                     selected
                       ? "bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] border-[rgb(var(--fg-rgb))]"
                       : dimmed
@@ -142,18 +142,18 @@ export default function OnboardingStep3() {
             })}
           </div>
           {errors.roles && (
-            <span className="text-[var(--accent)] text-sm">{errors.roles}</span>
+            <span className="text-[var(--accent)] text-base">{errors.roles}</span>
           )}
         </div>
 
         {/* Goals — multi-select, max 5 */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+            <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
               My goals —
             </label>
             {goalLimitHit && (
-              <span className="text-[rgba(var(--fg-rgb),0.4)] text-xs font-light">
+              <span className="text-[rgba(var(--fg-rgb),0.4)] text-sm font-light">
                 Maximum 5 goals
               </span>
             )}
@@ -168,7 +168,7 @@ export default function OnboardingStep3() {
                   type="button"
                   onClick={() => toggleGoal(g.value)}
                   disabled={dimmed}
-                  className={`st-pill px-4 py-2 text-sm border ${
+                  className={`st-pill px-4 py-2 text-base border ${
                     selected
                       ? "bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] border-[rgb(var(--fg-rgb))]"
                       : dimmed
@@ -182,13 +182,13 @@ export default function OnboardingStep3() {
             })}
           </div>
           {errors.goals && (
-            <span className="text-[var(--accent)] text-sm">{errors.goals}</span>
+            <span className="text-[var(--accent)] text-base">{errors.goals}</span>
           )}
         </div>
 
         {/* Availability */}
         <div className="flex flex-col gap-3">
-          <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+          <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
             I can commit —
           </label>
           <div className="flex flex-wrap gap-2">
@@ -202,7 +202,7 @@ export default function OnboardingStep3() {
                     setAvailability(a);
                     setErrors((e) => ({ ...e, availability: "" }));
                   }}
-                  className={`st-pill px-4 py-2 text-sm border ${
+                  className={`st-pill px-4 py-2 text-base border ${
                     selected
                       ? "bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] border-[rgb(var(--fg-rgb))]"
                       : "bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] border-[rgba(var(--fg-rgb),0.2)] hover:border-[rgba(var(--fg-rgb),0.5)]"
@@ -214,14 +214,14 @@ export default function OnboardingStep3() {
             })}
           </div>
           {errors.availability && (
-            <span className="text-[var(--accent)] text-sm">{errors.availability}</span>
+            <span className="text-[var(--accent)] text-base">{errors.availability}</span>
           )}
         </div>
 
         <button
           type="button"
           onClick={handleSubmit}
-          className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white"
+          className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white"
         >
           Continue
         </button>
@@ -230,7 +230,7 @@ export default function OnboardingStep3() {
       <button
         type="button"
         onClick={() => router.push("/onboarding/step-2")}
-        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-sm font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
+        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
       >
         ← Back
       </button>

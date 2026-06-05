@@ -63,7 +63,7 @@ const fieldStyle: React.CSSProperties = {
   background: "var(--bg-surface)",
   border: "0.5px solid rgba(var(--fg-rgb),0.12)",
   color: "rgb(var(--fg-rgb))",
-  fontSize: "14px",
+  fontSize: "17px",
   padding: "12px 14px",
   outline: "none",
   width: "100%",
@@ -72,7 +72,7 @@ const fieldStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontSize: "10px",
+  fontSize: "13px",
   letterSpacing: "0.18em",
   color: "rgba(var(--fg-rgb),0.3)",
   textTransform: "uppercase",
@@ -237,7 +237,7 @@ export default function EditWinModal({ win, onClose, onUpdated }: EditWinModalPr
                   <button key={c.value} type="button" onClick={() => setValue("category", c.value)}
                     className="st-pill font-poppins font-light uppercase"
                     style={{
-                      fontSize: "10px", letterSpacing: "0.15em", padding: "6px 12px",
+                      fontSize: "13px", letterSpacing: "0.15em", padding: "6px 12px",
                       background: active ? "rgb(var(--fg-rgb))" : "var(--bg-surface)",
                       color: active ? "var(--bg-primary)" : "rgba(var(--fg-rgb),0.45)",
                       border: active ? "none" : "0.5px solid rgba(var(--fg-rgb),0.15)",
@@ -254,24 +254,24 @@ export default function EditWinModal({ win, onClose, onUpdated }: EditWinModalPr
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <div className="flex items-center justify-between">
               <label className="font-poppins" style={labelStyle}>What did you win?</label>
-              <span className="font-poppins font-light" style={{ fontSize: "10px", color: titleVal.length > 72 ? "var(--accent)" : "rgba(var(--fg-rgb),0.2)" }}>
+              <span className="font-poppins font-light" style={{ fontSize: "13px", color: titleVal.length > 72 ? "var(--accent)" : "rgba(var(--fg-rgb),0.2)" }}>
                 {titleVal.length}/80
               </span>
             </div>
             <input {...register("title")} type="text" className="st-field font-poppins text-[rgb(var(--fg-rgb))] outline-none" style={fieldStyle} maxLength={80} />
-            {errors.title && <span style={{ color: "var(--accent)", fontSize: "11px" }}>{errors.title.message}</span>}
+            {errors.title && <span style={{ color: "var(--accent)", fontSize: "14px" }}>{errors.title.message}</span>}
           </div>
 
           {/* Description */}
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <div className="flex items-center justify-between">
               <label className="font-poppins" style={labelStyle}>Tell us more</label>
-              <span className="font-poppins font-light" style={{ fontSize: "10px", color: descVal.length > 450 ? "var(--accent)" : "rgba(var(--fg-rgb),0.2)" }}>
+              <span className="font-poppins font-light" style={{ fontSize: "13px", color: descVal.length > 450 ? "var(--accent)" : "rgba(var(--fg-rgb),0.2)" }}>
                 {descVal.length}/500
               </span>
             </div>
             <textarea {...register("description")} rows={5} className="st-field font-poppins text-[rgb(var(--fg-rgb))] outline-none resize-none" style={{ ...fieldStyle, lineHeight: 1.7 }} maxLength={500} />
-            {errors.description && <span style={{ color: "var(--accent)", fontSize: "11px" }}>{errors.description.message}</span>}
+            {errors.description && <span style={{ color: "var(--accent)", fontSize: "14px" }}>{errors.description.message}</span>}
           </div>
 
           {/* Images */}
@@ -286,17 +286,17 @@ export default function EditWinModal({ win, onClose, onUpdated }: EditWinModalPr
                       <>
                         {slot.uploading ? (
                           <div className="flex items-center justify-center" style={{ width: "120px", height: "120px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--fg-rgb),0.12)", borderRadius: "var(--radius-md)" }}>
-                            <span className="font-poppins font-light" style={{ fontSize: "10px", color: "rgba(var(--fg-rgb),0.3)" }}>Uploading…</span>
+                            <span className="font-poppins font-light" style={{ fontSize: "13px", color: "rgba(var(--fg-rgb),0.3)" }}>Uploading…</span>
                           </div>
                         ) : slot.error ? (
                           <div className="flex items-center justify-center" style={{ width: "120px", height: "120px", background: "var(--bg-surface)", border: "0.5px solid rgba(var(--accent-rgb),0.4)", borderRadius: "var(--radius-md)" }}>
-                            <span style={{ color: "var(--accent)", fontSize: "10px", textAlign: "center", padding: "4px" }}>{slot.error}</span>
+                            <span style={{ color: "var(--accent)", fontSize: "13px", textAlign: "center", padding: "4px" }}>{slot.error}</span>
                           </div>
                         ) : (
                           <img src={slot.preview} alt="" className="object-cover" style={{ width: "120px", height: "120px", borderRadius: "var(--radius-md)" }} />
                         )}
                         <button type="button" onClick={() => removeImage(slotIndex)}
-                          style={{ position: "absolute", top: "6px", right: "6px", width: "22px", height: "22px", background: "rgba(0,0,0,0.7)", color: "#fff", border: "none", cursor: "pointer", fontSize: "14px", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
+                          style={{ position: "absolute", top: "6px", right: "6px", width: "22px", height: "22px", background: "rgba(0,0,0,0.7)", color: "#fff", border: "none", cursor: "pointer", fontSize: "17px", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%" }}>
                           ×
                         </button>
                       </>
@@ -304,8 +304,8 @@ export default function EditWinModal({ win, onClose, onUpdated }: EditWinModalPr
                       <button type="button" onClick={() => fileRefs[slotIndex].current?.click()}
                         className="flex flex-col items-center justify-center transition-colors hover:border-[rgba(var(--fg-rgb),0.4)]"
                         style={{ width: "120px", height: "120px", background: "transparent", border: "1px dashed rgba(var(--fg-rgb),0.2)", cursor: "pointer", gap: "6px", borderRadius: "var(--radius-md)" }}>
-                        <span style={{ fontSize: "20px", color: "rgba(var(--fg-rgb),0.2)", lineHeight: 1 }}>+</span>
-                        <span className="font-poppins font-light" style={{ fontSize: "9px", letterSpacing: "0.1em", color: "rgba(var(--fg-rgb),0.2)", textTransform: "uppercase" }}>Add image</span>
+                        <span style={{ fontSize: "23px", color: "rgba(var(--fg-rgb),0.2)", lineHeight: 1 }}>+</span>
+                        <span className="font-poppins font-light" style={{ fontSize: "12px", letterSpacing: "0.1em", color: "rgba(var(--fg-rgb),0.2)", textTransform: "uppercase" }}>Add image</span>
                       </button>
                     )}
                     <input ref={fileRefs[slotIndex]} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => handleImageSelect(slotIndex, e)} />
@@ -319,13 +319,13 @@ export default function EditWinModal({ win, onClose, onUpdated }: EditWinModalPr
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <label className="font-poppins" style={labelStyle}>Project Link <span style={{ opacity: 0.5 }}>(optional)</span></label>
             <input {...register("media_url")} type="url" placeholder="Link to what you built…" className="st-field font-poppins text-[rgb(var(--fg-rgb))] outline-none" style={fieldStyle} />
-            {errors.media_url && <span style={{ color: "var(--accent)", fontSize: "11px" }}>{errors.media_url.message}</span>}
+            {errors.media_url && <span style={{ color: "var(--accent)", fontSize: "14px" }}>{errors.media_url.message}</span>}
           </div>
 
-          {serverError && <p style={{ color: "var(--accent)", fontSize: "12px" }}>{serverError}</p>}
+          {serverError && <p style={{ color: "var(--accent)", fontSize: "15px" }}>{serverError}</p>}
 
           <button type="submit" disabled={loading} className="st-btn font-poppins font-black uppercase"
-            style={{ background: "rgb(var(--fg-rgb))", color: "var(--bg-primary)", fontSize: "12px", letterSpacing: "0.15em", padding: "16px", border: "none", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.5 : 1 }}>
+            style={{ background: "rgb(var(--fg-rgb))", color: "var(--bg-primary)", fontSize: "15px", letterSpacing: "0.15em", padding: "16px", border: "none", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.5 : 1 }}>
             {loading ? "Saving…" : "SAVE CHANGES"}
           </button>
         </form>

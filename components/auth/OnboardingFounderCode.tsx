@@ -59,7 +59,7 @@ export default function OnboardingFounderCode() {
       </p>
 
       <div className="flex flex-col gap-2">
-        <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+        <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
           Founder code
         </label>
         <input
@@ -74,7 +74,7 @@ export default function OnboardingFounderCode() {
           placeholder="STN-7F3KQ2"
           className="st-field bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-4 text-base tracking-[0.2em] uppercase outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] placeholder:text-[rgba(var(--fg-rgb),0.2)] placeholder:tracking-normal"
         />
-        <div className="min-h-[1.25rem] text-sm font-light">
+        <div className="min-h-[1.25rem] text-base font-light">
           {check.kind === "checking" && (
             <span className="text-[rgba(var(--fg-rgb),0.4)]">Checking…</span>
           )}
@@ -95,7 +95,7 @@ export default function OnboardingFounderCode() {
         <button
           type="button"
           onClick={goNext}
-          className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white"
+          className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white"
         >
           Continue
         </button>
@@ -105,7 +105,7 @@ export default function OnboardingFounderCode() {
             localStorage.removeItem("onboarding_founder_code");
             router.push("/onboarding/step-4");
           }}
-          className="text-[rgba(var(--fg-rgb),0.3)] text-sm font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors"
+          className="text-[rgba(var(--fg-rgb),0.3)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors"
         >
           I don&apos;t have a code — skip
         </button>
@@ -114,7 +114,7 @@ export default function OnboardingFounderCode() {
       <button
         type="button"
         onClick={() => router.push("/onboarding/step-3")}
-        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-sm font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
+        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
       >
         ← Back
       </button>

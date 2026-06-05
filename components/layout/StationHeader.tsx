@@ -33,7 +33,7 @@ export default function StationHeader({ number, name, tagline }: StationHeaderPr
         {/* Eyebrow */}
         <p
           className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]"
-          style={{ fontSize: "12px", marginBottom: "8px" }}
+          style={{ fontSize: "15px", marginBottom: "8px" }}
         >
           {number} —
         </p>
@@ -56,7 +56,7 @@ export default function StationHeader({ number, name, tagline }: StationHeaderPr
         {tagline && (
           <p
             className="font-playfair italic text-[rgba(var(--fg-rgb),0.35)] mt-12 md:mt-20"
-            style={{ fontSize: "17px", lineHeight: 1.6 }}
+            style={{ fontSize: "20px", lineHeight: 1.6 }}
           >
             {tagline}
           </p>

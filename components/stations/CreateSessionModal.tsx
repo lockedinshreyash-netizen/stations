@@ -105,7 +105,7 @@ export default function CreateSessionModal({
         <div className="flex items-baseline justify-between">
           <h2
             className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-            style={{ fontSize: "16px", letterSpacing: "0.04em" }}
+            style={{ fontSize: "19px", letterSpacing: "0.04em" }}
           >
             New Session
           </h2>
@@ -113,7 +113,7 @@ export default function CreateSessionModal({
             type="button"
             onClick={onClose}
             className="text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))] transition-colors"
-            style={{ fontSize: "18px" }}
+            style={{ fontSize: "21px" }}
             aria-label="Close"
           >
             ✕
@@ -129,9 +129,9 @@ export default function CreateSessionModal({
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Class 12 JEE Physics solving"
             className="w-full bg-transparent font-poppins text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none"
-            style={{ fontSize: "14px", padding: "10px 0", borderBottom: "0.5px solid rgba(var(--fg-rgb),0.15)" }}
+            style={{ fontSize: "17px", padding: "10px 0", borderBottom: "0.5px solid rgba(var(--fg-rgb),0.15)" }}
           />
-          <span className="font-poppins text-[rgba(var(--fg-rgb),0.25)]" style={{ fontSize: "10px" }}>
+          <span className="font-poppins text-[rgba(var(--fg-rgb),0.25)]" style={{ fontSize: "13px" }}>
             {title.length}/{MAX_TITLE}
           </span>
         </Field>
@@ -146,7 +146,7 @@ export default function CreateSessionModal({
                 onClick={() => setCategory(c.value)}
                 className="st-pill font-poppins font-medium uppercase"
                 style={{
-                  fontSize: "11px",
+                  fontSize: "14px",
                   letterSpacing: "0.08em",
                   padding: "8px 16px",
                   border: "0.5px solid rgba(var(--fg-rgb),0.15)",
@@ -173,7 +173,7 @@ export default function CreateSessionModal({
                 }}
                 className="st-pill font-poppins font-medium"
                 style={{
-                  fontSize: "11px",
+                  fontSize: "14px",
                   padding: "8px 16px",
                   border: "0.5px solid rgba(var(--fg-rgb),0.15)",
                   background: !isCustom && duration === d ? "var(--accent)" : "transparent",
@@ -188,7 +188,7 @@ export default function CreateSessionModal({
               onClick={() => setIsCustom(true)}
               className="st-pill font-poppins font-medium"
               style={{
-                fontSize: "11px",
+                fontSize: "14px",
                 padding: "8px 16px",
                 border: "0.5px solid rgba(var(--fg-rgb),0.15)",
                 background: isCustom ? "var(--accent)" : "transparent",
@@ -206,7 +206,7 @@ export default function CreateSessionModal({
               onChange={(e) => setCustomDuration(e.target.value)}
               placeholder="Minutes"
               className="w-32 bg-transparent font-poppins text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none mt-2"
-              style={{ fontSize: "14px", padding: "8px 0", borderBottom: "0.5px solid rgba(var(--fg-rgb),0.15)" }}
+              style={{ fontSize: "17px", padding: "8px 0", borderBottom: "0.5px solid rgba(var(--fg-rgb),0.15)" }}
             />
           )}
         </Field>
@@ -229,14 +229,14 @@ export default function CreateSessionModal({
                 onChange={(e) => setStartTime(e.target.value)}
                 className="bg-transparent font-poppins text-[rgb(var(--fg-rgb))] focus:outline-none"
                 style={{
-                  fontSize: "13px",
+                  fontSize: "16px",
                   padding: "8px 0",
                   borderBottom: "0.5px solid rgba(var(--fg-rgb),0.15)",
                   colorScheme: "dark",
                 }}
               />
               {endPreview && (
-                <span className="font-poppins text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "11px" }}>
+                <span className="font-poppins text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "14px" }}>
                   Ends {endPreview}
                 </span>
               )}
@@ -245,7 +245,7 @@ export default function CreateSessionModal({
         </Field>
 
         {error && (
-          <p className="font-poppins" style={{ fontSize: "12px", color: "var(--accent)" }}>
+          <p className="font-poppins" style={{ fontSize: "15px", color: "var(--accent)" }}>
             {error}
           </p>
         )}
@@ -256,7 +256,7 @@ export default function CreateSessionModal({
           disabled={submitting}
           className="st-btn font-poppins font-bold uppercase disabled:opacity-50"
           style={{
-            fontSize: "12px",
+            fontSize: "15px",
             letterSpacing: "0.12em",
             background: "rgb(var(--fg-rgb))",
             color: "var(--bg-primary)",
@@ -275,7 +275,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="flex flex-col gap-2">
       <label
         className="font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.4)]"
-        style={{ fontSize: "10px", letterSpacing: "0.18em" }}
+        style={{ fontSize: "13px", letterSpacing: "0.18em" }}
       >
         {label}
       </label>
@@ -299,7 +299,7 @@ function Toggle({
       onClick={onClick}
       className="st-pill font-poppins font-medium uppercase"
       style={{
-        fontSize: "11px",
+        fontSize: "14px",
         letterSpacing: "0.08em",
         padding: "8px 16px",
         border: "0.5px solid rgba(var(--fg-rgb),0.15)",

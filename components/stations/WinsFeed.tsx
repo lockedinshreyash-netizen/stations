@@ -85,7 +85,7 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
           onClick={() => setModalOpen(true)}
           className="wins-postbtn st-btn font-poppins"
           style={{
-            background: "rgb(var(--fg-rgb))", color: "var(--bg-primary)", fontSize: "11px", fontWeight: 500,
+            background: "rgb(var(--fg-rgb))", color: "var(--bg-primary)", fontSize: "14px", fontWeight: 500,
             letterSpacing: "0.15em", textTransform: "uppercase", padding: "10px 20px",
             border: "none", cursor: "pointer", order: -1,
           }}
@@ -102,7 +102,7 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
                 onClick={() => setFilter(value)}
                 className="font-poppins font-light uppercase transition-colors"
                 style={{
-                  fontSize: "11px", letterSpacing: "0.15em", padding: "6px 14px 8px",
+                  fontSize: "14px", letterSpacing: "0.15em", padding: "6px 14px 8px",
                   background: "none", border: "none",
                   borderBottom: active ? "2px solid var(--accent)" : "2px solid transparent",
                   color: active ? "rgb(var(--fg-rgb))" : "rgba(var(--fg-rgb),0.35)",
@@ -118,9 +118,9 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
       </div>
 
       {loading ? (
-        <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "15px" }}>Loading…</p>
+        <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "18px" }}>Loading…</p>
       ) : wins.length === 0 ? (
-        <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "15px" }}>
+        <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.2)]" style={{ fontSize: "18px" }}>
           {filter === "all" ? "No wins yet. Be the first." : `No ${filter} wins yet.`}
         </p>
       ) : (

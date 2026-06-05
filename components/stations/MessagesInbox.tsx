@@ -110,11 +110,11 @@ export default function MessagesInbox({
         {query.trim() && (
           <div className="flex flex-col border border-[rgba(var(--fg-rgb),0.08)] rounded-[var(--radius-sm)] overflow-hidden">
             {searching && results.length === 0 ? (
-              <span className="px-4 py-3 font-poppins font-light text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "13px" }}>
+              <span className="px-4 py-3 font-poppins font-light text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "16px" }}>
                 Searching…
               </span>
             ) : results.length === 0 ? (
-              <span className="px-4 py-3 font-poppins font-light text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "13px" }}>
+              <span className="px-4 py-3 font-poppins font-light text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "16px" }}>
                 No members found.
               </span>
             ) : (
@@ -127,7 +127,7 @@ export default function MessagesInbox({
                   className="flex items-center gap-3 px-4 py-3 text-left hover:bg-[rgba(var(--fg-rgb),0.04)] transition-colors disabled:opacity-50"
                 >
                   <Avatar url={r.avatar_url} username={r.username} />
-                  <span className="font-poppins text-[rgb(var(--fg-rgb))] flex items-center gap-1.5" style={{ fontSize: "13px" }}>
+                  <span className="font-poppins text-[rgb(var(--fg-rgb))] flex items-center gap-1.5" style={{ fontSize: "16px" }}>
                     {r.username}
                     <FounderMark founderNumber={r.founder_number} />
                   </span>
@@ -140,11 +140,11 @@ export default function MessagesInbox({
 
       {/* Conversation list */}
       <div className="flex flex-col">
-        <h2 className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] mb-4" style={{ fontSize: "12px", letterSpacing: "0.2em" }}>
+        <h2 className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] mb-4" style={{ fontSize: "15px", letterSpacing: "0.2em" }}>
           Messages
         </h2>
         {conversations.length === 0 ? (
-          <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "14px" }}>
+          <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "17px" }}>
             No conversations yet. Search a username above to start one.
           </p>
         ) : (
@@ -158,7 +158,7 @@ export default function MessagesInbox({
                 <Avatar url={c.other.avatar_url} username={c.other.username} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-poppins font-medium text-[rgb(var(--fg-rgb))] truncate" style={{ fontSize: "13px" }}>
+                    <span className="font-poppins font-medium text-[rgb(var(--fg-rgb))] truncate" style={{ fontSize: "16px" }}>
                       {c.other.username}
                     </span>
                     <FounderMark founderNumber={c.other.founder_number} />
@@ -168,7 +168,7 @@ export default function MessagesInbox({
                   </div>
                   <span
                     className="font-poppins font-light text-[rgba(var(--fg-rgb),0.4)] truncate block"
-                    style={{ fontSize: "12px", fontWeight: c.unread ? 500 : 300 }}
+                    style={{ fontSize: "15px", fontWeight: c.unread ? 500 : 300 }}
                   >
                     {c.last_message ?? "Say hello."}
                   </span>
@@ -186,13 +186,13 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
   if (url) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={url} alt={username} className="rounded-full object-cover shrink-0" style={{ width: "36px", height: "36px" }} />
+      <img src={url} alt={username} className="rounded-full object-cover shrink-0" style={{ width: "48px", height: "48px" }} />
     );
   }
   return (
     <div
       className="rounded-full flex items-center justify-center font-poppins font-bold shrink-0"
-      style={{ width: "36px", height: "36px", fontSize: "13px", background: "rgba(var(--fg-rgb),0.1)", color: "rgba(var(--fg-rgb),0.6)" }}
+      style={{ width: "48px", height: "48px", fontSize: "16px", background: "rgba(var(--fg-rgb),0.1)", color: "rgba(var(--fg-rgb),0.6)" }}
     >
       {username.charAt(0).toUpperCase()}
     </div>

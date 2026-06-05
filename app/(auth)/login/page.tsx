@@ -46,7 +46,7 @@ function LoginForm() {
     background: "var(--bg-surface)",
     border: "0.5px solid rgba(var(--fg-rgb),0.15)",
     color: "rgb(var(--fg-rgb))",
-    fontSize: "14px",
+    fontSize: "17px",
     padding: "14px 16px",
     outline: "none",
     width: "100%",
@@ -63,7 +63,7 @@ function LoginForm() {
       <div>
         <span
           className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-          style={{ fontSize: "13px", letterSpacing: "0.2em" }}
+          style={{ fontSize: "16px", letterSpacing: "0.2em" }}
         >
           STATIONS
         </span>
@@ -77,7 +77,7 @@ function LoginForm() {
           <div
             className="font-poppins font-light text-[rgb(var(--fg-rgb))]"
             style={{
-              fontSize: "12px",
+              fontSize: "15px",
               letterSpacing: "0.05em",
               padding: "12px 16px",
               background: "rgba(var(--accent-rgb),0.08)",
@@ -99,7 +99,7 @@ function LoginForm() {
         <p
           className="font-playfair italic"
           style={{
-            fontSize: "18px",
+            fontSize: "21px",
             color: "rgba(var(--fg-rgb),0.5)",
             marginTop: "12px",
             marginBottom: "48px",
@@ -114,7 +114,7 @@ function LoginForm() {
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <label
               className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.3)]"
-              style={{ fontSize: "10px", letterSpacing: "0.18em" }}
+              style={{ fontSize: "13px", letterSpacing: "0.18em" }}
             >
               Email
             </label>
@@ -136,7 +136,7 @@ function LoginForm() {
           <div className="flex flex-col" style={{ gap: "8px" }}>
             <label
               className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.3)]"
-              style={{ fontSize: "10px", letterSpacing: "0.18em" }}
+              style={{ fontSize: "13px", letterSpacing: "0.18em" }}
             >
               Password
             </label>
@@ -162,7 +162,7 @@ function LoginForm() {
                   right: "14px",
                   top: "50%",
                   transform: "translateY(-50%)",
-                  fontSize: "9px",
+                  fontSize: "12px",
                   letterSpacing: "0.12em",
                   background: "none",
                   border: "none",
@@ -181,7 +181,7 @@ function LoginForm() {
             className="st-btn font-poppins uppercase text-[var(--bg-primary)]"
             style={{
               background: "rgb(var(--fg-rgb))",
-              fontSize: "12px",
+              fontSize: "15px",
               fontWeight: 500,
               letterSpacing: "0.15em",
               height: "48px",
@@ -198,7 +198,7 @@ function LoginForm() {
           {error && (
             <p
               className="font-poppins font-light text-[var(--accent)]"
-              style={{ fontSize: "12px" }}
+              style={{ fontSize: "15px" }}
             >
               {error}
             </p>
@@ -208,7 +208,7 @@ function LoginForm() {
         {/* Footer link */}
         <p
           className="font-poppins font-light text-[rgba(var(--fg-rgb),0.3)]"
-          style={{ fontSize: "12px", marginTop: "28px" }}
+          style={{ fontSize: "15px", marginTop: "28px" }}
         >
           Don&apos;t have an account?{" "}
           <a

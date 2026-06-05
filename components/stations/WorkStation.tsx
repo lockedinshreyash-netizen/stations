@@ -93,7 +93,7 @@ export default function WorkStation({
           onClick={() => setShowCreate(true)}
           className="st-btn font-poppins font-bold uppercase"
           style={{
-            fontSize: "12px",
+            fontSize: "15px",
             letterSpacing: "0.12em",
             background: "var(--accent)",
             color: "var(--bg-primary)",
@@ -107,7 +107,7 @@ export default function WorkStation({
       {!isFirebaseConfigured && (
         <div
           className="st-card p-4 font-poppins"
-          style={{ fontSize: "12px", border: "0.5px solid var(--accent)", color: "var(--accent)" }}
+          style={{ fontSize: "15px", border: "0.5px solid var(--accent)", color: "var(--accent)" }}
         >
           Realtime chat isn&apos;t configured yet. Add your Firebase keys to{" "}
           <code>.env.local</code> to enable session chat.
@@ -115,7 +115,7 @@ export default function WorkStation({
       )}
 
       {error && (
-        <p className="font-poppins" style={{ fontSize: "13px", color: "var(--accent)" }}>
+        <p className="font-poppins" style={{ fontSize: "16px", color: "var(--accent)" }}>
           {error}
         </p>
       )}
@@ -151,7 +151,7 @@ export default function WorkStation({
               onClick={() => setShowCreate(true)}
               className="st-btn self-start font-poppins font-bold uppercase"
               style={{
-                fontSize: "11px",
+                fontSize: "14px",
                 letterSpacing: "0.1em",
                 border: "0.5px solid rgba(var(--fg-rgb),0.2)",
                 color: "rgba(var(--fg-rgb),0.6)",
@@ -204,7 +204,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <h2
       className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] mb-6"
-      style={{ fontSize: "13px", letterSpacing: "0.25em" }}
+      style={{ fontSize: "16px", letterSpacing: "0.25em" }}
     >
       {children}
     </h2>
@@ -224,7 +224,7 @@ function Grid({ children }: { children: React.ReactNode }) {
 
 function Empty({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "14px" }}>
+    <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "17px" }}>
       {children}
     </p>
   );
@@ -235,7 +235,7 @@ function Stat({ label, value }: { label: string; value: string | number }) {
     <div className="flex flex-col gap-1">
       <span
         className="font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.3)]"
-        style={{ fontSize: "10px", letterSpacing: "0.18em" }}
+        style={{ fontSize: "13px", letterSpacing: "0.18em" }}
       >
         {label}
       </span>

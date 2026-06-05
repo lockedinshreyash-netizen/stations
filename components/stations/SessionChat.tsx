@@ -149,7 +149,7 @@ export default function SessionChat({
       >
         <h2
           className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-          style={{ fontSize: "14px", letterSpacing: "0.04em" }}
+          style={{ fontSize: "17px", letterSpacing: "0.04em" }}
         >
           Session Chat
         </h2>
@@ -158,7 +158,7 @@ export default function SessionChat({
           {!isHost && closed && (
             <span
               className="font-poppins uppercase text-[rgba(var(--fg-rgb),0.3)]"
-              style={{ fontSize: "10px", letterSpacing: "0.1em" }}
+              style={{ fontSize: "13px", letterSpacing: "0.1em" }}
             >
               Read-only
             </span>
@@ -171,7 +171,7 @@ export default function SessionChat({
               disabled={toggling}
               className="font-poppins font-bold uppercase transition-colors disabled:opacity-50"
               style={{
-                fontSize: "10px",
+                fontSize: "13px",
                 letterSpacing: "0.1em",
                 color: closed ? "var(--accent)" : "rgba(var(--fg-rgb),0.4)",
               }}
@@ -188,7 +188,7 @@ export default function SessionChat({
               onClick={onMinimize}
               aria-label="Minimize chat"
               className="flex items-center gap-1 font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.4)] transition-colors"
-              style={{ fontSize: "10px", letterSpacing: "0.1em" }}
+              style={{ fontSize: "13px", letterSpacing: "0.1em" }}
               onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
@@ -220,13 +220,13 @@ export default function SessionChat({
         style={{ background: "var(--bg-surface)" }}
       >
         {!isFirebaseConfigured ? (
-          <p className="font-poppins text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "13px" }}>
+          <p className="font-poppins text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "16px" }}>
             Chat is not configured. Add your Firebase keys to <code>.env.local</code>.
           </p>
         ) : sorted.length === 0 ? (
           <p
             className="font-playfair italic text-[rgba(var(--fg-rgb),0.25)]"
-            style={{ fontSize: "14px" }}
+            style={{ fontSize: "17px" }}
           >
             No messages yet. Focus together.
           </p>
@@ -246,7 +246,7 @@ export default function SessionChat({
       {error && (
         <div
           className="px-6 py-2 font-poppins shrink-0"
-          style={{ fontSize: "11px", color: "var(--accent)" }}
+          style={{ fontSize: "14px", color: "var(--accent)" }}
         >
           {error}
         </div>
@@ -274,11 +274,11 @@ export default function SessionChat({
               rows={1}
               maxLength={MAX_MESSAGE_LENGTH}
               className="flex-1 resize-none bg-transparent font-poppins font-light text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none py-2"
-              style={{ fontSize: "13px", maxHeight: "120px", lineHeight: 1.5 }}
+              style={{ fontSize: "16px", maxHeight: "120px", lineHeight: 1.5 }}
             />
             <span
               className="font-poppins text-[rgba(var(--fg-rgb),0.25)] pb-2.5"
-              style={{ fontSize: "10px" }}
+              style={{ fontSize: "13px" }}
             >
               {draft.length}/{MAX_MESSAGE_LENGTH}
             </span>
@@ -288,7 +288,7 @@ export default function SessionChat({
               disabled={sending || !draft.trim()}
               className="st-btn font-poppins font-bold uppercase disabled:opacity-40 my-1"
               style={{
-                fontSize: "11px",
+                fontSize: "14px",
                 letterSpacing: "0.1em",
                 background: "var(--accent)",
                 color: "var(--bg-primary)",
@@ -306,7 +306,7 @@ export default function SessionChat({
         >
           <span
             className="font-poppins font-light text-[rgba(var(--fg-rgb),0.4)]"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "15px" }}
           >
             {closed
               ? "The host closed this chat."
@@ -326,21 +326,21 @@ function MessageRow({ message }: { message: WorkChatMessage }) {
         <div className="flex items-baseline gap-2">
           <span
             className="font-poppins font-medium text-[rgb(var(--fg-rgb))]"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "15px" }}
           >
             {message.username}
           </span>
           <FounderMark founderNumber={message.founder_number} />
           <span
             className="font-poppins text-[rgba(var(--fg-rgb),0.25)] ml-auto"
-            style={{ fontSize: "10px" }}
+            style={{ fontSize: "13px" }}
           >
             {format(message.created_at, "h:mm a")}
           </span>
         </div>
         <p
           className="font-poppins font-light text-[rgba(var(--fg-rgb),0.8)] break-words whitespace-pre-wrap"
-          style={{ fontSize: "13px", lineHeight: 1.5 }}
+          style={{ fontSize: "16px", lineHeight: 1.5 }}
         >
           {message.content}
         </p>
@@ -353,7 +353,7 @@ function SystemRow({ message }: { message: WorkChatMessage }) {
   return (
     <p
       className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)] text-center"
-      style={{ fontSize: "12px" }}
+      style={{ fontSize: "15px" }}
     >
       {message.content}
     </p>
@@ -370,7 +370,7 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
         width={28}
         height={28}
         className="rounded-full object-cover shrink-0"
-        style={{ width: "28px", height: "28px" }}
+        style={{ width: "40px", height: "40px" }}
       />
     );
   }
@@ -380,7 +380,7 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
       style={{
         width: "28px",
         height: "28px",
-        fontSize: "11px",
+        fontSize: "14px",
         background: "rgba(var(--fg-rgb),0.1)",
         color: "rgba(var(--fg-rgb),0.6)",
       }}

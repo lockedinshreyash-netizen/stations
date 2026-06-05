@@ -45,7 +45,7 @@ export default async function RoomPage({
         <Link
           href="/network"
           className="font-poppins font-medium uppercase text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))] transition-colors"
-          style={{ fontSize: "11px", letterSpacing: "0.15em" }}
+          style={{ fontSize: "14px", letterSpacing: "0.15em" }}
         >
           ← Network
         </Link>

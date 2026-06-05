@@ -50,7 +50,7 @@ export default function ExploreRoomCard({
       <Link href={`/network/rooms/${roomName}`} className="block group">
         <h3
           className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] group-hover:text-[var(--accent)] transition-colors"
-          style={{ fontSize: "14px", letterSpacing: "0.02em" }}
+          style={{ fontSize: "17px", letterSpacing: "0.02em" }}
         >
           {meta.title}
         </h3>
@@ -58,7 +58,7 @@ export default function ExploreRoomCard({
 
       <p
         className="font-poppins font-light text-[rgba(var(--fg-rgb),0.45)] mt-2"
-        style={{ fontSize: "11px", lineHeight: 1.5 }}
+        style={{ fontSize: "14px", lineHeight: 1.5 }}
       >
         {meta.description}
       </p>
@@ -66,17 +66,17 @@ export default function ExploreRoomCard({
       <div className="mt-3 flex items-center gap-3">
         <span
           className="font-poppins text-[rgba(var(--fg-rgb),0.35)]"
-          style={{ fontSize: "11px" }}
+          style={{ fontSize: "14px" }}
         >
           {memberCount} {memberCount === 1 ? "member" : "members"}
         </span>
-        <span className="font-poppins text-[rgba(var(--fg-rgb),0.35)]" style={{ fontSize: "11px" }}>
+        <span className="font-poppins text-[rgba(var(--fg-rgb),0.35)]" style={{ fontSize: "14px" }}>
           {onlineCount} online now
         </span>
       </div>
 
       {error && (
-        <p className="font-poppins mt-2" style={{ fontSize: "10px", color: "var(--accent)" }}>
+        <p className="font-poppins mt-2" style={{ fontSize: "13px", color: "var(--accent)" }}>
           {error}
         </p>
       )}
@@ -87,7 +87,7 @@ export default function ExploreRoomCard({
         disabled={joining}
         className="st-btn mt-4 w-full font-poppins font-bold uppercase disabled:opacity-50"
         style={{
-          fontSize: "11px",
+          fontSize: "14px",
           letterSpacing: "0.1em",
           background: "var(--accent)",
           color: "var(--bg-primary)",

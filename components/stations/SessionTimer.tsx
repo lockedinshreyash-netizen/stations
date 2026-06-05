@@ -56,7 +56,7 @@ export default function SessionTimer({
     >
       <span
         className="font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.35)]"
-        style={{ fontSize: "11px", letterSpacing: "0.25em" }}
+        style={{ fontSize: "14px", letterSpacing: "0.25em" }}
       >
         {isEnded ? "Session ended" : label}
       </span>
@@ -76,7 +76,7 @@ export default function SessionTimer({
       {isEnded && (
         <span
           className="font-playfair italic text-[rgba(var(--fg-rgb),0.3)]"
-          style={{ fontSize: "18px" }}
+          style={{ fontSize: "21px" }}
         >
           Time&apos;s up.
         </span>

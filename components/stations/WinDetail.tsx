@@ -140,7 +140,7 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
           <button
             onClick={() => { setMenuOpen((v) => !v); setConfirmingDelete(false); }}
             aria-label="Win options"
-            style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.4)", fontSize: "18px", lineHeight: 1, padding: "2px 4px" }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.4)", fontSize: "21px", lineHeight: 1, padding: "2px 4px" }}
           >
             ···
           </button>
@@ -150,20 +150,20 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
                 <>
                   <button
                     onClick={() => { setMenuOpen(false); setEditing(true); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.6)", fontSize: "12px", padding: "12px 16px", textAlign: "left", fontFamily: "inherit", fontWeight: 300 }}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.6)", fontSize: "15px", padding: "12px 16px", textAlign: "left", fontFamily: "inherit", fontWeight: 300 }}
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => setConfirmingDelete(true)}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: "12px", padding: "12px 16px", textAlign: "left", fontFamily: "inherit", fontWeight: 300, borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: "15px", padding: "12px 16px", textAlign: "left", fontFamily: "inherit", fontWeight: 300, borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
                   >
                     Delete
                   </button>
                 </>
               ) : (
                 <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <p style={{ fontSize: "11px", color: "rgba(var(--fg-rgb),0.6)", lineHeight: 1.5, margin: 0, fontFamily: "inherit", fontWeight: 300 }}>
+                  <p style={{ fontSize: "14px", color: "rgba(var(--fg-rgb),0.6)", lineHeight: 1.5, margin: 0, fontFamily: "inherit", fontWeight: 300 }}>
                     Are you sure? This cannot be undone.
                   </p>
                   <div style={{ display: "flex", gap: "8px" }}>
@@ -171,14 +171,14 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
                       onClick={handleDelete}
                       disabled={deleting}
                       className="st-btn"
-                      style={{ background: "var(--accent)", color: "rgb(var(--fg-rgb))", border: "none", cursor: deleting ? "default" : "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", opacity: deleting ? 0.6 : 1, fontFamily: "inherit" }}
+                      style={{ background: "var(--accent)", color: "rgb(var(--fg-rgb))", border: "none", cursor: deleting ? "default" : "pointer", fontSize: "13px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", opacity: deleting ? 0.6 : 1, fontFamily: "inherit" }}
                     >
                       {deleting ? "…" : "Delete"}
                     </button>
                     <button
                       onClick={() => setConfirmingDelete(false)}
                       className="st-btn"
-                      style={{ background: "none", border: "0.5px solid rgba(var(--fg-rgb),0.15)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", fontFamily: "inherit" }}
+                      style={{ background: "none", border: "0.5px solid rgba(var(--fg-rgb),0.15)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", fontSize: "13px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", fontFamily: "inherit" }}
                     >
                       Cancel
                     </button>
@@ -194,19 +194,19 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
       <Link
         href="/wins"
         className="font-poppins font-light text-[rgba(var(--fg-rgb),0.3)] hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors"
-        style={{ fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "32px", display: "inline-block" }}
+        style={{ fontSize: "14px", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "32px", display: "inline-block" }}
       >
         ← Wins
       </Link>
 
       {/* Meta */}
       <div className="flex items-center flex-wrap" style={{ gap: "10px", marginBottom: "16px" }}>
-        <span className="font-poppins text-[rgb(var(--fg-rgb))]" style={{ fontSize: "12px", fontWeight: 500 }}>{username}</span>
+        <span className="font-poppins text-[rgb(var(--fg-rgb))]" style={{ fontSize: "15px", fontWeight: 500 }}>{username}</span>
         <FounderMark founderNumber={win.users?.founder_number} />
-        <span className="font-poppins uppercase" style={{ fontSize: "9px", letterSpacing: "0.15em", color: "rgba(var(--fg-rgb),0.4)" }}>
+        <span className="font-poppins uppercase" style={{ fontSize: "12px", letterSpacing: "0.15em", color: "rgba(var(--fg-rgb),0.4)" }}>
           {win.category}
         </span>
-        <span className="font-poppins font-light text-[rgba(var(--fg-rgb),0.25)]" style={{ fontSize: "11px" }}>{timeAgo}</span>
+        <span className="font-poppins font-light text-[rgba(var(--fg-rgb),0.25)]" style={{ fontSize: "14px" }}>{timeAgo}</span>
       </div>
 
       {/* Title */}
@@ -215,7 +215,7 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
       </h1>
 
       {/* Description */}
-      <p className="font-poppins font-light text-[rgba(var(--fg-rgb),0.7)]" style={{ fontSize: "16px", lineHeight: 1.8 }}>
+      <p className="font-poppins font-light text-[rgba(var(--fg-rgb),0.7)]" style={{ fontSize: "19px", lineHeight: 1.8 }}>
         {win.description}
       </p>
 
@@ -249,7 +249,7 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
       {/* Link */}
       {win.media_url && (
         <div className="flex flex-col" style={{ marginTop: "28px", gap: "8px" }}>
-          <p className="font-poppins font-light uppercase" style={{ fontSize: "10px", letterSpacing: "0.18em", color: "rgba(var(--fg-rgb),0.3)" }}>
+          <p className="font-poppins font-light uppercase" style={{ fontSize: "13px", letterSpacing: "0.18em", color: "rgba(var(--fg-rgb),0.3)" }}>
             Link
           </p>
           <a
@@ -257,7 +257,7 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
             target="_blank"
             rel="noopener noreferrer"
             className="font-poppins font-light hover:underline"
-            style={{ fontSize: "13px", color: "var(--accent)", wordBreak: "break-all" }}
+            style={{ fontSize: "16px", color: "var(--accent)", wordBreak: "break-all" }}
           >
             {win.media_url}
           </a>
@@ -280,19 +280,19 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
                 color: active ? "var(--bg-primary)" : "rgba(var(--fg-rgb),0.35)",
                 border: active ? "none" : "0.5px solid rgba(var(--fg-rgb),0.12)",
                 cursor: busy.has(type) ? "default" : "pointer",
-                fontSize: "14px",
+                fontSize: "17px",
               }}
               title={label}
             >
-              <span style={{ fontSize: "14px" }}>{emoji}</span>
-              {count > 0 && <span style={{ fontSize: "12px", fontWeight: 500 }}>{count}</span>}
+              <span style={{ fontSize: "17px" }}>{emoji}</span>
+              {count > 0 && <span style={{ fontSize: "15px", fontWeight: 500 }}>{count}</span>}
             </button>
           );
         })}
       </div>
 
       {actionError && (
-        <p className="font-poppins" style={{ color: "var(--accent)", fontSize: "12px", marginTop: "16px" }}>{actionError}</p>
+        <p className="font-poppins" style={{ color: "var(--accent)", fontSize: "15px", marginTop: "16px" }}>{actionError}</p>
       )}
 
       {/* Edit modal */}

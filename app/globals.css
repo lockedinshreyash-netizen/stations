@@ -23,6 +23,16 @@
   --accent:       #c0392b;
   --accent-rgb:   192, 57, 43;
 
+  /* Brass/amber — warm ambient accent (the "lit" glow). Used softly for
+     hairlines, muted labels, the light source. Red stays the rare signal. */
+  --accent-2:     #d9c7a3;
+  --accent-2-rgb: 217, 199, 163;
+
+  /* Atmosphere — keeps near-black from reading as a dead flat field */
+  --grain-opacity: 0.05;
+  --halo:     rgba(217, 199, 163, 0.07);
+  --vignette: rgba(0, 0, 0, 0.40);
+
   /* Depth — deeper on dark so cards read against near-black */
   --shadow-rgb: 0, 0, 0;
   --shadow-1:   0.45;
@@ -42,6 +52,15 @@
   --fg-rgb:       10, 10, 10;
   --accent:       #c0392b;
   --accent-rgb:   192, 57, 43;
+
+  /* Brass — deeper on paper so it still reads warm, not washed out */
+  --accent-2:     #b08d57;
+  --accent-2-rgb: 176, 141, 87;
+
+  /* Atmosphere — lighter on the warm-paper background */
+  --grain-opacity: 0.025;
+  --halo:     rgba(176, 141, 87, 0.06);
+  --vignette: rgba(120, 105, 80, 0.10);
 
   /* Depth — soft per the spec's light-mode shadow scale */
   --shadow-rgb: 0, 0, 0;
@@ -80,6 +99,7 @@
   --color-text-secondary: rgba(var(--fg-rgb), 0.5);
   --color-text-muted:     rgba(var(--fg-rgb), 0.3);
   --color-accent-red:     var(--accent);
+  --color-accent-brass:   var(--accent-2);
   --color-border:         rgba(var(--fg-rgb), 0.1);
   --font-poppins:         var(--font-poppins);
   --font-playfair:        var(--font-playfair);
@@ -94,9 +114,77 @@
     box-shadow       var(--t-base) var(--ease);
 }
 
+html {
+  /* Base type scale-up: body copy should feel confident, not timid.
+     Bumped from the browser default so rem/`text-base` content breathes. */
+  font-size: 17px;
+}
+
 body {
   background: var(--bg-primary);
   color: rgb(var(--fg-rgb));
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================================
+   ATMOSPHERE — the app should feel like a room, not a void.
+   Two fixed, non-interactive layers tuned per theme:
+     1. halo + vignette (behind content)  — a light source + edges
+     2. film grain (above content, ~4%)   — kills the dead flatness
+   ============================================================ */
+.st-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 12% 0%, var(--halo), transparent 55%),
+    radial-gradient(140% 120% at 50% 50%, transparent 60%, var(--vignette));
+}
+
+.st-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* App content rides above the halo layer. */
+.st-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   ENTRANCE MOTION — content arrives, it doesn't just appear.
+   ============================================================ */
+@keyframes st-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.st-rise {
+  animation: st-rise 0.5s var(--ease) both;
+}
+/* Stagger helpers — apply to siblings for a choreographed reveal. */
+.st-stagger > * { animation: st-rise 0.5s var(--ease) both; }
+.st-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.st-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.st-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.st-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.st-stagger > *:nth-child(5) { animation-delay: 160ms; }
+.st-stagger > *:nth-child(6) { animation-delay: 200ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .st-rise,
+  .st-card-hover,
+  .st-stagger > * { animation: none; }
 }
 
 ::selection {
@@ -125,6 +213,7 @@ body {
     background-color 200ms var(--ease),
     border-color     200ms var(--ease);
   will-change: transform;
+  animation: st-rise 0.5s var(--ease) both;
 }
 .st-card-hover:hover {
   transform: translateY(-2px) scale(1.01);

@@ -25,7 +25,7 @@ export default function RoomCard({ roomName }: { roomName: RoomName }) {
             minWidth: "18px",
             height: "18px",
             padding: "0 5px",
-            fontSize: "10px",
+            fontSize: "13px",
             background: "var(--accent)",
             color: "var(--bg-primary)",
           }}
@@ -36,7 +36,7 @@ export default function RoomCard({ roomName }: { roomName: RoomName }) {
 
       <h3
         className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-        style={{ fontSize: "14px", letterSpacing: "0.02em" }}
+        style={{ fontSize: "17px", letterSpacing: "0.02em" }}
       >
         {meta.title}
       </h3>
@@ -44,11 +44,11 @@ export default function RoomCard({ roomName }: { roomName: RoomName }) {
       <div className="mt-3 flex items-center gap-3">
         <span
           className="font-poppins text-[rgba(var(--fg-rgb),0.35)]"
-          style={{ fontSize: "11px" }}
+          style={{ fontSize: "14px" }}
         >
           {memberCount} {memberCount === 1 ? "member" : "members"}
         </span>
-        <span className="font-poppins" style={{ fontSize: "11px", color: "var(--accent)" }}>
+        <span className="font-poppins" style={{ fontSize: "14px", color: "var(--accent)" }}>
           {onlineCount} online now
         </span>
       </div>

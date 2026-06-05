@@ -48,13 +48,13 @@ export default function SessionMemberList({
       >
         <h2
           className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-          style={{ fontSize: "12px", letterSpacing: "0.15em" }}
+          style={{ fontSize: "15px", letterSpacing: "0.15em" }}
         >
           Members
         </h2>
         <p
           className="font-poppins text-[rgba(var(--fg-rgb),0.35)] mt-1"
-          style={{ fontSize: "11px" }}
+          style={{ fontSize: "14px" }}
         >
           <span style={{ color: "var(--accent)" }}>{onlineCount} online now</span>
           {" · "}
@@ -85,7 +85,7 @@ export default function SessionMemberList({
                 <div className="flex items-center gap-2">
                   <span
                     className="font-poppins font-medium text-[rgb(var(--fg-rgb))] truncate"
-                    style={{ fontSize: "12px" }}
+                    style={{ fontSize: "15px" }}
                   >
                     {m.username}
                   </span>
@@ -93,7 +93,7 @@ export default function SessionMemberList({
                   {m.user_id === hostId && (
                     <span
                       className="font-poppins font-bold uppercase shrink-0"
-                      style={{ fontSize: "9px", letterSpacing: "0.1em", color: "var(--accent)" }}
+                      style={{ fontSize: "12px", letterSpacing: "0.1em", color: "var(--accent)" }}
                     >
                       Host
                     </span>
@@ -101,7 +101,7 @@ export default function SessionMemberList({
                 </div>
                 <span
                   className="font-poppins text-[rgba(var(--fg-rgb),0.3)]"
-                  style={{ fontSize: "10px" }}
+                  style={{ fontSize: "13px" }}
                 >
                   {m.left_early
                     ? "Left early"
@@ -124,7 +124,7 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
         src={url}
         alt={username}
         className="rounded-full object-cover"
-        style={{ width: "32px", height: "32px" }}
+        style={{ width: "44px", height: "44px" }}
       />
     );
   }
@@ -134,7 +134,7 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
       style={{
         width: "32px",
         height: "32px",
-        fontSize: "12px",
+        fontSize: "15px",
         background: "rgba(var(--fg-rgb),0.1)",
         color: "rgba(var(--fg-rgb),0.6)",
       }}

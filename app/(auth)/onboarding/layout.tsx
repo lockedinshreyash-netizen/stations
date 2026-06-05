@@ -26,7 +26,7 @@ export default function OnboardingLayout({
         <span className="font-poppins font-black text-xl tracking-widest uppercase text-[rgb(var(--fg-rgb))]">
           STATIONS
         </span>
-        <span className="text-[rgba(var(--fg-rgb),0.3)] text-sm font-light tracking-widest uppercase">
+        <span className="text-[rgba(var(--fg-rgb),0.3)] text-base font-light tracking-widest uppercase">
           Step {stepNumber} of {STEPS.length}
         </span>
       </header>

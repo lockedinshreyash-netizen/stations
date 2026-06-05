@@ -65,13 +65,13 @@ export default function FocusQualityRating({
           <>
             <h2
               className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-              style={{ fontSize: "16px", letterSpacing: "0.04em" }}
+              style={{ fontSize: "19px", letterSpacing: "0.04em" }}
             >
               Session complete
             </h2>
             <p
               className="font-playfair italic text-[rgba(var(--fg-rgb),0.7)]"
-              style={{ fontSize: "18px", lineHeight: 1.6 }}
+              style={{ fontSize: "21px", lineHeight: 1.6 }}
             >
               You focused for {formatDuration(recap.duration_minutes)}
               {recap.others_count > 0
@@ -80,7 +80,7 @@ export default function FocusQualityRating({
               . Focus quality: {recap.focus_quality_rating}/5.
             </p>
             {!existingRating && recap.focus_streak_days > 0 && (
-              <p className="font-poppins text-[rgba(var(--fg-rgb),0.5)]" style={{ fontSize: "13px" }}>
+              <p className="font-poppins text-[rgba(var(--fg-rgb),0.5)]" style={{ fontSize: "16px" }}>
                 🔥 {recap.focus_streak_days}-day focus streak
               </p>
             )}
@@ -89,7 +89,7 @@ export default function FocusQualityRating({
               onClick={onDone}
               className="st-btn font-poppins font-bold uppercase mt-2"
               style={{
-                fontSize: "12px",
+                fontSize: "15px",
                 letterSpacing: "0.12em",
                 background: "rgb(var(--fg-rgb))",
                 color: "var(--bg-primary)",
@@ -103,7 +103,7 @@ export default function FocusQualityRating({
           <>
             <h2
               className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-              style={{ fontSize: "16px", letterSpacing: "0.04em" }}
+              style={{ fontSize: "19px", letterSpacing: "0.04em" }}
             >
               Rate your focus quality
             </h2>
@@ -135,7 +135,7 @@ export default function FocusQualityRating({
             </div>
 
             {error && (
-              <p className="font-poppins" style={{ fontSize: "12px", color: "var(--accent)" }}>
+              <p className="font-poppins" style={{ fontSize: "15px", color: "var(--accent)" }}>
                 {error}
               </p>
             )}
@@ -146,7 +146,7 @@ export default function FocusQualityRating({
               disabled={submitting || selected === 0}
               className="st-btn font-poppins font-bold uppercase disabled:opacity-40"
               style={{
-                fontSize: "12px",
+                fontSize: "15px",
                 letterSpacing: "0.12em",
                 background: "var(--accent)",
                 color: "var(--bg-primary)",

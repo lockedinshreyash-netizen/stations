@@ -58,7 +58,7 @@ export default function OnboardingStep1() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+          <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
             Email
           </label>
           <input
@@ -69,12 +69,12 @@ export default function OnboardingStep1() {
             placeholder="you@example.com"
           />
           {errors.email && (
-            <span className="text-[var(--accent)] text-sm">{errors.email.message}</span>
+            <span className="text-[var(--accent)] text-base">{errors.email.message}</span>
           )}
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+          <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
             Password
           </label>
           <input
@@ -85,22 +85,22 @@ export default function OnboardingStep1() {
             placeholder="Min. 8 characters"
           />
           {errors.password && (
-            <span className="text-[var(--accent)] text-sm">{errors.password.message}</span>
+            <span className="text-[var(--accent)] text-base">{errors.password.message}</span>
           )}
         </div>
 
-        {serverError && <p className="text-[var(--accent)] text-sm">{serverError}</p>}
+        {serverError && <p className="text-[var(--accent)] text-base">{serverError}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="st-btn mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white disabled:opacity-40"
+          className="st-btn mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white disabled:opacity-40"
         >
           {loading ? "Creating account…" : "Continue"}
         </button>
       </form>
 
-      <p className="mt-8 text-[rgba(var(--fg-rgb),0.3)] text-sm font-light">
+      <p className="mt-8 text-[rgba(var(--fg-rgb),0.3)] text-base font-light">
         Already have an account?{" "}
         <a href="/login" className="text-[rgb(var(--fg-rgb))] underline underline-offset-4">
           Sign in

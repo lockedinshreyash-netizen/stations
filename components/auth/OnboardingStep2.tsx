@@ -106,7 +106,7 @@ export default function OnboardingStep2() {
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
         {/* Avatar */}
         <div className="flex flex-col gap-2">
-          <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+          <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
             Avatar (optional)
           </label>
           <div className="flex items-center gap-4">
@@ -120,7 +120,7 @@ export default function OnboardingStep2() {
                 <span className="text-[rgba(var(--fg-rgb),0.2)] text-2xl">+</span>
               )}
             </div>
-            <span className="text-[rgba(var(--fg-rgb),0.3)] text-sm font-light">
+            <span className="text-[rgba(var(--fg-rgb),0.3)] text-base font-light">
               Click to upload a photo
             </span>
             <input
@@ -135,7 +135,7 @@ export default function OnboardingStep2() {
 
         {/* Full name */}
         <div className="flex flex-col gap-2">
-          <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+          <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
             Full name
           </label>
           <input
@@ -146,13 +146,13 @@ export default function OnboardingStep2() {
             placeholder="Your full name"
           />
           {errors.full_name && (
-            <span className="text-[var(--accent)] text-sm">{errors.full_name.message}</span>
+            <span className="text-[var(--accent)] text-base">{errors.full_name.message}</span>
           )}
         </div>
 
         {/* Username */}
         <div className="flex flex-col gap-2">
-          <label className="text-[rgba(var(--fg-rgb),0.5)] text-xs tracking-widest uppercase font-light">
+          <label className="text-[rgba(var(--fg-rgb),0.5)] text-sm tracking-widest uppercase font-light">
             Username
           </label>
           <input
@@ -163,16 +163,16 @@ export default function OnboardingStep2() {
             placeholder="lowercase_only"
           />
           {errors.username && (
-            <span className="text-[var(--accent)] text-sm">{errors.username.message}</span>
+            <span className="text-[var(--accent)] text-base">{errors.username.message}</span>
           )}
         </div>
 
-        {serverError && <p className="text-[var(--accent)] text-sm">{serverError}</p>}
+        {serverError && <p className="text-[var(--accent)] text-base">{serverError}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="st-btn mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-sm px-8 py-4 hover:bg-white disabled:opacity-40"
+          className="st-btn mt-4 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white disabled:opacity-40"
         >
           {loading ? "Saving…" : "Continue"}
         </button>
@@ -181,7 +181,7 @@ export default function OnboardingStep2() {
       <button
         type="button"
         onClick={() => router.push("/onboarding/step-1")}
-        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-sm font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
+        className="mt-6 text-[rgba(var(--fg-rgb),0.3)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors text-left"
       >
         ← Back
       </button>

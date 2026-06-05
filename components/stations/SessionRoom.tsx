@@ -194,7 +194,7 @@ export default function SessionRoom({
     return (
       <Shell>
         <div className="flex-1 flex items-center justify-center">
-          <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "18px" }}>
+          <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "21px" }}>
             This session was cancelled.
           </p>
         </div>
@@ -233,7 +233,7 @@ export default function SessionRoom({
             onClick={handleCancel}
             disabled={cancelling}
             className="font-poppins font-bold uppercase text-[rgba(var(--fg-rgb),0.4)] hover:text-[var(--accent)] transition-colors disabled:opacity-50"
-            style={{ fontSize: "10px", letterSpacing: "0.1em" }}
+            style={{ fontSize: "13px", letterSpacing: "0.1em" }}
           >
             {cancelling ? "Cancelling…" : "Cancel session"}
           </button>
@@ -241,7 +241,7 @@ export default function SessionRoom({
       }
     >
       {error && (
-        <div className="px-6 py-2 font-poppins" style={{ fontSize: "11px", color: "var(--accent)" }}>
+        <div className="px-6 py-2 font-poppins" style={{ fontSize: "14px", color: "var(--accent)" }}>
           {error}
         </div>
       )}
@@ -249,7 +249,7 @@ export default function SessionRoom({
       {leftEarly && (
         <div
           className="px-6 py-3 font-poppins text-center"
-          style={{ fontSize: "12px", color: "var(--accent)", borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+          style={{ fontSize: "15px", color: "var(--accent)", borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
         >
           You left this session early.
         </div>
@@ -280,7 +280,7 @@ export default function SessionRoom({
           />
           <p
             className="font-poppins text-[rgba(var(--fg-rgb),0.35)] text-center"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "15px" }}
           >
             {session.title}
           </p>
@@ -291,7 +291,7 @@ export default function SessionRoom({
               disabled={joining}
               className="st-btn font-poppins font-bold uppercase disabled:opacity-50"
               style={{
-                fontSize: "11px",
+                fontSize: "14px",
                 letterSpacing: "0.1em",
                 background: "var(--accent)",
                 color: "var(--bg-primary)",
@@ -307,7 +307,7 @@ export default function SessionRoom({
               onClick={() => setShowLeave(true)}
               className="st-btn font-poppins font-bold uppercase"
               style={{
-                fontSize: "10px",
+                fontSize: "13px",
                 letterSpacing: "0.1em",
                 border: "0.5px solid rgba(var(--fg-rgb),0.2)",
                 color: "rgba(var(--fg-rgb),0.5)",
@@ -399,7 +399,7 @@ export default function SessionRoom({
                 minWidth: "20px",
                 height: "20px",
                 padding: "0 5px",
-                fontSize: "11px",
+                fontSize: "14px",
                 background: "var(--accent)",
                 color: "#fff",
                 border: "2px solid #1a1a1a",
@@ -438,7 +438,7 @@ function Shell({
         <Link
           href="/work"
           className="font-poppins font-medium uppercase text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))] transition-colors"
-          style={{ fontSize: "11px", letterSpacing: "0.15em" }}
+          style={{ fontSize: "14px", letterSpacing: "0.15em" }}
         >
           ← Work
         </Link>

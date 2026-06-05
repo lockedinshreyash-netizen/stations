@@ -15,7 +15,7 @@ export default function FounderMark({
       title={label}
       aria-label={label}
       className="shrink-0 leading-none"
-      style={{ color: "var(--accent)", fontSize: "9px" }}
+      style={{ color: "var(--accent)", fontSize: "12px" }}
     >
       ◆
     </span>

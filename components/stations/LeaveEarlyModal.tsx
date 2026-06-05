@@ -53,11 +53,11 @@ export default function LeaveEarlyModal({
       >
         <h2
           className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-          style={{ fontSize: "16px", letterSpacing: "0.04em" }}
+          style={{ fontSize: "19px", letterSpacing: "0.04em" }}
         >
           Why are you leaving?
         </h2>
-        <p className="font-poppins font-light text-[rgba(var(--fg-rgb),0.45)]" style={{ fontSize: "12px" }}>
+        <p className="font-poppins font-light text-[rgba(var(--fg-rgb),0.45)]" style={{ fontSize: "15px" }}>
           Your reason will be posted to the session chat so the group knows.
         </p>
 
@@ -67,11 +67,11 @@ export default function LeaveEarlyModal({
           rows={4}
           placeholder="Something came up…"
           className="st-field w-full resize-none bg-transparent font-poppins font-light text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none p-3"
-          style={{ fontSize: "13px", border: "0.5px solid rgba(var(--fg-rgb),0.15)", lineHeight: 1.5 }}
+          style={{ fontSize: "16px", border: "0.5px solid rgba(var(--fg-rgb),0.15)", lineHeight: 1.5 }}
         />
 
         {error && (
-          <p className="font-poppins" style={{ fontSize: "12px", color: "var(--accent)" }}>
+          <p className="font-poppins" style={{ fontSize: "15px", color: "var(--accent)" }}>
             {error}
           </p>
         )}
@@ -83,7 +83,7 @@ export default function LeaveEarlyModal({
             disabled={submitting || reason.trim().length < MIN_REASON}
             className="st-btn font-poppins font-bold uppercase disabled:opacity-40 flex-1"
             style={{
-              fontSize: "12px",
+              fontSize: "15px",
               letterSpacing: "0.12em",
               background: "var(--accent)",
               color: "var(--bg-primary)",
@@ -96,7 +96,7 @@ export default function LeaveEarlyModal({
             type="button"
             onClick={onClose}
             className="font-poppins font-medium uppercase text-[rgba(var(--fg-rgb),0.5)] hover:text-[rgb(var(--fg-rgb))] transition-colors"
-            style={{ fontSize: "12px", letterSpacing: "0.1em", padding: "12px" }}
+            style={{ fontSize: "15px", letterSpacing: "0.1em", padding: "12px" }}
           >
             Stay
           </button>

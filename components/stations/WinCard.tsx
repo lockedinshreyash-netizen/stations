@@ -184,7 +184,7 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuOpen((v) => !v); setConfirmingDelete(false); }}
             aria-label="Win options"
-            style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.4)", fontSize: "16px", lineHeight: 1, padding: "2px 4px", letterSpacing: "0.1em" }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.4)", fontSize: "19px", lineHeight: 1, padding: "2px 4px", letterSpacing: "0.1em" }}
           >
             ···
           </button>
@@ -195,20 +195,20 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
                 <>
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMenuOpen(false); setEditing(true); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.6)", fontSize: "12px", padding: "12px 16px", textAlign: "left", fontFamily: "inherit", fontWeight: 300 }}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.6)", fontSize: "15px", padding: "12px 16px", textAlign: "left", fontFamily: "inherit", fontWeight: 300 }}
                   >
                     Edit
                   </button>
                   <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmingDelete(true); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: "12px", padding: "12px 16px", textAlign: "left", fontFamily: "inherit", fontWeight: 300, borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: "15px", padding: "12px 16px", textAlign: "left", fontFamily: "inherit", fontWeight: 300, borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
                   >
                     Delete
                   </button>
                 </>
               ) : (
                 <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <p style={{ fontSize: "11px", color: "rgba(var(--fg-rgb),0.6)", lineHeight: 1.5, margin: 0, fontFamily: "inherit", fontWeight: 300 }}>
+                  <p style={{ fontSize: "14px", color: "rgba(var(--fg-rgb),0.6)", lineHeight: 1.5, margin: 0, fontFamily: "inherit", fontWeight: 300 }}>
                     Are you sure? This cannot be undone.
                   </p>
                   <div style={{ display: "flex", gap: "8px" }}>
@@ -216,14 +216,14 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
                       onClick={handleDelete}
                       disabled={deleting}
                       className="st-btn"
-                      style={{ background: "var(--accent)", color: "rgb(var(--fg-rgb))", border: "none", cursor: deleting ? "default" : "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", opacity: deleting ? 0.6 : 1, fontFamily: "inherit" }}
+                      style={{ background: "var(--accent)", color: "rgb(var(--fg-rgb))", border: "none", cursor: deleting ? "default" : "pointer", fontSize: "13px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", opacity: deleting ? 0.6 : 1, fontFamily: "inherit" }}
                     >
                       {deleting ? "…" : "Delete"}
                     </button>
                     <button
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmingDelete(false); }}
                       className="st-btn"
-                      style={{ background: "none", border: "0.5px solid rgba(var(--fg-rgb),0.15)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", fontFamily: "inherit" }}
+                      style={{ background: "none", border: "0.5px solid rgba(var(--fg-rgb),0.15)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", fontSize: "13px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 12px", fontFamily: "inherit" }}
                     >
                       Cancel
                     </button>
@@ -239,23 +239,23 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
       <Link href={`/wins/${win.id}`} className="flex flex-col" style={{ gap: 0, textDecoration: "none" }}>
         {/* Top row */}
         <div className="flex items-center" style={{ gap: "10px", marginBottom: "8px", paddingRight: isOwner ? "28px" : 0 }}>
-          <span className="font-poppins text-[rgb(var(--fg-rgb))]" style={{ fontSize: "12px", fontWeight: 500 }}>
+          <span className="font-poppins text-[rgb(var(--fg-rgb))]" style={{ fontSize: "15px", fontWeight: 500 }}>
             {username}
           </span>
           <FounderMark founderNumber={win.users?.founder_number} />
-          <span className="font-poppins uppercase" style={{ fontSize: "9px", letterSpacing: "0.15em", color: CATEGORY_COLORS[win.category] }}>
+          <span className="font-poppins uppercase" style={{ fontSize: "12px", letterSpacing: "0.15em", color: CATEGORY_COLORS[win.category] }}>
             {win.category}
           </span>
-          <span className="font-poppins font-light text-[rgba(var(--fg-rgb),0.25)] ml-auto" style={{ fontSize: "11px" }}>
+          <span className="font-poppins font-light text-[rgba(var(--fg-rgb),0.25)] ml-auto" style={{ fontSize: "14px" }}>
             {timeAgo}
           </span>
         </div>
 
-        <h2 className="font-poppins font-black text-[rgb(var(--fg-rgb))] leading-tight" style={{ fontSize: "20px", marginBottom: "6px" }}>
+        <h2 className="font-poppins font-black text-[rgb(var(--fg-rgb))] leading-tight" style={{ fontSize: "23px", marginBottom: "6px" }}>
           {win.title}
         </h2>
 
-        <p className="font-poppins font-light text-[rgba(var(--fg-rgb),0.6)]" style={{ fontSize: "14px", lineHeight: 1.7 }}>
+        <p className="font-poppins font-light text-[rgba(var(--fg-rgb),0.6)]" style={{ fontSize: "17px", lineHeight: 1.7 }}>
           {win.description}
         </p>
 
@@ -266,15 +266,15 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
         )}
 
         {win.media_url && (
-          <div className="flex items-center font-poppins font-light text-[rgba(var(--fg-rgb),0.35)]" style={{ marginTop: "12px", gap: "6px", fontSize: "11px" }}>
-            <span style={{ fontSize: "12px" }}>🔗</span>
+          <div className="flex items-center font-poppins font-light text-[rgba(var(--fg-rgb),0.35)]" style={{ marginTop: "12px", gap: "6px", fontSize: "14px" }}>
+            <span style={{ fontSize: "15px" }}>🔗</span>
             <span>Link attached</span>
           </div>
         )}
       </Link>
 
       {actionError && (
-        <p className="font-poppins" style={{ color: "var(--accent)", fontSize: "11px", marginTop: "8px" }}>{actionError}</p>
+        <p className="font-poppins" style={{ color: "var(--accent)", fontSize: "14px", marginTop: "8px" }}>{actionError}</p>
       )}
 
       {/* Reactions — outside Link */}
@@ -297,13 +297,13 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
                 color: active ? "var(--bg-primary)" : "rgba(var(--fg-rgb),0.35)",
                 border: active ? "none" : "0.5px solid rgba(var(--fg-rgb),0.12)",
                 cursor: busy.has(type) ? "default" : "pointer",
-                fontSize: "13px",
+                fontSize: "16px",
                 lineHeight: 1,
               }}
               title={label}
             >
-              <span style={{ fontSize: "13px" }}>{emoji}</span>
-              {count > 0 && <span style={{ fontSize: "11px", fontWeight: 500 }}>{count}</span>}
+              <span style={{ fontSize: "16px" }}>{emoji}</span>
+              {count > 0 && <span style={{ fontSize: "14px", fontWeight: 500 }}>{count}</span>}
             </button>
           );
         })}

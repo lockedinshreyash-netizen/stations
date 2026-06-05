@@ -59,7 +59,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full bg-bg-primary text-text-primary font-poppins">
-        {children}
+        {/* Atmosphere: light source + vignette behind, film grain above.
+            Both fixed and non-interactive; tuned per theme in globals.css. */}
+        <div className="st-atmosphere" aria-hidden="true" />
+        <div className="st-grain" aria-hidden="true" />
+        <div className="st-content">{children}</div>
       </body>
     </html>
   );

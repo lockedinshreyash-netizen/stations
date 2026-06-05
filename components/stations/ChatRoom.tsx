@@ -158,13 +158,13 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
       >
         <h2
           className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-          style={{ fontSize: "18px", letterSpacing: "0.02em" }}
+          style={{ fontSize: "21px", letterSpacing: "0.02em" }}
         >
           {meta.title}
         </h2>
         <span
           className="font-poppins text-[rgba(var(--fg-rgb),0.3)]"
-          style={{ fontSize: "11px" }}
+          style={{ fontSize: "14px" }}
         >
           <span style={{ color: "var(--accent)" }}>{onlineCount} online</span>
           {" · "}
@@ -179,13 +179,13 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
         style={{ background: "var(--bg-surface)" }}
       >
         {!isFirebaseConfigured ? (
-          <p className="font-poppins text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "13px" }}>
+          <p className="font-poppins text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "16px" }}>
             Chat is not configured. Add your Firebase keys to <code>.env.local</code>.
           </p>
         ) : sorted.length === 0 ? (
           <p
             className="font-playfair italic text-[rgba(var(--fg-rgb),0.25)]"
-            style={{ fontSize: "14px" }}
+            style={{ fontSize: "17px" }}
           >
             No messages yet. {isMember ? "Say something." : "Join to start the conversation."}
           </p>
@@ -202,7 +202,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
       {error && (
         <div
           className="px-6 py-2 font-poppins shrink-0"
-          style={{ fontSize: "11px", color: "var(--accent)" }}
+          style={{ fontSize: "14px", color: "var(--accent)" }}
         >
           {error}
         </div>
@@ -222,7 +222,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
                   type="button"
                   onClick={() => insertEmoji(e)}
                   className="hover:scale-125 transition-transform"
-                  style={{ fontSize: "18px" }}
+                  style={{ fontSize: "21px" }}
                 >
                   {e}
                 </button>
@@ -242,7 +242,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
               onClick={() => setShowEmoji((v) => !v)}
               aria-label="Emoji"
               className="text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))] transition-colors pb-2"
-              style={{ fontSize: "18px" }}
+              style={{ fontSize: "21px" }}
             >
               ☺
             </button>
@@ -255,11 +255,11 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
               rows={1}
               maxLength={MAX_MESSAGE_LENGTH}
               className="flex-1 resize-none bg-transparent font-poppins font-light text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none py-2"
-              style={{ fontSize: "13px", maxHeight: "120px", lineHeight: 1.5 }}
+              style={{ fontSize: "16px", maxHeight: "120px", lineHeight: 1.5 }}
             />
             <span
               className="font-poppins text-[rgba(var(--fg-rgb),0.25)] pb-2.5"
-              style={{ fontSize: "10px" }}
+              style={{ fontSize: "13px" }}
             >
               {draft.length}/{MAX_MESSAGE_LENGTH}
             </span>
@@ -269,7 +269,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
               disabled={sending || !draft.trim()}
               className="st-btn font-poppins font-bold uppercase disabled:opacity-40 my-1"
               style={{
-                fontSize: "11px",
+                fontSize: "14px",
                 letterSpacing: "0.1em",
                 background: "var(--accent)",
                 color: "var(--bg-primary)",
@@ -287,7 +287,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
         >
           <span
             className="font-poppins font-light text-[rgba(var(--fg-rgb),0.4)]"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "15px" }}
           >
             You&apos;re viewing this room. Join to post.
           </span>
@@ -297,7 +297,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
             disabled={joining}
             className="st-btn font-poppins font-bold uppercase disabled:opacity-50"
             style={{
-              fontSize: "11px",
+              fontSize: "14px",
               letterSpacing: "0.1em",
               background: "var(--accent)",
               color: "var(--bg-primary)",
@@ -320,21 +320,21 @@ function MessageRow({ message }: { message: ChatMessage }) {
         <div className="flex items-baseline gap-2">
           <span
             className="font-poppins font-medium text-[rgb(var(--fg-rgb))]"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "15px" }}
           >
             {message.username}
           </span>
           <FounderMark founderNumber={message.founder_number} />
           <span
             className="font-poppins text-[rgba(var(--fg-rgb),0.25)] ml-auto"
-            style={{ fontSize: "10px" }}
+            style={{ fontSize: "13px" }}
           >
             {format(message.created_at, "h:mm a")}
           </span>
         </div>
         <p
           className="font-poppins font-light text-[rgba(var(--fg-rgb),0.8)] break-words whitespace-pre-wrap"
-          style={{ fontSize: "13px", lineHeight: 1.5 }}
+          style={{ fontSize: "16px", lineHeight: 1.5 }}
         >
           {message.content}
         </p>
@@ -350,10 +350,10 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
       <img
         src={url}
         alt={username}
-        width={28}
-        height={28}
+        width={40}
+        height={40}
         className="rounded-full object-cover shrink-0"
-        style={{ width: "28px", height: "28px" }}
+        style={{ width: "40px", height: "40px" }}
       />
     );
   }
@@ -363,7 +363,7 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
       style={{
         width: "28px",
         height: "28px",
-        fontSize: "11px",
+        fontSize: "14px",
         background: "rgba(var(--fg-rgb),0.1)",
         color: "rgba(var(--fg-rgb),0.6)",
       }}
