@@ -30,8 +30,18 @@ create table if not exists public.direct_messages (
   sender_id       uuid not null references public.users(id) on delete cascade,
   content         text not null check (char_length(content) between 1 and 2000),
   created_at      timestamptz not null default now(),
-  read_at         timestamptz
+  read_at         timestamptz,
+  edited_at       timestamptz
 );
+
+-- Existing installs: add the edited_at marker if it isn't there yet.
+alter table public.direct_messages
+  add column if not exists edited_at timestamptz;
+
+-- Send the full OLD row on UPDATE/DELETE so RLS can be evaluated for realtime
+-- events (the policies reference conversation_id, not just the primary key) and
+-- so the client can remove/replace the right message.
+alter table public.direct_messages replica identity full;
 
 create index if not exists direct_messages_conversation_idx
   on public.direct_messages (conversation_id, created_at);
@@ -85,6 +95,18 @@ create policy "recipient marks read" on public.direct_messages
         and (auth.uid() = c.user_low or auth.uid() = c.user_high)
     )
   );
+
+-- The sender may edit their own message (content/edited_at). Separate UPDATE
+-- policy from "recipient marks read"; RLS ORs permissive policies together.
+drop policy if exists "sender edits own dm" on public.direct_messages;
+create policy "sender edits own dm" on public.direct_messages
+  for update using (auth.uid() = sender_id)
+  with check (auth.uid() = sender_id);
+
+-- The sender may delete their own message.
+drop policy if exists "sender deletes own dm" on public.direct_messages;
+create policy "sender deletes own dm" on public.direct_messages
+  for delete using (auth.uid() = sender_id);
 
 -- ------------------------------------------------------------
 -- get_or_create_conversation(other_user) — start (or resume) a DM.

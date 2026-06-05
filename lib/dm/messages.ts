@@ -153,6 +153,40 @@ export async function sendDirectMessage(
   return data as DirectMessage;
 }
 
+/** Edit a message's text. RLS allows this only for the sender. */
+export async function editDirectMessage(
+  messageId: string,
+  senderId: string,
+  content: string
+): Promise<DirectMessage> {
+  const trimmed = content.trim().slice(0, 2000);
+  if (!trimmed) throw new Error("Message can't be empty.");
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("direct_messages")
+    .update({ content: trimmed, edited_at: new Date().toISOString() })
+    .eq("id", messageId)
+    .eq("sender_id", senderId)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as DirectMessage;
+}
+
+/** Delete a message. RLS allows this only for the sender. */
+export async function deleteDirectMessage(
+  messageId: string,
+  senderId: string
+): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("direct_messages")
+    .delete()
+    .eq("id", messageId)
+    .eq("sender_id", senderId);
+  if (error) throw new Error(error.message);
+}
+
 /** Mark every message the caller received in this conversation as read. */
 export async function markConversationRead(
   conversationId: string,

@@ -18,7 +18,9 @@ export default function PlatformShell({
   // it never covers their bottom input bars; the back button returns to a
   // station, where the nav reappears.
   const immersive =
-    /\/network\/rooms\/[^/]+/.test(pathname) || /\/work\/[^/]+/.test(pathname);
+    /\/network\/rooms\/[^/]+/.test(pathname) ||
+    /\/work\/[^/]+/.test(pathname) ||
+    /\/messages\/[^/]+/.test(pathname);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">

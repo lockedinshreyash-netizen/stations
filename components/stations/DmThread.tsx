@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 import {
   getMessages,
   sendDirectMessage,
+  editDirectMessage,
+  deleteDirectMessage,
   markConversationRead,
 } from "@/lib/dm/messages";
 import FounderMark from "@/components/ui/FounderMark";
@@ -29,20 +31,30 @@ export default function DmThread({
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ block: "end" });
   }, []);
 
-  // Merge a message by id (de-dupes optimistic + realtime echoes).
+  // Merge a message by id — inserts new, or replaces an existing one in place
+  // (so realtime edits and optimistic echoes both reconcile cleanly).
   const upsert = useCallback((m: DirectMessage) => {
     setMessages((prev) => {
-      if (prev.some((x) => x.id === m.id)) return prev;
+      if (prev.some((x) => x.id === m.id)) {
+        return prev.map((x) => (x.id === m.id ? m : x));
+      }
       return [...prev, m].sort(
         (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       );
     });
+  }, []);
+
+  const removeById = useCallback((id: string) => {
+    setMessages((prev) => prev.filter((x) => x.id !== id));
   }, []);
 
   // Live messages for THIS conversation only. RLS ensures only the two
@@ -65,11 +77,34 @@ export default function DmThread({
           if (m.sender_id !== user.id) markConversationRead(conversationId, user.id);
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "direct_messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => upsert(payload.new as DirectMessage)
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "direct_messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const old = payload.old as Partial<DirectMessage>;
+          if (old.id) removeById(old.id);
+        }
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId, user.id, upsert]);
+  }, [conversationId, user.id, upsert, removeById]);
 
   // Mark read on open and whenever messages change.
   useEffect(() => {
@@ -94,6 +129,46 @@ export default function DmThread({
       setError("Couldn't send. Try again.");
     } finally {
       setSending(false);
+    }
+  }
+
+  function startEdit(m: DirectMessage) {
+    setMenuFor(null);
+    setEditingId(m.id);
+    setEditDraft(m.content);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditDraft("");
+  }
+
+  async function saveEdit(m: DirectMessage) {
+    const content = editDraft.trim();
+    if (!content) return;
+    if (content === m.content) {
+      cancelEdit();
+      return;
+    }
+    // Optimistic; realtime UPDATE will reconcile.
+    upsert({ ...m, content, edited_at: new Date().toISOString() });
+    cancelEdit();
+    try {
+      await editDirectMessage(m.id, user.id, content);
+    } catch {
+      setError("Couldn't edit. Try again.");
+    }
+  }
+
+  async function handleDelete(m: DirectMessage) {
+    setMenuFor(null);
+    const prev = messages;
+    removeById(m.id); // optimistic
+    try {
+      await deleteDirectMessage(m.id, user.id);
+    } catch {
+      setMessages(prev); // restore on failure
+      setError("Couldn't delete. Try again.");
     }
   }
 
@@ -132,8 +207,120 @@ export default function DmThread({
         )}
         {messages.map((m) => {
           const mine = m.sender_id === user.id;
+
+          if (mine && editingId === m.id) {
+            return (
+              <div key={m.id} className="flex justify-end">
+                <div className="flex flex-col gap-2" style={{ maxWidth: "78%", width: "100%" }}>
+                  <textarea
+                    value={editDraft}
+                    onChange={(e) => setEditDraft(e.target.value.slice(0, MAX_LEN))}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        saveEdit(m);
+                      } else if (e.key === "Escape") {
+                        cancelEdit();
+                      }
+                    }}
+                    autoFocus
+                    rows={2}
+                    className="st-field bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-3 py-2 text-base outline-none border border-[var(--accent)] resize-none rounded-[var(--radius-sm)]"
+                  />
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={cancelEdit}
+                      className="font-poppins uppercase text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))]"
+                      style={{ fontSize: "10px", letterSpacing: "0.1em" }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => saveEdit(m)}
+                      disabled={!editDraft.trim()}
+                      className="font-poppins font-black uppercase"
+                      style={{
+                        fontSize: "10px",
+                        letterSpacing: "0.1em",
+                        padding: "5px 12px",
+                        background: "rgb(var(--fg-rgb))",
+                        color: "var(--bg-primary)",
+                        border: "none",
+                        borderRadius: "var(--radius-sm)",
+                        cursor: editDraft.trim() ? "pointer" : "default",
+                        opacity: editDraft.trim() ? 1 : 0.4,
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
           return (
-            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+            <div key={m.id} className={`group flex items-center gap-1.5 ${mine ? "justify-end" : "justify-start"}`}>
+              {/* Own-message actions (left of the bubble) */}
+              {mine && (
+                <div className="relative shrink-0">
+                  <button
+                    type="button"
+                    aria-label="Message options"
+                    onClick={() => setMenuFor((v) => (v === m.id ? null : m.id))}
+                    className="font-poppins opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "rgba(var(--fg-rgb),0.35)",
+                      fontSize: "15px",
+                      lineHeight: 1,
+                      padding: "2px 4px",
+                      opacity: menuFor === m.id ? 1 : undefined,
+                    }}
+                  >
+                    ···
+                  </button>
+                  {menuFor === m.id && (
+                    <div
+                      className="absolute z-20"
+                      style={{
+                        bottom: "calc(100% + 4px)",
+                        right: 0,
+                        minWidth: "120px",
+                        background: "var(--bg-surface)",
+                        border: "0.5px solid rgba(var(--fg-rgb),0.12)",
+                        borderRadius: "var(--radius-md)",
+                        boxShadow: "var(--shadow-lg)",
+                        overflow: "hidden",
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => startEdit(m)}
+                        className="font-poppins text-left hover:bg-[rgba(var(--fg-rgb),0.05)]"
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(var(--fg-rgb),0.7)", fontSize: "12px", padding: "10px 14px", fontWeight: 300 }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(m)}
+                        className="font-poppins text-left hover:bg-[rgba(var(--fg-rgb),0.05)]"
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent)", fontSize: "12px", padding: "10px 14px", fontWeight: 300, borderTop: "0.5px solid rgba(var(--fg-rgb),0.06)" }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div
                 className="font-poppins"
                 style={{
@@ -151,11 +338,32 @@ export default function DmThread({
                 title={format(new Date(m.created_at), "MMM d, h:mm a")}
               >
                 {m.content}
+                {m.edited_at && (
+                  <span
+                    style={{
+                      fontSize: "9px",
+                      marginLeft: "6px",
+                      opacity: 0.6,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    (edited)
+                  </span>
+                )}
               </div>
             </div>
           );
         })}
         <div ref={bottomRef} />
+
+        {/* Click-away layer to dismiss an open message menu */}
+        {menuFor && (
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setMenuFor(null)}
+            aria-hidden
+          />
+        )}
       </div>
 
       {/* Composer */}

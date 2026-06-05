@@ -124,6 +124,7 @@ export interface DirectMessage {
   content: string;
   created_at: string;
   read_at: string | null;
+  edited_at: string | null;
 }
 
 /** Minimal public profile of the other person in a conversation. */
