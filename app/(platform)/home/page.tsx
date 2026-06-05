@@ -27,7 +27,8 @@ export default async function PlatformHome() {
   return (
     <div>
       {/* Editorial header — same treatment as station pages */}
-      <div className="px-5 md:px-10 pt-7 pb-5 md:pt-9 md:pb-6 border-b border-[rgba(var(--fg-rgb),0.06)]">
+      <div className="relative overflow-hidden px-5 md:px-10 pt-7 pb-5 md:pt-9 md:pb-6 border-b border-[rgba(var(--fg-rgb),0.06)]">
+        <div className="st-aurora" aria-hidden="true" />
         <p
           className="font-playfair italic text-[rgba(var(--accent-2-rgb),0.55)]"
           style={{ fontSize: "15px", marginBottom: "2px" }}

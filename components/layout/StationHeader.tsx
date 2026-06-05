@@ -7,6 +7,9 @@ interface StationHeaderProps {
 export default function StationHeader({ number, name, tagline }: StationHeaderProps) {
   return (
     <div className="relative overflow-hidden px-5 md:px-10 pt-7 pb-5 md:pt-9 md:pb-6 border-b border-[rgba(var(--fg-rgb),0.06)]">
+      {/* Aurora — slow brass light drifting behind the header */}
+      <div className="st-aurora" aria-hidden="true" />
+
       {/* Oversized station number — supergraphic layered in front, very faint */}
       <span
         aria-hidden

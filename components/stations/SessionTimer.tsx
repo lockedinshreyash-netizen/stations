@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { formatClock } from "@/lib/work/format";
 import { success } from "@/lib/feedback";
+import SplitFlapClock from "@/components/stations/SplitFlapClock";
 
 interface SessionTimerProps {
   /** Eyebrow label, e.g. "Starts in" or "Time remaining". */
@@ -63,17 +64,12 @@ export default function SessionTimer({
         {isEnded ? "Session ended" : label}
       </span>
       {!isEnded && targetIso && (
-        <span
-          className="font-playfair leading-none tabular-nums"
-          style={{
-            fontSize: big
-              ? "clamp(96px, 16vw, 144px)"
-              : "clamp(56px, 9vw, 96px)",
-            color: warn ? "var(--accent)" : "rgb(var(--fg-rgb))",
-          }}
-        >
-          {formatClock(remaining)}
-        </span>
+        <SplitFlapClock
+          className="font-playfair leading-none"
+          value={formatClock(remaining)}
+          fontSize={big ? "clamp(96px, 16vw, 144px)" : "clamp(56px, 9vw, 96px)"}
+          color={warn ? "var(--accent)" : "rgb(var(--fg-rgb))"}
+        />
       )}
       {isEnded && (
         <span

@@ -205,22 +205,59 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* Interactive card — lifts and deepens its shadow on hover. */
+/* Animatable transform pieces so tilt (JS) + lift (hover) + reveal compose
+   cleanly and tween smoothly. @property lets custom props transition. */
+@property --rx { syntax: "<angle>";  inherits: false; initial-value: 0deg; }
+@property --ry { syntax: "<angle>";  inherits: false; initial-value: 0deg; }
+@property --ty { syntax: "<length>"; inherits: false; initial-value: 0px;  }
+@property --sc { syntax: "<number>"; inherits: false; initial-value: 1;    }
+
+/* Interactive card — cursor-driven 3D tilt + a light that tracks the pointer,
+   plus the lift/shadow on hover. CardFX sets --rx/--ry/--mx/--my. */
 .st-card-hover {
+  position: relative;
+  transform:
+    perspective(900px)
+    rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg))
+    translateY(var(--ty, 0px))
+    scale(var(--sc, 1));
+  transform-style: preserve-3d;
   transition:
-    transform  var(--t-base) var(--ease),
+    --rx 160ms var(--ease),
+    --ry 160ms var(--ease),
+    --ty var(--t-base) var(--ease),
+    --sc var(--t-base) var(--ease),
     box-shadow var(--t-base) var(--ease),
     background-color 200ms var(--ease),
     border-color     200ms var(--ease);
   will-change: transform;
-  animation: st-rise 0.5s var(--ease) both;
 }
 .st-card-hover:hover {
-  transform: translateY(-2px) scale(1.01);
+  --ty: -3px;
+  --sc: 1.012;
   box-shadow: var(--shadow-lg);
 }
+/* Pointer-tracking sheen. */
+.st-card-hover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(var(--accent-2-rgb), 0.13),
+    transparent 60%
+  );
+}
+@media (hover: hover) {
+  .st-card-hover:hover::after { opacity: 1; }
+}
 @media (hover: none) {
-  .st-card-hover:hover { transform: none; }
+  .st-card-hover:hover { --ty: 0px; --sc: 1; }
 }
 
 /* Button — gentle scale + shadow on hover/press. */
@@ -438,6 +475,62 @@ body {
   transition: width 0.2s var(--ease), opacity 0.3s var(--ease);
 }
 
+/* Aurora — a slow brass/red light drifting behind page headers. The parent
+   must be position:relative + overflow:hidden; this sits at z-0 under content. */
+.st-aurora {
+  position: absolute;
+  inset: -60% -15% auto -15%;
+  height: 220%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.7;
+  background:
+    radial-gradient(38% 55% at 18% 30%, rgba(var(--accent-2-rgb), 0.20), transparent 70%),
+    radial-gradient(42% 60% at 82% 18%, rgba(var(--accent-rgb), 0.12), transparent 72%),
+    radial-gradient(50% 60% at 55% 80%, rgba(var(--accent-2-rgb), 0.10), transparent 75%);
+  filter: blur(36px);
+  animation: st-aurora 16s ease-in-out infinite alternate;
+}
+@keyframes st-aurora {
+  from { transform: translate3d(-3%, 0, 0) scale(1); }
+  to   { transform: translate3d(4%, 2%, 0) scale(1.08); }
+}
+
+/* Scroll reveal — opacity-only (no transform) so it never fights the card's
+   3D tilt transform. RevealFX adds .st-in when the element enters the viewport. */
+[data-reveal] {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+[data-reveal].st-in { opacity: 1; }
+
+/* Shimmer skeleton — branded loading placeholder. */
+.st-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: rgba(var(--fg-rgb), 0.06);
+}
+.st-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--fg-rgb), 0.10),
+    transparent
+  );
+  animation: st-shimmer 1.4s infinite;
+}
+@keyframes st-shimmer { to { transform: translateX(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .st-aurora { animation: none; }
+  [data-reveal] { opacity: 1; }
+  .st-shimmer::after { animation: none; }
+}
+
 /* Reaction burst — particles fly outward + the pill pops when you react. */
 .st-pop { animation: st-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes st-pop {
@@ -467,13 +560,16 @@ body {
   .st-burst-p { display: none; }
 }
 
-/* Per-page entrance — fires on every navigation via template.tsx. */
+/* Per-page entrance — fires on every navigation via template.tsx.
+   IMPORTANT: opacity-only. A `transform` or `filter` here would make this
+   wrapper the containing block for any `position: fixed` descendant (e.g. the
+   floating BottomNav), pinning it to the page instead of the viewport. */
 .st-page-enter {
-  animation: st-page-enter 0.45s var(--ease) both;
+  animation: st-page-enter 0.4s var(--ease) both;
 }
 @keyframes st-page-enter {
-  from { opacity: 0; transform: translateY(8px) scale(0.995); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

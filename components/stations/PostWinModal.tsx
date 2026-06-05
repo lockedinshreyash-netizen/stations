@@ -6,7 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import type { WinCategory } from "@/types";
-import { success, error as errorSound } from "@/lib/feedback";
+import { error as errorSound } from "@/lib/feedback";
+import { fireCelebration } from "@/lib/celebrate";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -170,7 +171,7 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
     });
 
     if (error) { errorSound(); setServerError(error.message); setLoading(false); return; }
-    success();
+    fireCelebration(); // silver/gold party-popper + cheerful sound + haptics
     onPosted();
   }
 

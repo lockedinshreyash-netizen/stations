@@ -183,6 +183,7 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
 
   return (
     <article
+      data-reveal
       className="st-card st-card-hover flex flex-col relative"
       style={{
         padding: "22px 24px",

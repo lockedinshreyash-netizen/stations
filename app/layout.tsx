@@ -3,6 +3,9 @@ import { Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import SplashScreen from "@/components/layout/SplashScreen";
 import HapticsProvider from "@/components/layout/HapticsProvider";
+import Celebration from "@/components/layout/Celebration";
+import CardFX from "@/components/layout/CardFX";
+import RevealFX from "@/components/layout/RevealFX";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -67,6 +70,9 @@ export default function RootLayout({
         <div className="st-grain" aria-hidden="true" />
         <SplashScreen />
         <HapticsProvider />
+        <Celebration />
+        <CardFX />
+        <RevealFX />
         <div className="st-content">{children}</div>
       </body>
     </html>

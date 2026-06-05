@@ -175,6 +175,23 @@ export function success(): void {
   });
 }
 
+/**
+ * Party-popper celebration — a bright ascending major arpeggio + a sparkle
+ * tail, with a matching staccato haptic burst. Fired when a win is posted.
+ */
+export function celebrate(): void {
+  // Cheerful rhythmic burst to match the popper.
+  buzz([22, 30, 22, 30, 22, 40, 60]);
+  play(() => {
+    // C5 E5 G5 C6 — major, joyful — then a high sparkle.
+    tone(523, 0.0, 0.14, 0.24, "triangle");
+    tone(659, 0.08, 0.14, 0.24, "triangle");
+    tone(784, 0.16, 0.16, 0.24, "triangle");
+    tone(1047, 0.25, 0.28, 0.26, "triangle");
+    tone(1568, 0.32, 0.22, 0.16, "sine");
+  });
+}
+
 /** Bright two-blip pop — reacting to a win. (Haptic handled globally on press.) */
 export function pop(): void {
   play(() => {
