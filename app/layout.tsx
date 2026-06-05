@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import SplashScreen from "@/components/layout/SplashScreen";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -63,6 +64,7 @@ export default function RootLayout({
             Both fixed and non-interactive; tuned per theme in globals.css. */}
         <div className="st-atmosphere" aria-hidden="true" />
         <div className="st-grain" aria-hidden="true" />
+        <SplashScreen />
         <div className="st-content">{children}</div>
       </body>
     </html>

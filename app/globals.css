@@ -294,3 +294,168 @@ body {
     transform: none;
   }
 }
+
+/* ============================================================
+   CINEMATIC LOADING — splash on cold load, a route loader for
+   page-to-page fetches, and a per-page entrance. The "S" wordmark
+   reveals, a brass hairline sweeps, the red period drops in.
+   ============================================================ */
+
+/* Shared full-bleed dark stage used by splash + route loader. */
+.st-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: var(--bg-primary);
+  background-image:
+    radial-gradient(120% 90% at 50% 30%, var(--halo), transparent 60%);
+}
+
+/* The wordmark. Letters rise + unblur in a staggered cascade. */
+.st-word {
+  display: flex;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: rgb(var(--fg-rgb));
+}
+.st-word > span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.5em);
+  filter: blur(8px);
+  animation: st-letter 0.7s var(--ease) forwards;
+}
+.st-word > span.st-dot { color: var(--accent); }
+@keyframes st-letter {
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* Brass hairline that draws outward beneath the wordmark. */
+.st-sweep {
+  height: 1.5px;
+  width: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--accent-2-rgb), 0.9),
+    transparent
+  );
+  animation: st-sweep 1s var(--ease) 0.35s forwards;
+}
+@keyframes st-sweep {
+  to { width: min(260px, 60vw); }
+}
+
+/* Splash exit — the whole stage lifts and fades like a curtain. */
+.st-splash-out {
+  animation: st-splash-out 0.7s var(--ease) forwards;
+  pointer-events: none;
+}
+@keyframes st-splash-out {
+  to { opacity: 0; transform: scale(1.04); filter: blur(6px); }
+}
+
+/* Route loader — a quieter, faster version that pulses while a page
+   resolves. Lives below modals but above content. */
+.st-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: rgba(var(--shadow-rgb), 0.001);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: st-fade-in 0.25s var(--ease) both;
+}
+@keyframes st-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.st-pulse-mark {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: rgb(var(--fg-rgb));
+  animation: st-pulse 1.1s var(--ease) infinite;
+}
+.st-pulse-mark .st-dot { color: var(--accent); }
+@keyframes st-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.98); }
+  50%      { opacity: 1;    transform: scale(1); }
+}
+
+/* Indeterminate brass track. */
+.st-track {
+  position: relative;
+  width: min(220px, 50vw);
+  height: 2px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(var(--fg-rgb), 0.08);
+}
+.st-track::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--accent-2-rgb), 0.95),
+    transparent
+  );
+  animation: st-track 1.1s var(--ease) infinite;
+}
+@keyframes st-track {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(320%); }
+}
+
+/* Top-of-viewport navigation progress bar. */
+.st-navbar-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  z-index: 9990;
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    rgba(var(--accent-2-rgb), 1)
+  );
+  box-shadow: 0 0 10px rgba(var(--accent-2-rgb), 0.6);
+  transition: width 0.2s var(--ease), opacity 0.3s var(--ease);
+}
+
+/* Per-page entrance — fires on every navigation via template.tsx. */
+.st-page-enter {
+  animation: st-page-enter 0.45s var(--ease) both;
+}
+@keyframes st-page-enter {
+  from { opacity: 0; transform: translateY(8px) scale(0.995); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-word > span,
+  .st-sweep,
+  .st-splash-out,
+  .st-pulse-mark,
+  .st-track::after,
+  .st-page-enter {
+    animation: none;
+  }
+  .st-word > span { opacity: 1; transform: none; filter: none; }
+  .st-sweep { width: min(260px, 60vw); }
+}
