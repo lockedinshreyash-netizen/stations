@@ -64,18 +64,37 @@ export default function BottomNav({ user }: { user: User }) {
 
   return (
     <>
+      {/* Responsive nav sizing. Below 420px the bar goes icon-only (labels +
+          divider hide) so all seven controls fit comfortably on small phones;
+          wider screens get the full labelled treatment. */}
+      <style>{`
+        .st-navitem {
+          min-width: 44px;
+          padding: 6px 8px 5px;
+        }
+        .st-navlabel { font-size: 11px; }
+        @media (max-width: 420px) {
+          .st-navbar { gap: 0; padding: 5px; }
+          .st-navitem { min-width: 0; flex: 1 1 0; padding: 8px 4px; }
+          .st-navlabel { display: none; }
+          .st-navdivider { display: none !important; }
+        }
+        @media (min-width: 421px) {
+          .st-navbar { gap: 2px; }
+        }
+      `}</style>
       <nav
-        className="fixed inset-x-0 z-40 flex justify-center pointer-events-none"
+        className="fixed inset-x-0 z-40 flex justify-center pointer-events-none px-2.5"
         style={{ bottom: "calc(16px + env(safe-area-inset-bottom))" }}
         aria-label="Primary"
       >
         <div
-          className="st-glass pointer-events-auto flex items-center gap-0.5 px-1.5 py-1.5"
+          className="st-navbar st-glass pointer-events-auto flex items-center justify-center w-full px-1.5 py-1.5"
           style={{
             borderRadius: "9999px",
             boxShadow: "var(--shadow-lg)",
             border: "0.5px solid var(--glass-border)",
-            maxWidth: "calc(100vw - 20px)",
+            maxWidth: "560px",
           }}
         >
           {NAV.map(({ label, href, Icon }) => {
@@ -88,10 +107,8 @@ export default function BottomNav({ user }: { user: User }) {
                 aria-current={active ? "page" : undefined}
                 title={label}
                 onClick={() => tap()}
-                className="st-pill flex flex-col items-center justify-center gap-1 shrink-0"
+                className="st-navitem st-pill flex flex-col items-center justify-center gap-1 shrink-0"
                 style={{
-                  minWidth: "40px",
-                  padding: "6px 6px 5px",
                   borderRadius: "14px",
                   background: active ? "rgba(var(--accent-rgb),0.14)" : "transparent",
                   color: active ? "var(--accent)" : "rgba(var(--fg-rgb),0.5)",
@@ -117,8 +134,8 @@ export default function BottomNav({ user }: { user: User }) {
                   )}
                 </span>
                 <span
-                  className="font-poppins uppercase"
-                  style={{ fontSize: "11px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500 }}
+                  className="st-navlabel font-poppins uppercase"
+                  style={{ letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500 }}
                 >
                   {label}
                 </span>
@@ -129,6 +146,7 @@ export default function BottomNav({ user }: { user: User }) {
           {/* Divider */}
           <span
             aria-hidden
+            className="st-navdivider"
             style={{
               width: "0.5px",
               height: "30px",
@@ -144,10 +162,8 @@ export default function BottomNav({ user }: { user: User }) {
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             title={theme === "dark" ? "Light mode" : "Dark mode"}
-            className="st-pill flex flex-col items-center justify-center gap-1 shrink-0"
+            className="st-navitem st-pill flex flex-col items-center justify-center gap-1 shrink-0"
             style={{
-              minWidth: "40px",
-              padding: "6px 6px 5px",
               borderRadius: "14px",
               color: "rgba(var(--fg-rgb),0.5)",
               background: "transparent",
@@ -161,8 +177,8 @@ export default function BottomNav({ user }: { user: User }) {
               <Sun size={18} strokeWidth={1.75} aria-hidden />
             )}
             <span
-              className="font-poppins uppercase"
-              style={{ fontSize: "11px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500 }}
+              className="st-navlabel font-poppins uppercase"
+              style={{ letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500 }}
             >
               Theme
             </span>
@@ -177,10 +193,8 @@ export default function BottomNav({ user }: { user: User }) {
             }}
             aria-label="Profile settings"
             title="Profile settings"
-            className="st-pill flex flex-col items-center justify-center gap-1 shrink-0"
+            className="st-navitem st-pill flex flex-col items-center justify-center gap-1 shrink-0"
             style={{
-              minWidth: "40px",
-              padding: "6px 6px 5px",
               borderRadius: "14px",
               background: "transparent",
               border: "none",
@@ -214,8 +228,8 @@ export default function BottomNav({ user }: { user: User }) {
               )}
             </span>
             <span
-              className="font-poppins uppercase"
-              style={{ fontSize: "11px", letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500, color: "rgba(var(--fg-rgb),0.5)" }}
+              className="st-navlabel font-poppins uppercase"
+              style={{ letterSpacing: "0.04em", lineHeight: 1, fontWeight: 500, color: "rgba(var(--fg-rgb),0.5)" }}
             >
               Profile
             </span>
