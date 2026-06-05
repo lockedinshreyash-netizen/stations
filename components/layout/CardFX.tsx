@@ -32,6 +32,15 @@ export default function CardFX() {
         current = el ?? null;
       }
       if (!el) return;
+      // Over anything interactive? Flatten and hold still so the target
+      // doesn't move under the cursor — tilt only over the card's dead space.
+      const overInteractive = (e.target as Element | null)?.closest(
+        'a, button, [role="button"], [role="switch"], input, textarea, select, label, .reaction-btn'
+      );
+      if (overInteractive) {
+        reset(el);
+        return;
+      }
       const r = el.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width;
       const py = (e.clientY - r.top) / r.height;

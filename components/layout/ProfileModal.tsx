@@ -8,6 +8,7 @@ import type { User, UserRole } from "@/types";
 import MembershipBadge from "@/components/ui/MembershipBadge";
 import { addMember } from "@/lib/firebase/rooms";
 import { isSoundEnabled, setSoundEnabled, success, error as errorSound, testHaptics } from "@/lib/feedback";
+import { isMotionEnabled, setMotionEnabled } from "@/lib/motion";
 
 const ROLES: { value: UserRole; label: string }[] = [
   { value: "student",   label: "Student"   },
@@ -76,9 +77,25 @@ export default function ProfileModal({ user, onClose }: Props) {
   const [error, setError] = useState("");
   const [soundOn, setSoundOn] = useState(true);
   const [hapticMsg, setHapticMsg] = useState("");
+  const [motionOn, setMotionOn] = useState(false);
+  const [motionMsg, setMotionMsg] = useState("");
 
-  // Reflect the stored sound preference once mounted (localStorage is client-only).
-  useEffect(() => { setSoundOn(isSoundEnabled()); }, []);
+  // Reflect stored preferences once mounted (localStorage is client-only).
+  useEffect(() => {
+    setSoundOn(isSoundEnabled());
+    setMotionOn(isMotionEnabled());
+  }, []);
+
+  async function toggleMotion() {
+    const next = !motionOn;
+    const result = await setMotionEnabled(next); // requests permission on iOS
+    setMotionOn(result);
+    if (next && !result) {
+      setMotionMsg("Motion access was denied. Enable it in your browser's site settings.");
+    } else {
+      setMotionMsg("");
+    }
+  }
 
   function runHapticTest() {
     const { supported, accepted } = testHaptics();
@@ -556,6 +573,53 @@ export default function ProfileModal({ user, onClose }: Props) {
                   position: "absolute",
                   top: "3px",
                   left: soundOn ? "23px" : "3px",
+                  width: "20px",
+                  height: "20px",
+                  borderRadius: "50%",
+                  background: "#fff",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
+                  transition: "left 200ms var(--ease)",
+                }}
+              />
+            </button>
+          </div>
+
+          {/* Preferences — gyroscope / motion parallax */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <span className="font-poppins" style={labelStyle}>Motion parallax</span>
+              <span className="font-poppins font-light" style={{ fontSize: "14px", color: "rgba(var(--fg-rgb),0.3)" }}>
+                Tilt your phone — the cards lean with it. (Uses device motion.)
+              </span>
+              {motionMsg && (
+                <span className="font-poppins font-light" style={{ fontSize: "13px", color: "rgba(var(--fg-rgb),0.45)", maxWidth: "260px", lineHeight: 1.4 }}>
+                  {motionMsg}
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={motionOn}
+              aria-label="Toggle motion parallax"
+              onClick={toggleMotion}
+              style={{
+                position: "relative",
+                width: "46px",
+                height: "26px",
+                flexShrink: 0,
+                borderRadius: "9999px",
+                border: "none",
+                cursor: "pointer",
+                background: motionOn ? "var(--accent)" : "rgba(var(--fg-rgb),0.18)",
+                transition: "background 200ms var(--ease)",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: "3px",
+                  left: motionOn ? "23px" : "3px",
                   width: "20px",
                   height: "20px",
                   borderRadius: "50%",

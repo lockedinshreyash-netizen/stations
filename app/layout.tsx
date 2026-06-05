@@ -6,6 +6,7 @@ import HapticsProvider from "@/components/layout/HapticsProvider";
 import Celebration from "@/components/layout/Celebration";
 import CardFX from "@/components/layout/CardFX";
 import RevealFX from "@/components/layout/RevealFX";
+import GyroFX from "@/components/layout/GyroFX";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -73,6 +74,7 @@ export default function RootLayout({
         <Celebration />
         <CardFX />
         <RevealFX />
+        <GyroFX />
         <div className="st-content">{children}</div>
       </body>
     </html>

@@ -218,8 +218,8 @@ body {
   position: relative;
   transform:
     perspective(900px)
-    rotateX(var(--rx, 0deg))
-    rotateY(var(--ry, 0deg))
+    rotateX(calc(var(--rx, 0deg) + var(--gyro-rx, 0deg)))
+    rotateY(calc(var(--ry, 0deg) + var(--gyro-ry, 0deg)))
     translateY(var(--ty, 0px))
     scale(var(--sc, 1));
   transform-style: preserve-3d;
