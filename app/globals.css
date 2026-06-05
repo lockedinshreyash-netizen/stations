@@ -497,12 +497,14 @@ body {
 }
 
 /* Scroll reveal — opacity-only (no transform) so it never fights the card's
-   3D tilt transform. RevealFX adds .st-in when the element enters the viewport. */
-[data-reveal] {
+   3D tilt transform. Fail-OPEN: elements are visible by default; RevealFX only
+   hides ones it has armed (off-screen) and reveals them with .st-in. If the JS
+   never runs, content stays visible. */
+[data-reveal].st-armed {
   opacity: 0;
   transition: opacity 0.6s var(--ease);
 }
-[data-reveal].st-in { opacity: 1; }
+[data-reveal].st-armed.st-in { opacity: 1; }
 
 /* Shimmer skeleton — branded loading placeholder. */
 .st-shimmer {
