@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import NotificationsToggle from "@/components/layout/NotificationsToggle";
 import type { User, UserRole } from "@/types";
 import MembershipBadge from "@/components/ui/MembershipBadge";
 import { addMember } from "@/lib/firebase/rooms";
@@ -566,6 +567,9 @@ export default function ProfileModal({ user, onClose }: Props) {
               />
             </button>
           </div>
+
+          {/* Preferences — push notifications */}
+          <NotificationsToggle />
 
           {error && (
             <span className="font-poppins font-light" style={{ fontSize: "15px", color: "var(--accent)" }}>

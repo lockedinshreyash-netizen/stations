@@ -20,6 +20,7 @@ import {
 import { isFirebaseConfigured } from "@/lib/firebase/config";
 import { joinRoom } from "@/lib/rooms/membership";
 import { markRoomSeen } from "@/lib/rooms/useRoomStats";
+import { notifyMentions } from "@/lib/push/client";
 import type { User } from "@/types";
 import FounderMark from "@/components/ui/FounderMark";
 
@@ -114,6 +115,7 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
         founder_number: user.founder_number,
         content,
       });
+      notifyMentions(roomName, content);
       setDraft("");
       setShowEmoji(false);
     } catch (e) {

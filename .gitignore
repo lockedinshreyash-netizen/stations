@@ -45,3 +45,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# next-pwa (generated custom worker)
+/public/worker-*.js
+/public/worker-*.js.map
