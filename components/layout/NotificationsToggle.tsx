@@ -7,6 +7,7 @@ import {
   isSubscribed,
   enablePush,
   disablePush,
+  PushError,
 } from "@/lib/push/client";
 
 const labelStyle = { fontSize: "16px", color: "rgba(var(--fg-rgb),0.85)" } as const;
@@ -23,6 +24,7 @@ export default function NotificationsToggle() {
   const [on, setOn] = useState(false);
   const [blocked, setBlocked] = useState(() => permissionState() === "denied");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Async external read — the setState runs in a later callback, not the
@@ -33,6 +35,7 @@ export default function NotificationsToggle() {
   async function toggle() {
     if (busy || blocked) return;
     setBusy(true);
+    setError(null);
     try {
       if (on) {
         await disablePush();
@@ -40,8 +43,14 @@ export default function NotificationsToggle() {
       } else {
         const ok = await enablePush();
         setOn(ok);
-        if (!ok) setBlocked(permissionState() === "denied");
       }
+    } catch (e) {
+      setBlocked(permissionState() === "denied");
+      setError(
+        e instanceof PushError
+          ? e.message
+          : "Couldn't enable notifications. Please try again."
+      );
     } finally {
       setBusy(false);
     }
@@ -49,15 +58,17 @@ export default function NotificationsToggle() {
 
   if (!supported) return null;
 
-  const caption = blocked
-    ? "Blocked in your browser settings. Re-enable notifications for this site to turn them on."
-    : "Get pinged for DMs, reactions, session starts, and mentions — on this device.";
+  const caption =
+    error ??
+    (blocked
+      ? "Blocked in your browser settings. Re-enable notifications for this site to turn them on."
+      : "Get pinged for DMs, reactions, session starts, and mentions — on this device.");
 
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
         <span className="font-poppins" style={labelStyle}>Push notifications</span>
-        <span className="font-poppins font-light" style={{ fontSize: "14px", color: "rgba(var(--fg-rgb),0.3)", maxWidth: "300px", lineHeight: 1.4 }}>
+        <span className="font-poppins font-light" style={{ fontSize: "14px", color: error ? "var(--accent)" : "rgba(var(--fg-rgb),0.3)", maxWidth: "300px", lineHeight: 1.4 }}>
           {caption}
         </span>
       </div>

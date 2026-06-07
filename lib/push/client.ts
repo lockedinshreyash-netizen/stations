@@ -36,21 +36,55 @@ function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
  * persist the subscription server-side. Returns true on success. Safe to call
  * repeatedly — re-subscribing upserts by endpoint.
  */
+
+/** Carries a message safe to show the user when enabling push fails. */
+export class PushError extends Error {}
+
+/**
+ * Resolve the active service-worker registration, registering it ourselves if
+ * next-pwa hasn't (it doesn't in development). Races `ready` against a timeout
+ * so a missing/broken worker surfaces an error instead of hanging the UI.
+ */
+async function getReadyRegistration(): Promise<ServiceWorkerRegistration> {
+  let reg = await navigator.serviceWorker.getRegistration();
+  if (!reg) reg = await navigator.serviceWorker.register("/sw.js");
+
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(
+      () =>
+        reject(
+          new PushError(
+            "The service worker isn't active. In local dev run a production build (npm run build && npm start), or test on the deployed site."
+          )
+        ),
+      8000
+    )
+  );
+  return Promise.race([navigator.serviceWorker.ready, timeout]);
+}
+
 export async function enablePush(): Promise<boolean> {
-  if (!pushSupported()) return false;
+  if (!pushSupported()) {
+    throw new PushError("This browser doesn't support push notifications.");
+  }
   const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   if (!vapidKey) {
-    console.warn("Push disabled: NEXT_PUBLIC_VAPID_PUBLIC_KEY is unset");
-    return false;
+    throw new PushError("Push isn't configured (missing VAPID key).");
   }
 
   const permission =
     Notification.permission === "default"
       ? await Notification.requestPermission()
       : Notification.permission;
-  if (permission !== "granted") return false;
+  if (permission !== "granted") {
+    throw new PushError(
+      permission === "denied"
+        ? "Notifications are blocked. Enable them for this site in your browser settings."
+        : "Notification permission wasn't granted."
+    );
+  }
 
-  const reg = await navigator.serviceWorker.ready;
+  const reg = await getReadyRegistration();
   let sub = await reg.pushManager.getSubscription();
   if (!sub) {
     sub = await reg.pushManager.subscribe({
@@ -64,7 +98,10 @@ export async function enablePush(): Promise<boolean> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sub.toJSON()),
   });
-  return res.ok;
+  if (!res.ok) {
+    throw new PushError("Couldn't save your subscription. Please try again.");
+  }
+  return true;
 }
 
 /** Unsubscribe locally and tell the server to forget the subscription. */
