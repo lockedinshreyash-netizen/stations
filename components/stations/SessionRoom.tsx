@@ -12,6 +12,7 @@ import {
   joinSession,
 } from "@/lib/work/sessions";
 import { markSessionPresent } from "@/lib/firebase/work-chat";
+import { notifySessionStarted } from "@/lib/push/client";
 import SessionTimer from "@/components/stations/SessionTimer";
 import SessionChat from "@/components/stations/SessionChat";
 import SessionMemberList, {
@@ -131,7 +132,9 @@ export default function SessionRoom({
   useEffect(() => {
     if (!isHost) return;
     if (status === "active" && session.status === "scheduled") {
-      updateSessionStatus(session.id, "active").catch(() => {});
+      updateSessionStatus(session.id, "active")
+        .then(() => notifySessionStarted(session.id))
+        .catch(() => {});
     } else if (
       status === "completed" &&
       (session.status === "scheduled" || session.status === "active")

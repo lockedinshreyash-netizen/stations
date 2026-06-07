@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { createSession } from "@/lib/work/sessions";
+import { notifySessionStarted } from "@/lib/push/client";
 import { formatDuration } from "@/lib/work/format";
 import type { WorkCategory, WorkSession } from "@/types";
 
@@ -84,6 +85,9 @@ export default function CreateSessionModal({
           ? undefined
           : new Date(startTime).toISOString(),
       });
+      // A "start now" session is already live on creation, so broadcast here
+      // (the SessionRoom transition effect only covers scheduled→active).
+      if (startNow) notifySessionStarted(session.id);
       onCreated(session);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create session.");

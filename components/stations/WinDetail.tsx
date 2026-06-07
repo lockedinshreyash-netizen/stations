@@ -8,6 +8,7 @@ import { type WinCardData, storagePathFromUrl } from "@/components/stations/WinC
 import EditWinModal from "@/components/stations/EditWinModal";
 import type { ReactionType, ReactionCounts } from "@/types";
 import { REACTIONS, getCounts } from "@/lib/utils/reactions";
+import { notifyNewReaction } from "@/lib/push/client";
 import FounderMark from "@/components/ui/FounderMark";
 import { formatDistanceToNow } from "date-fns";
 
@@ -127,6 +128,8 @@ export default function WinDetail({ win: winProp, currentUserId, initialUserReac
         [type]: Math.max(0, prev[type] + (reacted ? 1 : -1)),
       }));
       console.error("Reaction failed:", error.message);
+    } else if (!reacted) {
+      notifyNewReaction(win.id);
     }
 
     setBusy((b) => { const s = new Set(b); s.delete(type); return s; });

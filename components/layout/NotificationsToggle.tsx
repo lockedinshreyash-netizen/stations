@@ -7,6 +7,7 @@ import {
   isSubscribed,
   enablePush,
   disablePush,
+  sendTestPush,
   PushError,
 } from "@/lib/push/client";
 
@@ -25,6 +26,8 @@ export default function NotificationsToggle() {
   const [blocked, setBlocked] = useState(() => permissionState() === "denied");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const [testMsg, setTestMsg] = useState<string | null>(null);
 
   useEffect(() => {
     // Async external read — the setState runs in a later callback, not the
@@ -56,6 +59,21 @@ export default function NotificationsToggle() {
     }
   }
 
+  async function handleTest() {
+    if (testing) return;
+    setTesting(true);
+    setTestMsg(null);
+    try {
+      const ok = await sendTestPush();
+      setTestMsg(ok ? "Sent — check your device 🔔" : "Couldn't send. Try again.");
+    } catch {
+      setTestMsg("Couldn't send. Try again.");
+    } finally {
+      setTesting(false);
+      setTimeout(() => setTestMsg(null), 4000);
+    }
+  }
+
   if (!supported) return null;
 
   const caption =
@@ -65,47 +83,70 @@ export default function NotificationsToggle() {
       : "Get pinged for DMs, reactions, session starts, and mentions — on this device.");
 
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span className="font-poppins" style={labelStyle}>Push notifications</span>
-        <span className="font-poppins font-light" style={{ fontSize: "14px", color: error ? "var(--accent)" : "rgba(var(--fg-rgb),0.3)", maxWidth: "300px", lineHeight: 1.4 }}>
-          {caption}
-        </span>
-      </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={on}
-        aria-label="Toggle push notifications"
-        disabled={blocked || busy}
-        onClick={toggle}
-        style={{
-          position: "relative",
-          width: "46px",
-          height: "26px",
-          flexShrink: 0,
-          borderRadius: "9999px",
-          border: "none",
-          cursor: blocked || busy ? "default" : "pointer",
-          opacity: blocked ? 0.4 : 1,
-          background: on ? "var(--accent)" : "rgba(var(--fg-rgb),0.18)",
-          transition: "background 200ms var(--ease)",
-        }}
-      >
-        <span
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <span className="font-poppins" style={labelStyle}>Push notifications</span>
+          <span className="font-poppins font-light" style={{ fontSize: "14px", color: error ? "var(--accent)" : "rgba(var(--fg-rgb),0.3)", maxWidth: "300px", lineHeight: 1.4 }}>
+            {caption}
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={on}
+          aria-label="Toggle push notifications"
+          disabled={blocked || busy}
+          onClick={toggle}
           style={{
-            position: "absolute",
-            top: "3px",
-            left: on ? "23px" : "3px",
-            width: "20px",
-            height: "20px",
-            borderRadius: "50%",
-            background: "#fff",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
-            transition: "left 200ms var(--ease)",
+            position: "relative",
+            width: "46px",
+            height: "26px",
+            flexShrink: 0,
+            borderRadius: "9999px",
+            border: "none",
+            cursor: blocked || busy ? "default" : "pointer",
+            opacity: blocked ? 0.4 : 1,
+            background: on ? "var(--accent)" : "rgba(var(--fg-rgb),0.18)",
+            transition: "background 200ms var(--ease)",
           }}
-        />
-      </button>
+        >
+          <span
+            style={{
+              position: "absolute",
+              top: "3px",
+              left: on ? "23px" : "3px",
+              width: "20px",
+              height: "20px",
+              borderRadius: "50%",
+              background: "#fff",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
+              transition: "left 200ms var(--ease)",
+            }}
+          />
+        </button>
+      </div>
+
+      {on && (
+        <button
+          type="button"
+          onClick={handleTest}
+          disabled={testing}
+          className="font-poppins uppercase st-pill"
+          style={{
+            alignSelf: "flex-start",
+            fontSize: "12px",
+            letterSpacing: "0.12em",
+            padding: "6px 12px",
+            border: "0.5px solid rgba(var(--accent-2-rgb),0.5)",
+            color: "rgba(var(--accent-2-rgb),0.9)",
+            background: "transparent",
+            cursor: testing ? "default" : "pointer",
+          }}
+        >
+          {testMsg ?? (testing ? "Sending…" : "Send test notification")}
+        </button>
+      )}
     </div>
   );
 }

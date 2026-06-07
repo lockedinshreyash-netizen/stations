@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { WinCategory, ReactionCounts, ReactionType } from "@/types";
 import { REACTIONS, getCounts } from "@/lib/utils/reactions";
 import { pop } from "@/lib/feedback";
+import { notifyNewReaction } from "@/lib/push/client";
 import { openUserProfile } from "@/lib/userProfile";
 import { formatDistanceToNow } from "date-fns";
 import EditWinModal, { type EditableWin } from "@/components/stations/EditWinModal";
@@ -131,6 +132,9 @@ export default function WinCard({ win: winProp, currentUserId, userReactions, on
         [type]: Math.max(0, prev[type] + (reacted ? 1 : -1)),
       }));
       console.error("Reaction toggle failed:", error?.message);
+    } else if (!reacted) {
+      // Only a newly-added reaction pings the author (not un-reacting).
+      notifyNewReaction(win.id);
     }
 
     setBusy((b) => { const s = new Set(b); s.delete(type); return s; });

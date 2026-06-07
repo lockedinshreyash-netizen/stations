@@ -127,19 +127,53 @@ export async function isSubscribed(): Promise<boolean> {
   return !!(await reg.pushManager.getSubscription());
 }
 
+/**
+ * Fire-and-forget push request to the unified, session-authed endpoint. Called
+ * AFTER the underlying write succeeds; failures are swallowed so a push can
+ * never affect the action that triggered it.
+ */
+function fireNotify(payload: Record<string, unknown>): void {
+  void fetch("/api/push/notify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}
+
+/** Notify the other participant that a DM was sent. */
+export function notifyNewDm(conversationId: string): void {
+  fireNotify({ kind: "dm", conversationId });
+}
+
+/** Notify a win's author that it was reacted to (server skips self-reactions). */
+export function notifyNewReaction(winId: string): void {
+  fireNotify({ kind: "reaction", winId });
+}
+
+/** Host broadcast: a work session just went live. */
+export function notifySessionStarted(sessionId: string): void {
+  fireNotify({ kind: "session_start", sessionId });
+}
+
 /** Pull @usernames out of a message body (lowercased, deduped). */
 export function extractMentions(content: string): string[] {
   const matches = content.match(/@([a-zA-Z0-9_]{2,32})/g) ?? [];
   return [...new Set(matches.map((m) => m.slice(1).toLowerCase()))];
 }
 
-/** Fire-and-forget: ask the server to push @mentioned room members. */
+/** Notify @mentioned room members. No-op when there are no mentions. */
 export function notifyMentions(room: string, content: string): void {
   const usernames = extractMentions(content);
   if (usernames.length === 0) return;
-  void fetch("/api/push/mention", {
+  fireNotify({ kind: "mention", room, usernames });
+}
+
+/** Send a diagnostic push to the caller's own devices. Returns true on 200. */
+export async function sendTestPush(): Promise<boolean> {
+  const res = await fetch("/api/push/notify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ room, usernames, content }),
-  }).catch(() => {});
+    body: JSON.stringify({ kind: "test" }),
+  });
+  return res.ok;
 }

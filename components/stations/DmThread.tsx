@@ -13,6 +13,7 @@ import {
   deleteDirectMessage,
   markConversationRead,
 } from "@/lib/dm/messages";
+import { notifyNewDm } from "@/lib/push/client";
 import FounderMark from "@/components/ui/FounderMark";
 import type { DirectMessage, DmParticipant, User } from "@/types";
 
@@ -126,6 +127,7 @@ export default function DmThread({
     try {
       const saved = await sendDirectMessage(conversationId, user.id, content);
       upsert(saved);
+      notifyNewDm(conversationId);
       setDraft("");
     } catch {
       setError("Couldn't send. Try again.");
