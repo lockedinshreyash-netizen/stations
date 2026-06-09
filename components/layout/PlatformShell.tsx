@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import BottomNav from "@/components/layout/BottomNav";
+import TodoFab from "@/components/todos/TodoFab";
 import type { User } from "@/types";
 
 export default function PlatformShell({
@@ -27,6 +28,7 @@ export default function PlatformShell({
       {/* Bottom padding clears the floating nav on normal scrollable pages. */}
       <main className={immersive ? "" : "pb-28"}>{children}</main>
 
+      {!immersive && <TodoFab user={user} />}
       {!immersive && <BottomNav user={user} />}
     </div>
   );

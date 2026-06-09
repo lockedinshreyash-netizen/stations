@@ -10,6 +10,7 @@ import {
   getConversations,
 } from "@/lib/dm/messages";
 import FounderMark from "@/components/ui/FounderMark";
+import PartnersPanel from "@/components/stations/PartnersPanel";
 import type { ConversationSummary, DmParticipant, User } from "@/types";
 
 export default function MessagesInbox({
@@ -20,6 +21,8 @@ export default function MessagesInbox({
   initialConversations: ConversationSummary[];
 }) {
   const router = useRouter();
+  const [tab, setTab] = useState<"dms" | "partners">("dms");
+  const [reqCount, setReqCount] = useState(0);
   const [conversations, setConversations] =
     useState<ConversationSummary[]>(initialConversations);
 
@@ -96,6 +99,22 @@ export default function MessagesInbox({
 
   return (
     <div className="px-5 md:px-10 py-10 max-w-2xl mx-auto w-full flex flex-col gap-8">
+      {/* Tabs — direct messages vs accountability partners */}
+      <div className="flex items-center gap-2">
+        <TabButton active={tab === "dms"} onClick={() => setTab("dms")}>
+          Messages
+        </TabButton>
+        <TabButton active={tab === "partners"} onClick={() => setTab("partners")} badge={reqCount}>
+          Partners
+        </TabButton>
+      </div>
+
+      {tab === "partners" && (
+        <PartnersPanel user={user} onRequestCount={setReqCount} />
+      )}
+
+      {tab === "dms" && (
+        <>
       {/* Search to start a new DM */}
       <div className="flex flex-col gap-2">
         <input
@@ -178,7 +197,60 @@ export default function MessagesInbox({
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
+  );
+}
+
+/** A pill tab with an optional count badge (used for pending partner requests). */
+function TabButton({
+  active,
+  onClick,
+  badge,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  badge?: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="st-pill relative px-4 py-2 font-poppins uppercase"
+      style={{
+        fontSize: "12px",
+        letterSpacing: "0.12em",
+        fontWeight: 600,
+        color: active ? "var(--accent)" : "rgba(var(--fg-rgb),0.45)",
+        background: active ? "rgba(var(--accent-rgb),0.1)" : "transparent",
+        border: active ? "0.5px solid rgba(var(--accent-rgb),0.3)" : "0.5px solid rgba(var(--fg-rgb),0.1)",
+      }}
+    >
+      {children}
+      {badge ? (
+        <span
+          aria-label={`${badge} pending`}
+          className="absolute flex items-center justify-center font-poppins"
+          style={{
+            top: "-6px",
+            right: "-6px",
+            minWidth: "18px",
+            height: "18px",
+            padding: "0 5px",
+            borderRadius: "9999px",
+            fontSize: "10px",
+            fontWeight: 700,
+            color: "#fff",
+            background: "var(--accent)",
+          }}
+        >
+          {badge}
+        </span>
+      ) : null}
+    </button>
   );
 }
 

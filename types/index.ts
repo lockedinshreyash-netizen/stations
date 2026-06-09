@@ -242,3 +242,66 @@ export interface Message {
   content: string;
   created_at: string;
 }
+
+// ============================================================
+// TODOS + DAILY "3 THINGS" PLAN — supabase/todos.sql
+// ============================================================
+export interface Todo {
+  id: string;
+  user_id: string;
+  title: string;
+  done: boolean;
+  completed_at: string | null;
+  // null = backlog; an ISO date (YYYY-MM-DD) = committed to that day's plan.
+  planned_for: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** The caller's todos split into today's committed plan vs. the backlog. */
+export interface TodoBoard {
+  today: Todo[];
+  backlog: Todo[];
+}
+
+/** Progress summary for today's daily plan. */
+export interface TodayPlanStatus {
+  total: number;
+  completed: number;
+  allDone: boolean;
+}
+
+/** A single item of a partner's daily plan (no ids leak beyond what's needed). */
+export interface PartnerTodo {
+  id: string;
+  title: string;
+  done: boolean;
+}
+
+// ============================================================
+// ACCOUNTABILITY PARTNERS (1:1) — supabase/partnerships.sql
+// ============================================================
+export type PartnershipStatus = "pending" | "accepted" | "declined";
+
+export interface Partnership {
+  id: string;
+  requester_id: string;
+  addressee_id: string;
+  status: PartnershipStatus;
+  created_at: string;
+  responded_at: string | null;
+}
+
+/** An accepted partner, enriched with their public profile, for the inbox. */
+export interface PartnerSummary {
+  partnership_id: string;
+  partner: DmParticipant;
+}
+
+/** An incoming pending request, enriched with the requester's profile. */
+export interface PartnerRequest {
+  partnership_id: string;
+  from: DmParticipant;
+  created_at: string;
+}

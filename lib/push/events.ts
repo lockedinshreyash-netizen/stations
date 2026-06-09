@@ -198,6 +198,97 @@ export async function notifyMention(
   await sendPushToUsers(recipients, payload);
 }
 
+/** Someone sent an accountability partner request — notify the addressee. */
+export async function notifyPartnerRequest(addresseeId: string, requesterId: string) {
+  const supabase = createAdminClient();
+  const { data: requester } = await supabase
+    .from("users")
+    .select("username")
+    .eq("id", requesterId)
+    .maybeSingle();
+
+  const payload: PushPayload = {
+    title: `${requester?.username ?? "Someone"} wants to be your partner`,
+    body: "Tap to accept and start keeping each other accountable.",
+    url: "/messages",
+    tag: `partner-req-${requesterId}`,
+  };
+  await sendPushToUsers([addresseeId], payload);
+}
+
+/** A request was accepted — notify the original requester. */
+export async function notifyPartnerAccepted(requesterId: string, accepterId: string) {
+  const supabase = createAdminClient();
+  const { data: accepter } = await supabase
+    .from("users")
+    .select("username")
+    .eq("id", accepterId)
+    .maybeSingle();
+
+  const payload: PushPayload = {
+    title: `${accepter?.username ?? "Someone"} accepted 🤝`,
+    body: "You're accountability partners now.",
+    url: "/messages",
+    tag: `partner-acc-${accepterId}`,
+  };
+  await sendPushToUsers([requesterId], payload);
+}
+
+/**
+ * A member finished every task on today's plan — celebrate to their partners.
+ * Re-verifies completion server-side and writes a once-per-day marker so a
+ * re-checked todo can never re-fire the push.
+ */
+export async function notifyDailyComplete(userId: string) {
+  const supabase = createAdminClient();
+  // UTC date matches the DB's current_date (Supabase runs in UTC), the same
+  // boundary get_partner_today_plan uses.
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data: planned } = await supabase
+    .from("todos")
+    .select("done")
+    .eq("user_id", userId)
+    .eq("planned_for", today);
+  const items = planned ?? [];
+  if (items.length === 0 || items.some((t) => !t.done)) return;
+
+  // Claim the day's completion. ignoreDuplicates → no rows back means we already
+  // announced today, so bail without re-pinging anyone.
+  const { data: claimed } = await supabase
+    .from("daily_plan_completions")
+    .upsert(
+      { user_id: userId, plan_date: today },
+      { onConflict: "user_id,plan_date", ignoreDuplicates: true }
+    )
+    .select("user_id");
+  if (!claimed || claimed.length === 0) return;
+
+  const { data: links } = await supabase
+    .from("partnerships")
+    .select("requester_id, addressee_id")
+    .eq("status", "accepted")
+    .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`);
+  const partners = (links ?? [])
+    .map((l) => (l.requester_id === userId ? l.addressee_id : l.requester_id))
+    .filter((id) => id !== userId);
+  if (partners.length === 0) return;
+
+  const { data: actor } = await supabase
+    .from("users")
+    .select("username")
+    .eq("id", userId)
+    .maybeSingle();
+
+  const payload: PushPayload = {
+    title: `${actor?.username ?? "Your partner"} finished all their tasks today 🎉`,
+    body: "Cheer them on.",
+    url: "/messages",
+    tag: `daily-done-${userId}-${today}`,
+  };
+  await sendPushToUsers(partners, payload);
+}
+
 /** A diagnostic push the caller sends to their own devices. */
 export async function notifyTest(userId: string) {
   const payload: PushPayload = {

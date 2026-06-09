@@ -6,6 +6,9 @@ import {
   notifyReaction,
   notifySessionStart,
   notifyMention,
+  notifyPartnerRequest,
+  notifyPartnerAccepted,
+  notifyDailyComplete,
   notifyTest,
 } from "@/lib/push/events";
 
@@ -88,6 +91,49 @@ export async function POST(request: Request) {
           : [];
         if (!/^[a-z]+$/.test(room)) return bad("invalid room");
         await notifyMention(room, usernames, user.id);
+        break;
+      }
+
+      case "partner_request": {
+        const addresseeId = String(body.addresseeId ?? "");
+        if (!addresseeId) return bad("missing addresseeId");
+        // Authorize: a pending request from the caller to this addressee exists.
+        const { data: pr } = await admin
+          .from("partnerships")
+          .select("id")
+          .eq("requester_id", user.id)
+          .eq("addressee_id", addresseeId)
+          .eq("status", "pending")
+          .maybeSingle();
+        if (!pr) {
+          return NextResponse.json({ error: "forbidden" }, { status: 403 });
+        }
+        await notifyPartnerRequest(addresseeId, user.id);
+        break;
+      }
+
+      case "partner_accepted": {
+        const requesterId = String(body.requesterId ?? "");
+        if (!requesterId) return bad("missing requesterId");
+        // Authorize: the caller is the addressee who accepted this requester.
+        const { data: pa } = await admin
+          .from("partnerships")
+          .select("id")
+          .eq("requester_id", requesterId)
+          .eq("addressee_id", user.id)
+          .eq("status", "accepted")
+          .maybeSingle();
+        if (!pa) {
+          return NextResponse.json({ error: "forbidden" }, { status: 403 });
+        }
+        await notifyPartnerAccepted(requesterId, user.id);
+        break;
+      }
+
+      case "daily_complete": {
+        // The caller can only announce their OWN completion; the resolver
+        // re-verifies every task is done and dedupes to once per day.
+        await notifyDailyComplete(user.id);
         break;
       }
 

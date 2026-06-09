@@ -1,21 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
+import { pushSupported, getPushRegistration } from "@/lib/push/client";
 
 /**
- * Registers the PWA service worker on every page load. next-pwa's built-in
- * auto-register does not reliably run under the App Router, so we register
- * `/sw.js` ourselves — this is what makes push (and offline) work in
- * production. No-op where service workers aren't supported (and the file isn't
- * generated in dev, so it simply fails quietly there).
+ * Warms up the standalone push service worker on app load so it's already
+ * active when the user toggles notifications or a push arrives. Idempotent and
+ * works in dev and production (the worker has no precache step). No-op where
+ * service workers aren't supported.
  */
 export default function ServiceWorkerRegistrar() {
   useEffect(() => {
-    if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) {
-      return;
-    }
-    navigator.serviceWorker.register("/sw.js").catch(() => {
-      // Expected in `next dev` (no sw.js generated). Harmless.
+    if (!pushSupported()) return;
+    void getPushRegistration().catch(() => {
+      // Non-fatal: the toggle will register on demand and surface any error.
     });
   }, []);
 

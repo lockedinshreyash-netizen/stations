@@ -3,8 +3,8 @@
 /**
  * Browser-side Web Push helpers: feature detection, permission + subscription
  * lifecycle, and a small @mention extractor for room chat. The subscription is
- * created against the service worker that next-pwa registers (public/sw.js,
- * which importScripts our custom push handler).
+ * created against our standalone push worker (public/push-sw.js) — independent
+ * of next-pwa, so it works identically in dev and production.
  */
 
 export function pushSupported(): boolean {
@@ -40,27 +40,40 @@ function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
 /** Carries a message safe to show the user when enabling push fails. */
 export class PushError extends Error {}
 
-/**
- * Resolve the active service-worker registration, registering it ourselves if
- * next-pwa hasn't (it doesn't in development). Races `ready` against a timeout
- * so a missing/broken worker surfaces an error instead of hanging the UI.
- */
-async function getReadyRegistration(): Promise<ServiceWorkerRegistration> {
-  let reg = await navigator.serviceWorker.getRegistration();
-  if (!reg) reg = await navigator.serviceWorker.register("/sw.js");
+// Standalone push worker (public/push-sw.js), registered at a dedicated scope
+// so it never collides with the PWA worker. It has no precache step, so it
+// activates immediately in both dev and production.
+const PUSH_SW_URL = "/push-sw.js";
+const PUSH_SW_SCOPE = "/push-scope/";
 
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(
-      () =>
-        reject(
-          new PushError(
-            "The service worker isn't active. In local dev run a production build (npm run build && npm start), or test on the deployed site."
-          )
-        ),
+/**
+ * Register the standalone push worker and resolve once it's ACTIVE. We don't
+ * use navigator.serviceWorker.ready (that tracks the page-controlling worker);
+ * we wait on this specific registration's lifecycle, with a timeout so a broken
+ * worker surfaces an error instead of hanging the UI.
+ */
+export async function getPushRegistration(): Promise<ServiceWorkerRegistration> {
+  const reg = await navigator.serviceWorker.register(PUSH_SW_URL, {
+    scope: PUSH_SW_SCOPE,
+  });
+  if (reg.active) return reg;
+
+  const worker = reg.installing ?? reg.waiting;
+  if (!worker) return reg;
+
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new PushError("The notification service worker didn't start. Please retry.")),
       8000
-    )
-  );
-  return Promise.race([navigator.serviceWorker.ready, timeout]);
+    );
+    worker.addEventListener("statechange", () => {
+      if (worker.state === "activated") {
+        clearTimeout(timer);
+        resolve();
+      }
+    });
+  });
+  return reg;
 }
 
 export async function enablePush(): Promise<boolean> {
@@ -84,7 +97,7 @@ export async function enablePush(): Promise<boolean> {
     );
   }
 
-  const reg = await getReadyRegistration();
+  const reg = await getPushRegistration();
   let sub = await reg.pushManager.getSubscription();
   if (!sub) {
     sub = await reg.pushManager.subscribe({
@@ -107,7 +120,7 @@ export async function enablePush(): Promise<boolean> {
 /** Unsubscribe locally and tell the server to forget the subscription. */
 export async function disablePush(): Promise<boolean> {
   if (!pushSupported()) return false;
-  const reg = await navigator.serviceWorker.ready;
+  const reg = await getPushRegistration();
   const sub = await reg.pushManager.getSubscription();
   if (!sub) return true;
   const endpoint = sub.endpoint;
@@ -123,7 +136,9 @@ export async function disablePush(): Promise<boolean> {
 /** True if this browser currently holds a push subscription. */
 export async function isSubscribed(): Promise<boolean> {
   if (!pushSupported()) return false;
-  const reg = await navigator.serviceWorker.ready;
+  // Look up the existing registration without creating one (cheap, mount-safe).
+  const reg = await navigator.serviceWorker.getRegistration(PUSH_SW_SCOPE);
+  if (!reg) return false;
   return !!(await reg.pushManager.getSubscription());
 }
 
@@ -153,6 +168,25 @@ export function notifyNewReaction(winId: string): void {
 /** Host broadcast: a work session just went live. */
 export function notifySessionStarted(sessionId: string): void {
   fireNotify({ kind: "session_start", sessionId });
+}
+
+/** Notify a member that the caller sent them an accountability partner request. */
+export function notifyPartnerRequest(addresseeId: string): void {
+  fireNotify({ kind: "partner_request", addresseeId });
+}
+
+/** Notify the original requester that the caller accepted their partner request. */
+export function notifyPartnerAccepted(requesterId: string): void {
+  fireNotify({ kind: "partner_accepted", requesterId });
+}
+
+/**
+ * Notify the caller's partners that they finished everything on today's plan.
+ * Fire only after the write that completed the last task has committed; the
+ * server re-verifies completion and dedupes to once per day.
+ */
+export function notifyDailyComplete(): void {
+  fireNotify({ kind: "daily_complete" });
 }
 
 /** Pull @usernames out of a message body (lowercased, deduped). */
