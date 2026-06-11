@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@mux/mux-node": "^14.1.1",
+    "@mux/mux-player-react": "^3.13.0",
+    "@mux/upchunk": "^3.5.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.2",
     "date-fns": "^4.4.0",

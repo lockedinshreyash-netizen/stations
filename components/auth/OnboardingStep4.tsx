@@ -48,6 +48,30 @@ export default function OnboardingStep4() {
       return;
     }
 
+    // ── FOUNDING 100 GATE ──────────────────────────────────────────────
+    // Entry is code-only. A valid founder code must be present AND still
+    // unclaimed before we create any profile. This re-check (the founder step
+    // already validated once) closes the gap between steps; the atomic claim
+    // below is the final arbiter, and the platform layout is the backstop.
+    const founderCode = localStorage.getItem("onboarding_founder_code");
+    if (!founderCode) {
+      setServerError("A founder code is required to join Stations.");
+      setLoading(false);
+      router.push("/onboarding/founder");
+      return;
+    }
+    const { data: codeStillValid, error: codeCheckError } = await supabase.rpc(
+      "founder_code_available",
+      { code: founderCode }
+    );
+    if (codeCheckError || codeStillValid !== true) {
+      localStorage.removeItem("onboarding_founder_code");
+      setServerError("That founder code is no longer valid. Please re-enter it.");
+      setLoading(false);
+      router.push("/onboarding/founder");
+      return;
+    }
+
     const step2Raw = localStorage.getItem("onboarding_step2");
     const step3Raw = localStorage.getItem("onboarding_step3");
 
@@ -72,58 +96,79 @@ export default function OnboardingStep4() {
       ? ["collective", categoryRoomName]
       : ["collective"];
 
-    const { error: userError } = await supabase.from("users").insert({
-      id: user.id,
-      username: step2.username,
-      full_name: step2.full_name,
-      avatar_url: step2.avatar_url ?? null,
-      role: roles,           // text[] — see migration note above
-      goals,
-      category,
-      room_memberships,
-      status: "active",
-      membership_tier: "free",
-      is_admin: false,
-      total_focus_minutes: 0,
-      total_sessions: 0,
-      streak_days: 0,
-    });
+    // Create the profile only if it doesn't already exist. This keeps the step
+    // idempotent on retries and on the rare claim-race recovery path (where a
+    // profile was made but the code claim lost the race and the platform gate
+    // bounced the user back here to enter another code).
+    const { data: existingProfile } = await supabase
+      .from("users")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
 
-    if (userError) {
-      setServerError("Failed to create profile: " + userError.message);
-      setLoading(false);
-      return;
-    }
+    if (!existingProfile) {
+      const { error: userError } = await supabase.from("users").insert({
+        id: user.id,
+        username: step2.username,
+        full_name: step2.full_name,
+        avatar_url: step2.avatar_url ?? null,
+        role: roles,           // text[] — see migration note above
+        goals,
+        category,
+        room_memberships,
+        status: "active",
+        // membership_tier and founder_number are intentionally OMITTED. Clients
+        // are no longer granted insert/update on those columns (see
+        // supabase/hardening_launch.sql) — they fall back to the DB default
+        // ('free'), and the only path to 'founding' is the atomic claim RPC
+        // below, which runs as SECURITY DEFINER. This makes the Founding 100
+        // tier impossible to forge from the client.
+        is_admin: false,
+        total_focus_minutes: 0,
+        total_sessions: 0,
+        streak_days: 0,
+      });
 
-    // Founder code (optional, set on the /onboarding/founder step). Redeem it
-    // now that the user row exists: claim_founder_code atomically marks the code
-    // used, assigns the next founding number, flips the tier to 'founding', and
-    // adds the private cohort room to room_memberships. Returns null if the code
-    // was claimed by someone else between steps — in that case they stay free.
-    const founderCode = localStorage.getItem("onboarding_founder_code");
-    if (founderCode) {
-      const { data: founderNumber, error: claimError } = await supabase.rpc(
-        "claim_founder_code",
-        { code: founderCode }
-      );
-      if (!claimError && typeof founderNumber === "number") {
-        // Mirror the membership into Firebase so the cohort chat lists them.
-        await addMember("founding", user.id).catch(() => {});
+      if (userError) {
+        setServerError("Failed to create profile: " + userError.message);
+        setLoading(false);
+        return;
+      }
+
+      const { error: appError } = await supabase.from("applications").insert({
+        user_id: user.id,
+        why_join: data.why_join,
+        goals_declaration: goals.join(", "),
+        role: roles.join(", "),
+        status: "approved",
+      });
+
+      if (appError) {
+        console.error("Application insert failed:", appError.message);
       }
     }
-    localStorage.removeItem("onboarding_founder_code");
 
-    const { error: appError } = await supabase.from("applications").insert({
-      user_id: user.id,
-      why_join: data.why_join,
-      goals_declaration: goals.join(", "),
-      role: roles.join(", "),
-      status: "approved",
-    });
-
-    if (appError) {
-      console.error("Application insert failed:", appError.message);
+    // MANDATORY claim. claim_founder_code atomically marks the code used,
+    // assigns the next founding number, flips the tier to 'founding', and adds
+    // the private cohort room. It returns null only if the code was claimed by
+    // someone else in the last few milliseconds — in which case the user is NOT
+    // a founder yet, so we do not let them proceed: send them back to enter a
+    // different code (the platform layout would block them anyway).
+    const { data: founderNumber, error: claimError } = await supabase.rpc(
+      "claim_founder_code",
+      { code: founderCode }
+    );
+    if (claimError || typeof founderNumber !== "number") {
+      setServerError(
+        "That founder code was just claimed by someone else. Please enter a different code."
+      );
+      setLoading(false);
+      router.push("/onboarding/founder");
+      return;
     }
+    // Mirror the membership into Firebase so the cohort chat lists them.
+    await addMember("founding", user.id).catch(() => {});
+    localStorage.removeItem("onboarding_founder_code");
 
     localStorage.removeItem("onboarding_email");
     localStorage.removeItem("onboarding_uid");

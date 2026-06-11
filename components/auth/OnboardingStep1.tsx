@@ -34,14 +34,22 @@ export default function OnboardingStep1() {
       return;
     }
 
-    // Confirm session is live before proceeding
-    const userId = signUpData.user?.id ?? signUpData.session?.user?.id;
-    if (!userId) {
-      setServerError("Account created but session not established. Please sign in.");
+    // The remaining onboarding steps (profile, founder-code claim, profile
+    // creation) all require an ACTIVE session. If email confirmation is enabled
+    // in Supabase, signUp returns a user but NO session — proceeding would
+    // dead-end at the final step with "Session expired". Detect that and route
+    // them to confirm + sign in instead; after login, the platform redirects an
+    // account with no profile straight back into onboarding (step-2), so their
+    // progress resumes cleanly with a real session.
+    if (!signUpData.session) {
+      setServerError(
+        "Check your inbox to confirm your email, then sign in to finish setting up."
+      );
       setLoading(false);
       return;
     }
 
+    const userId = signUpData.session.user.id;
     localStorage.setItem("onboarding_email", data.email);
     localStorage.setItem("onboarding_uid", userId);
     router.push("/onboarding/step-2");

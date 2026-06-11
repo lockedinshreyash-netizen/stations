@@ -11,10 +11,12 @@ type Check =
   | { kind: "invalid" };
 
 /**
- * Optional founder-code step. A valid, unclaimed code from the landing-page
- * waitlist upgrades the new account to the Founding Cohort at the final step.
- * Here we only VALIDATE (read-only) and stash the code — the atomic claim
- * happens in OnboardingStep4 once the user row exists.
+ * MANDATORY founder-code step (Founding 100 launch gate). Entry to Stations is
+ * code-only: a valid, unclaimed waitlist code is required to continue. There is
+ * no skip or bypass path. We VALIDATE here (read-only) and stash the code — the
+ * atomic claim happens in OnboardingStep4 — and the platform layout
+ * independently refuses access to any account that is not a founding member,
+ * so a forged localStorage value cannot get anyone in.
  */
 export default function OnboardingFounderCode() {
   const router = useRouter();
@@ -31,31 +33,41 @@ export default function OnboardingFounderCode() {
       code: normalized,
     });
     if (error) {
-      // Don't hard-block onboarding on a transient check failure; let them
-      // continue and the final claim will be the real arbiter.
-      setCheck({ kind: "idle" });
+      // Surface transient check failures as "invalid" so Continue stays locked —
+      // the gate must fail closed, never open.
+      setCheck({ kind: "invalid" });
       return;
     }
     setCheck({ kind: data === true ? "valid" : "invalid" });
   }
 
-  function goNext() {
-    if (normalized && check.kind === "valid") {
-      localStorage.setItem("onboarding_founder_code", normalized);
-    } else {
+  async function goNext() {
+    if (!normalized) return;
+    // Re-validate on submit so the button can't be enabled against a stale
+    // "valid" state, then carry the code forward to the atomic claim in step-4.
+    setCheck({ kind: "checking" });
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("founder_code_available", {
+      code: normalized,
+    });
+    if (error || data !== true) {
+      setCheck({ kind: "invalid" });
       localStorage.removeItem("onboarding_founder_code");
+      return;
     }
+    localStorage.setItem("onboarding_founder_code", normalized);
     router.push("/onboarding/step-4");
   }
 
   return (
     <div className="flex-1 flex flex-col justify-center px-6 md:px-8 py-16 max-w-lg mx-auto w-full">
       <h1 className="font-playfair italic text-4xl md:text-5xl text-[rgb(var(--fg-rgb))] mb-3 leading-tight">
-        Have a founder code?
+        Enter your founder code.
       </h1>
       <p className="text-[rgba(var(--fg-rgb),0.5)] font-light text-lg mb-12">
-        One of the first 100? Enter your code to join the Founding Cohort — free
-        premium, forever, and a number that&apos;s yours alone. No code? Skip it.
+        Stations is invite-only right now — entry is limited to the first 100
+        founders. Your code came with your waitlist spot. It&apos;s your key to
+        the room: free premium, forever, and a number that&apos;s yours alone.
       </p>
 
       <div className="flex flex-col gap-2">
@@ -84,8 +96,9 @@ export default function OnboardingFounderCode() {
             </span>
           )}
           {check.kind === "invalid" && (
-            <span className="text-[rgba(var(--fg-rgb),0.4)]">
-              That code isn&apos;t valid or has already been claimed.
+            <span className="text-[var(--accent)]">
+              That code isn&apos;t valid or has already been claimed. Entry
+              requires a valid founder code.
             </span>
           )}
         </div>
@@ -95,20 +108,20 @@ export default function OnboardingFounderCode() {
         <button
           type="button"
           onClick={goNext}
-          className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white"
+          disabled={check.kind === "checking" || !normalized}
+          className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Continue
+          {check.kind === "checking" ? "Checking…" : "Continue"}
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            localStorage.removeItem("onboarding_founder_code");
-            router.push("/onboarding/step-4");
-          }}
-          className="text-[rgba(var(--fg-rgb),0.3)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors"
-        >
-          I don&apos;t have a code — skip
-        </button>
+        <p className="text-center text-[rgba(var(--fg-rgb),0.3)] text-sm font-light">
+          Don&apos;t have a code?{" "}
+          <a
+            href="https://lockinstations.space"
+            className="underline underline-offset-4 hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors"
+          >
+            Join the waitlist
+          </a>
+        </p>
       </div>
 
       <button

@@ -115,6 +115,69 @@ export interface WorkSessionWithMeta extends WorkSession {
 }
 
 // ============================================================
+// ARCHIVE STATION (03) — courses (Mux video) + progress
+// supabase/archive.sql
+// ============================================================
+export type CourseStatus = "draft" | "published" | "archived";
+export type LessonStatus =
+  | "awaiting_upload"
+  | "processing"
+  | "ready"
+  | "errored";
+
+export interface ArchiveCourse {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  instructor_name: string;
+  instructor_title: string | null;
+  instructor_avatar_url: string | null;
+  instructor_user_id: string | null;
+  thumbnail_url: string | null;
+  topic: string | null;
+  status: CourseStatus;
+  sort_order: number;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArchiveLesson {
+  id: string;
+  course_id: string;
+  title: string;
+  description: string | null;
+  order_index: number;
+  mux_upload_id: string | null;
+  mux_asset_id: string | null;
+  mux_playback_id: string | null;
+  duration_seconds: number | null;
+  status: LessonStatus;
+  created_at: string;
+}
+
+export interface ArchiveLessonProgress {
+  id: string;
+  user_id: string;
+  lesson_id: string;
+  completed: boolean;
+  last_position_seconds: number;
+  updated_at: string;
+}
+
+/**
+ * A course enriched for the catalog: lesson count, total runtime, and the
+ * caller's progress. `progress_percent` is 0–100 (rounded), 0 when no progress.
+ */
+export interface ArchiveCourseWithMeta extends ArchiveCourse {
+  lesson_count: number;
+  total_duration_seconds: number;
+  completed_lessons: number;
+  progress_percent: number;
+}
+
+// ============================================================
 // DIRECT MESSAGES (private 1:1) — supabase/direct_messages.sql
 // ============================================================
 export interface DirectMessage {
