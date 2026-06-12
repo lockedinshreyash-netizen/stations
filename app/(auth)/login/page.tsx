@@ -15,11 +15,21 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Redirect if already logged in
+  // Redirect if already logged in — but only for a fully onboarded account.
+  // Onboarding step-1 creates a session before the profile exists; redirecting
+  // such a session to /wins bounces straight back to onboarding, making the
+  // login screen unreachable. Those users stay here and sign in normally
+  // (after which the platform layout resumes their onboarding).
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace("/wins");
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      const { data: profile } = await supabase
+        .from("users")
+        .select("id")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (profile) router.replace("/wins");
     });
   }, [router]);
 
