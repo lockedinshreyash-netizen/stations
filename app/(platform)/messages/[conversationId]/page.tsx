@@ -42,18 +42,22 @@ export default async function ConversationPage({
     .maybeSingle();
   if (!peer) notFound();
 
+  // Latest page only (oldest first after reversing); DmThread pages back
+  // through earlier history on demand.
   const { data: messages } = await supabase
     .from("direct_messages")
     .select("*")
     .eq("conversation_id", conversationId)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false })
+    .limit(50);
+  const initialMessages = ((messages as DirectMessage[]) ?? []).slice().reverse();
 
   return (
     <DmThread
       user={profile as User}
       conversationId={conversationId}
       peer={peer as DmParticipant}
-      initialMessages={(messages as DirectMessage[]) ?? []}
+      initialMessages={initialMessages}
     />
   );
 }

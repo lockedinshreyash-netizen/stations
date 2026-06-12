@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getActiveAndScheduledSessions } from "@/lib/work/sessions";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
@@ -49,7 +49,14 @@ export default function WorkStation({
     }
   }, [user.id]);
 
-  // Realtime: refetch whenever sessions or memberships change.
+  // Realtime: refetch whenever sessions or memberships change. Debounced so a
+  // burst of changes (several joins at once) triggers one re-query, not many.
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedRefetch = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => refetch(), 1500);
+  }, [refetch]);
+
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
@@ -57,18 +64,19 @@ export default function WorkStation({
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "work_sessions" },
-        () => refetch()
+        debouncedRefetch
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "work_session_members" },
-        () => refetch()
+        debouncedRefetch
       )
       .subscribe();
     return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       supabase.removeChannel(channel);
     };
-  }, [refetch]);
+  }, [debouncedRefetch]);
 
   const active = useMemo(
     () => sessions.filter((s) => s.status === "active"),

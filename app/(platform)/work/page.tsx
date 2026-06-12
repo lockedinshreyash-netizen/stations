@@ -28,7 +28,8 @@ export default async function WorkPage() {
       .from("work_sessions")
       .select(SESSION_SELECT)
       .in("status", ["active", "scheduled"])
-      .order("scheduled_start_time", { ascending: true }),
+      .order("scheduled_start_time", { ascending: true })
+      .limit(50),
     supabase
       .from("work_session_members")
       .select("session_id")

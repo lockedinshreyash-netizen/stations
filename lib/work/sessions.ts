@@ -53,7 +53,8 @@ export async function getActiveAndScheduledSessions(): Promise<
     .from("work_sessions")
     .select(SESSION_SELECT)
     .in("status", ["active", "scheduled"])
-    .order("scheduled_start_time", { ascending: true });
+    .order("scheduled_start_time", { ascending: true })
+    .limit(50);
 
   if (error) throw new Error(error.message);
   return ((data as SessionRow[]) ?? []).map(toMeta);

@@ -7,6 +7,8 @@ import PostWinModal from "@/components/stations/PostWinModal";
 import { markWinsSeen } from "@/lib/wins/useWinsUnread";
 import type { WinCategory, ReactionType } from "@/types";
 
+const PAGE_SIZE = 25;
+
 const CATEGORIES: { value: WinCategory | "all"; label: string }[] = [
   { value: "all",      label: "All"      },
   { value: "startup",  label: "Startup"  },
@@ -24,24 +26,33 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
   const [reactionMap, setReactionMap] = useState<Record<string, Set<ReactionType>>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
 
-  const fetchWins = useCallback(async () => {
-    setLoading(true);
+  // cursor = created_at of the last loaded win; null fetches the first page.
+  const fetchWins = useCallback(async (cursor: string | null) => {
+    if (cursor) setLoadingMore(true);
+    else setLoading(true);
     const supabase = createClient();
 
     let query = supabase
       .from("wins")
       .select("*, users(username, avatar_url, founder_number)")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(PAGE_SIZE);
 
     if (filter !== "all") query = query.eq("category", filter);
+    if (cursor) query = query.lt("created_at", cursor);
 
     const { data } = await query;
     const winRows = (data as unknown as WinCardData[]) ?? [];
-    setWins(winRows);
+    setHasMore(winRows.length >= PAGE_SIZE);
+    setWins((prev) =>
+      cursor
+        ? [...prev, ...winRows.filter((w) => !prev.some((p) => p.id === w.id))]
+        : winRows
+    );
     markWinsSeen(); // viewing the feed clears the nav badge for everyone
-
-
 
     if (winRows.length > 0) {
       const ids = winRows.map((w) => w.id);
@@ -56,15 +67,21 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
         if (!map[r.win_id]) map[r.win_id] = new Set();
         map[r.win_id].add(r.reaction_type as ReactionType);
       }
-      setReactionMap(map);
-    } else {
+      setReactionMap((prev) => (cursor ? { ...prev, ...map } : map));
+    } else if (!cursor) {
       setReactionMap({});
     }
 
-    setLoading(false);
+    if (cursor) setLoadingMore(false);
+    else setLoading(false);
   }, [filter, currentUserId]);
 
-  useEffect(() => { fetchWins(); }, [fetchWins]);
+  useEffect(() => { fetchWins(null); }, [fetchWins]);
+
+  const loadMore = () => {
+    if (loadingMore || wins.length === 0) return;
+    fetchWins(wins[wins.length - 1].created_at);
+  };
 
   return (
     <div className="px-5 md:px-10 py-8">
@@ -135,13 +152,33 @@ export default function WinsFeed({ currentUserId }: { currentUserId: string }) {
               onUpdated={(updated) => setWins((prev) => prev.map((w) => w.id === updated.id ? updated : w))}
             />
           ))}
+          {hasMore && (
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="font-poppins uppercase self-center transition-colors"
+              style={{
+                fontSize: "14px",
+                letterSpacing: "0.15em",
+                padding: "10px 20px",
+                marginTop: "8px",
+                background: "none",
+                border: "0.5px solid rgba(var(--fg-rgb),0.2)",
+                color: "rgba(var(--fg-rgb),0.6)",
+                cursor: loadingMore ? "default" : "pointer",
+              }}
+            >
+              {loadingMore ? "Loading…" : "Load more"}
+            </button>
+          )}
         </div>
       )}
 
       {modalOpen && (
         <PostWinModal
           onClose={() => setModalOpen(false)}
-          onPosted={() => { setModalOpen(false); fetchWins(); }}
+          onPosted={() => { setModalOpen(false); fetchWins(null); }}
         />
       )}
     </div>

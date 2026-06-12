@@ -7,6 +7,7 @@ import DateSeparator from "@/components/stations/DateSeparator";
 import { openUserProfile } from "@/lib/userProfile";
 import { createClient } from "@/lib/supabase/client";
 import {
+  DM_PAGE_SIZE,
   getMessages,
   sendDirectMessage,
   editDirectMessage,
@@ -37,7 +38,11 @@ export default function DmThread({
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
+  // Older history paging: a full first page means there may be more.
+  const [hasEarlier, setHasEarlier] = useState(initialMessages.length >= DM_PAGE_SIZE);
+  const [loadingEarlier, setLoadingEarlier] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const skipAutoScrollRef = useRef(false);
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ block: "end" });
@@ -115,8 +120,29 @@ export default function DmThread({
   }, [conversationId, user.id, messages.length]);
 
   useEffect(() => {
+    if (skipAutoScrollRef.current) {
+      skipAutoScrollRef.current = false;
+      return;
+    }
     scrollToBottom();
   }, [messages.length, scrollToBottom]);
+
+  async function loadEarlier() {
+    if (loadingEarlier || messages.length === 0) return;
+    setLoadingEarlier(true);
+    try {
+      const older = await getMessages(conversationId, messages[0].created_at);
+      setHasEarlier(older.length >= DM_PAGE_SIZE);
+      if (older.length > 0) {
+        skipAutoScrollRef.current = true; // keep the viewport where it is
+        setMessages((prev) => [...older.filter((o) => !prev.some((p) => p.id === o.id)), ...prev]);
+      }
+    } catch {
+      setError("Couldn't load earlier messages.");
+    } finally {
+      setLoadingEarlier(false);
+    }
+  }
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
@@ -176,9 +202,14 @@ export default function DmThread({
     }
   }
 
-  // Re-fetch once on mount in case the server snapshot is stale.
+  // Re-fetch the latest page once on mount in case the server snapshot is stale.
   useEffect(() => {
-    getMessages(conversationId).then(setMessages).catch(() => {});
+    getMessages(conversationId)
+      .then((latest) => {
+        setMessages(latest);
+        setHasEarlier(latest.length >= DM_PAGE_SIZE);
+      })
+      .catch(() => {});
   }, [conversationId]);
 
   return (
@@ -212,6 +243,24 @@ export default function DmThread({
 
       {/* Messages */}
       <div className="flex-1 min-h-0 overflow-y-auto px-5 py-5 flex flex-col gap-2.5 max-w-2xl mx-auto w-full">
+        {hasEarlier && messages.length > 0 && (
+          <button
+            type="button"
+            onClick={loadEarlier}
+            disabled={loadingEarlier}
+            className="font-poppins uppercase self-center text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))] transition-colors"
+            style={{
+              fontSize: "13px",
+              letterSpacing: "0.12em",
+              background: "none",
+              border: "none",
+              cursor: loadingEarlier ? "default" : "pointer",
+              padding: "6px 12px",
+            }}
+          >
+            {loadingEarlier ? "Loading…" : "Load earlier messages"}
+          </button>
+        )}
         {messages.length === 0 && (
           <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.25)] text-center mt-8" style={{ fontSize: "17px" }}>
             This is the beginning of your conversation with {peer.username}.
