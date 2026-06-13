@@ -81,15 +81,13 @@ export default function TodoFab({ user }: { user: User }) {
         onClick={() => { tap(); setOpen(true); }}
         aria-label="Todos"
         title="Todos"
-        className="st-glass fixed z-40 flex items-center justify-center"
+        className="st-liquid fixed z-40 flex items-center justify-center"
         style={{
           right: "16px",
           bottom: "calc(92px + env(safe-area-inset-bottom))",
           width: "52px",
           height: "52px",
           borderRadius: "9999px",
-          border: "0.5px solid var(--glass-border)",
-          boxShadow: "var(--shadow-lg)",
           color: "rgb(var(--fg-rgb))",
         }}
       >

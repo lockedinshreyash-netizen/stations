@@ -64,15 +64,13 @@ export default function TodoPanel({
       <div className="st-overlay absolute inset-0" style={{ background: "rgba(0,0,0,0.4)" }} onClick={onClose} aria-hidden />
 
       <div
-        className="st-glass st-card st-rise relative w-full flex flex-col"
+        className="st-liquid st-card st-rise relative w-full flex flex-col"
         style={{
           maxWidth: "460px",
           maxHeight: "82vh",
           margin: "0 12px",
           marginBottom: "calc(12px + env(safe-area-inset-bottom))",
           borderRadius: "var(--radius-card)",
-          border: "0.5px solid var(--glass-border)",
-          boxShadow: "var(--shadow-lg)",
         }}
       >
         {/* Header */}

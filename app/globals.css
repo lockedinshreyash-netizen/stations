@@ -42,6 +42,13 @@
   /* Glass — light tint floating over dark surfaces */
   --glass-bg:     rgba(26, 26, 26, 0.55);
   --glass-border: rgba(255, 255, 255, 0.12);
+
+  /* Liquid glass — denser, brighter frosted surface that lifts off the
+     background instead of blending in. Tuned for floating chrome (nav, fab). */
+  --liquid-bg:        rgba(40, 40, 44, 0.62);
+  --liquid-tint:      rgba(255, 255, 255, 0.08);
+  --liquid-edge:      rgba(255, 255, 255, 0.22);
+  --liquid-edge-soft: rgba(255, 255, 255, 0.07);
 }
 
 [data-theme="light"] {
@@ -71,6 +78,12 @@
   /* Glass — frosted warm-white over the paper background */
   --glass-bg:     rgba(245, 240, 232, 0.6);
   --glass-border: rgba(10, 10, 10, 0.08);
+
+  /* Liquid glass — bright, near-opaque frosted white that floats above paper. */
+  --liquid-bg:        rgba(252, 250, 246, 0.72);
+  --liquid-tint:      rgba(255, 255, 255, 0.5);
+  --liquid-edge:      rgba(255, 255, 255, 0.9);
+  --liquid-edge-soft: rgba(10, 10, 10, 0.04);
 }
 
 /* ------------------------------------------------------------
@@ -260,6 +273,64 @@ body {
   backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
   border-color: var(--glass-border);
+}
+
+/* Liquid glass — Apple-style floating chrome. Denser frost than .st-glass,
+   with a layered specular sheen and crisp edge lighting so it visibly lifts
+   off the background. Pseudo-elements carry the highlights so the surface can
+   stay theme-driven and self-contained. */
+.st-liquid {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(
+      160deg,
+      var(--liquid-tint) 0%,
+      rgba(255, 255, 255, 0) 42%
+    ),
+    var(--liquid-bg);
+  backdrop-filter: blur(28px) saturate(190%) brightness(1.06);
+  -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.06);
+  border: 0.75px solid var(--liquid-edge);
+  box-shadow:
+    0 16px 40px -8px rgba(0, 0, 0, 0.45),
+    0 4px 12px -4px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 0 var(--liquid-edge),
+    inset 0 -1px 1px 0 var(--liquid-edge-soft),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.04);
+}
+/* Top specular glint — a soft elongated highlight skimming the upper edge,
+   the hallmark of liquid glass catching the light. */
+.st-liquid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(
+      120% 80% at 30% -10%,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0) 55%
+    );
+  mix-blend-mode: screen;
+}
+/* Bottom inner shade — grounds the surface so it reads as solid glass, not film. */
+.st-liquid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(
+      120% 90% at 70% 120%,
+      rgba(0, 0, 0, 0.10) 0%,
+      rgba(0, 0, 0, 0) 50%
+    );
 }
 
 /* Modal shell + blurred overlay. */

@@ -117,12 +117,10 @@ export default function BottomNav({ user }: { user: User }) {
       >
         <div
           ref={navRef}
-          className="st-navbar st-glass pointer-events-auto flex items-center justify-center px-1.5 py-1.5"
+          className="st-navbar st-liquid pointer-events-auto flex items-center justify-center px-1.5 py-1.5"
           style={{
             position: "relative",
             borderRadius: "9999px",
-            boxShadow: "var(--shadow-lg)",
-            border: "0.5px solid var(--glass-border)",
             maxWidth: "calc(100vw - 24px)",
           }}
         >
