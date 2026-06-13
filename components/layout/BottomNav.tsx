@@ -110,11 +110,9 @@ export default function BottomNav({ user }: { user: User }) {
           .st-navdivider { display: none !important; }
         }
       `}</style>
-      <nav
-        className="fixed inset-x-0 z-40 flex justify-center pointer-events-none px-3"
-        style={{ bottom: "calc(16px + env(safe-area-inset-bottom))" }}
-        aria-label="Primary"
-      >
+      {/* Positioning is owned by the shared dock in PlatformShell; this is just
+          the bar itself, centred within that dock. */}
+      <nav className="flex justify-center" aria-label="Primary">
         <div
           ref={navRef}
           className="st-navbar st-liquid pointer-events-auto flex items-center justify-center px-1.5 py-1.5"

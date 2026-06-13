@@ -43,11 +43,12 @@
   --glass-bg:     rgba(26, 26, 26, 0.55);
   --glass-border: rgba(255, 255, 255, 0.12);
 
-  /* Liquid glass — denser, brighter frosted surface that lifts off the
-     background instead of blending in. Tuned for floating chrome (nav, fab). */
-  --liquid-bg:        rgba(40, 40, 44, 0.62);
-  --liquid-tint:      rgba(255, 255, 255, 0.08);
-  --liquid-edge:      rgba(255, 255, 255, 0.22);
+  /* Liquid glass — thin enough that the refracted backdrop shows THROUGH it
+     (so the water-distortion reads), but edge-lit + shadowed so the surface
+     still lifts off the background. Tuned for floating chrome (nav, fab). */
+  --liquid-bg:        rgba(38, 38, 42, 0.34);
+  --liquid-tint:      rgba(255, 255, 255, 0.10);
+  --liquid-edge:      rgba(255, 255, 255, 0.26);
   --liquid-edge-soft: rgba(255, 255, 255, 0.07);
 }
 
@@ -79,10 +80,11 @@
   --glass-bg:     rgba(245, 240, 232, 0.6);
   --glass-border: rgba(10, 10, 10, 0.08);
 
-  /* Liquid glass — bright, near-opaque frosted white that floats above paper. */
-  --liquid-bg:        rgba(252, 250, 246, 0.72);
-  --liquid-tint:      rgba(255, 255, 255, 0.5);
-  --liquid-edge:      rgba(255, 255, 255, 0.9);
+  /* Liquid glass — bright frosted white, thin enough to refract the paper
+     backdrop through it while edge-lighting keeps it distinct. */
+  --liquid-bg:        rgba(250, 248, 244, 0.42);
+  --liquid-tint:      rgba(255, 255, 255, 0.55);
+  --liquid-edge:      rgba(255, 255, 255, 0.95);
   --liquid-edge-soft: rgba(10, 10, 10, 0.04);
 }
 

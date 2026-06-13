@@ -60,7 +60,7 @@ export default function TodoPanel({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-end" role="dialog" aria-modal="true" aria-label="Your todos">
+    <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal="true" aria-label="Your todos">
       <div className="st-overlay absolute inset-0" style={{ background: "rgba(0,0,0,0.4)" }} onClick={onClose} aria-hidden />
 
       <div
@@ -68,11 +68,11 @@ export default function TodoPanel({
         style={{
           maxWidth: "460px",
           maxHeight: "82vh",
-          // Pinned bottom-right, almost touching the floating taskbar
-          // (taskbar sits at bottom 16px and is ~64px tall → ~80px from bottom).
-          marginRight: "16px",
+          // Open centred, resting just above the floating navbar
+          // (navbar sits at bottom 16px and is ~64px tall → ~92px from bottom).
           marginLeft: "12px",
-          marginBottom: "calc(84px + env(safe-area-inset-bottom))",
+          marginRight: "12px",
+          marginBottom: "calc(92px + env(safe-area-inset-bottom))",
           borderRadius: "var(--radius-card)",
         }}
       >

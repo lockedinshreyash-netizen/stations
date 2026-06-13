@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { ListChecks } from "lucide-react";
 import { tap } from "@/lib/feedback";
 import { fireCelebration } from "@/lib/celebrate";
@@ -81,10 +82,8 @@ export default function TodoFab({ user }: { user: User }) {
         onClick={() => { tap(); setOpen(true); }}
         aria-label="Todos"
         title="Todos"
-        className="st-liquid fixed z-40 flex items-center justify-center"
+        className="st-liquid pointer-events-auto relative flex items-center justify-center"
         style={{
-          right: "16px",
-          bottom: "calc(92px + env(safe-area-inset-bottom))",
           width: "52px",
           height: "52px",
           borderRadius: "9999px",
@@ -115,7 +114,7 @@ export default function TodoFab({ user }: { user: User }) {
         )}
       </button>
 
-      {open && board && (
+      {open && board && createPortal(
         <TodoPanel
           board={board}
           onClose={() => setOpen(false)}
@@ -123,7 +122,8 @@ export default function TodoFab({ user }: { user: User }) {
           onAdd={handleAdd}
           onPlanToday={handlePlanToday}
           onDelete={handleDelete}
-        />
+        />,
+        document.body,
       )}
     </>
   );
