@@ -43,22 +43,17 @@ export default function PlatformShell({
           height="170%"
           colorInterpolationFilters="sRGB"
         >
-          {/* Rippling water surface — anisotropic (wider horizontal waves) and
-              slowly animated so the distortion flows like real water. */}
+          {/* Static water surface — anisotropic (wider horizontal waves).
+              Static on purpose: animating baseFrequency re-rasterises the
+              backdrop every frame, which makes a backdrop-filter'd bar janky on
+              real devices. A strong static displacement already reads as liquid. */}
           <feTurbulence
             type="fractalNoise"
             baseFrequency="0.007 0.013"
             numOctaves="2"
             seed="17"
             result="noise"
-          >
-            <animate
-              attributeName="baseFrequency"
-              dur="20s"
-              values="0.007 0.013; 0.010 0.010; 0.007 0.013"
-              repeatCount="indefinite"
-            />
-          </feTurbulence>
+          />
           <feGaussianBlur in="noise" stdDeviation="0.8" result="surface" />
           {/* Refract the backdrop through that surface — the actual lensing.
               Strong scale so the bend is unmistakably liquid. */}
@@ -89,8 +84,15 @@ export default function PlatformShell({
           profile) portal to <body>, so they aren't constrained by this dock. */}
       {!immersive && (
         <div
-          className="fixed inset-x-0 z-40 flex flex-col items-center gap-3 px-3 pointer-events-none"
-          style={{ bottom: "calc(16px + env(safe-area-inset-bottom))" }}
+          className="fixed left-1/2 z-40 flex flex-col items-end gap-3 pointer-events-none"
+          style={{
+            bottom: "calc(16px + env(safe-area-inset-bottom))",
+            // Centre the dock on the navbar's width, then right-align the column
+            // so the todo widget pins to the navbar's RIGHT edge (not the
+            // viewport edge) and the two move together.
+            transform: "translateX(-50%)",
+            maxWidth: "calc(100vw - 24px)",
+          }}
         >
           <TodoFab user={user} />
           <BottomNav user={user} />

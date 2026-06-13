@@ -292,11 +292,14 @@ body {
     ),
     var(--liquid-bg);
   /* url(#liquid-glass) does ALL the work — refraction + frost + saturation are
-     baked into the SVG filter. It must stand alone: Chromium drops the entire
-     backdrop-filter if url() is chained with blur()/saturate(). Safari lacks SVG
-     backdrop filters, so its -webkit- rule falls back to a plain frosted blur. */
+     baked into the SVG filter. BOTH the prefixed and unprefixed properties must
+     carry the SAME value: in real Chrome -webkit-backdrop-filter is a live alias
+     for backdrop-filter, so a different -webkit value declared here would
+     OVERRIDE the url() and silently downgrade everything to plain blur (this was
+     the "no refraction in the app" bug). Safari can't render SVG backdrop
+     filters — it falls back to the semi-opaque tint + edge lighting below. */
+  -webkit-backdrop-filter: url(#liquid-glass);
   backdrop-filter: url(#liquid-glass);
-  -webkit-backdrop-filter: blur(14px) saturate(190%) brightness(1.06);
   border: 0.75px solid var(--liquid-edge);
   box-shadow:
     0 16px 40px -8px rgba(0, 0, 0, 0.45),
