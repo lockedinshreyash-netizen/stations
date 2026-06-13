@@ -198,6 +198,13 @@ export interface DmParticipant {
   founder_number: number | null;
 }
 
+/**
+ * Lifecycle of a 1:1 conversation. A conversation opens as a `pending` request
+ * from the initiator; the other person must accept before either can send a
+ * message. (Accountability partners skip straight to `accepted`.)
+ */
+export type ConversationStatus = "pending" | "accepted" | "declined";
+
 /** A conversation row enriched with the other participant + preview, for the inbox. */
 export interface ConversationSummary {
   id: string;
@@ -205,6 +212,13 @@ export interface ConversationSummary {
   other: DmParticipant;
   last_message: string | null;
   unread: boolean;
+}
+
+/** An incoming pending DM request, enriched with the requester's profile. */
+export interface DmRequest {
+  conversation_id: string;
+  from: DmParticipant;
+  created_at: string;
 }
 
 export interface Application {

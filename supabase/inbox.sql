@@ -6,6 +6,10 @@
 -- direct_messages query PER conversation (N+1) with a single query
 -- that returns each conversation, the other participant, and the
 -- latest message in one round trip.
+--
+-- NOTE: supabase/dm_requests.sql re-declares get_inbox() to also filter to
+-- 'accepted' conversations (pending DM requests surface separately). Run it
+-- after this file so the inbox hides un-accepted requests.
 -- ============================================================
 
 -- ------------------------------------------------------------

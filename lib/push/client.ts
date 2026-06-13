@@ -160,6 +160,19 @@ export function notifyNewDm(conversationId: string): void {
   fireNotify({ kind: "dm", conversationId });
 }
 
+/** Notify a member that the caller sent them a DM request. */
+export function notifyDmRequest(addresseeId: string): void {
+  fireNotify({ kind: "dm_request", addresseeId });
+}
+
+/** Notify the original requester that the caller accepted their DM request. */
+export function notifyDmRequestAccepted(
+  requesterId: string,
+  conversationId: string
+): void {
+  fireNotify({ kind: "dm_request_accepted", requesterId, conversationId });
+}
+
 /** Notify a win's author that it was reacted to (server skips self-reactions). */
 export function notifyNewReaction(winId: string): void {
   fireNotify({ kind: "reaction", winId });

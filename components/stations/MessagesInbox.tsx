@@ -8,10 +8,19 @@ import {
   searchUsers,
   startConversation,
   getConversations,
+  listIncomingDmRequests,
+  listOutgoingDmRequestIds,
+  respondToDmRequest,
 } from "@/lib/dm/messages";
+import { notifyDmRequest, notifyDmRequestAccepted } from "@/lib/push/client";
 import FounderMark from "@/components/ui/FounderMark";
 import PartnersPanel from "@/components/stations/PartnersPanel";
-import type { ConversationSummary, DmParticipant, User } from "@/types";
+import type {
+  ConversationSummary,
+  DmParticipant,
+  DmRequest,
+  User,
+} from "@/types";
 
 export default function MessagesInbox({
   user,
@@ -22,25 +31,43 @@ export default function MessagesInbox({
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"dms" | "partners">("dms");
-  const [reqCount, setReqCount] = useState(0);
+  const [partnerReqCount, setPartnerReqCount] = useState(0);
   const [conversations, setConversations] =
     useState<ConversationSummary[]>(initialConversations);
+  const [requests, setRequests] = useState<DmRequest[]>([]);
+  const [outgoing, setOutgoing] = useState<Set<string>>(new Set());
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<DmParticipant[]>([]);
   const [searching, setSearching] = useState(false);
-  const [starting, setStarting] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
-      setConversations(await getConversations(user.id));
+      const [convos, incoming, out] = await Promise.all([
+        getConversations(user.id),
+        listIncomingDmRequests(user.id),
+        listOutgoingDmRequestIds(user.id),
+      ]);
+      setConversations(convos);
+      setRequests(incoming);
+      setOutgoing(out);
     } catch {
       /* keep last good state */
     }
   }, [user.id]);
 
-  // Live inbox: any new DM in a conversation I'm in bumps/refreshes the list.
-  // RLS guarantees I only receive events for my own conversations.
+  // Pull requests + outgoing state once on mount (the server only seeds the
+  // accepted-conversation list). setState runs after the await, so the
+  // synchronous cascading-render concern the rule guards against doesn't apply.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refresh();
+  }, [refresh]);
+
+  // Live inbox: a new DM, or any conversation change (a request arriving, being
+  // accepted, or declined), refreshes the lists. RLS guarantees I only receive
+  // events for conversations I'm part of.
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
@@ -86,14 +113,54 @@ export default function MessagesInbox({
     };
   }, [query, user.id]);
 
-  async function openWith(other: DmParticipant) {
-    if (starting) return;
-    setStarting(true);
+  // Lookups for the per-result action state.
+  const convoByPeer = new Map(conversations.map((c) => [c.other.id, c.id]));
+  const incomingByUser = new Map(requests.map((r) => [r.from.id, r.conversation_id]));
+
+  // Send a DM request to someone new (or open the chat directly if we're already
+  // partners — the RPC reports back an accepted conversation in that case).
+  async function sendRequest(other: DmParticipant) {
+    if (busy) return;
+    setBusy(other.id);
     try {
-      const id = await startConversation(other.id);
-      router.push(`/messages/${id}`);
+      const { conversationId, status } = await startConversation(other.id);
+      if (status === "accepted") {
+        router.push(`/messages/${conversationId}`);
+        return;
+      }
+      setOutgoing((s) => new Set(s).add(other.id));
+      notifyDmRequest(other.id);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Couldn't send request.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  // Accept an incoming request (from the Requests list or a search result), then
+  // drop into the freshly-opened conversation.
+  async function accept(conversationId: string, fromId: string) {
+    if (busy) return;
+    setBusy(conversationId);
+    try {
+      await respondToDmRequest(conversationId, true);
+      notifyDmRequestAccepted(fromId, conversationId);
+      router.push(`/messages/${conversationId}`);
     } catch {
-      setStarting(false);
+      setBusy(null);
+    }
+  }
+
+  async function decline(conversationId: string) {
+    if (busy) return;
+    setBusy(conversationId);
+    try {
+      await respondToDmRequest(conversationId, false);
+      await refresh();
+    } catch {
+      /* ignore */
+    } finally {
+      setBusy(null);
     }
   }
 
@@ -101,21 +168,21 @@ export default function MessagesInbox({
     <div className="px-5 md:px-10 py-10 max-w-2xl mx-auto w-full flex flex-col gap-8">
       {/* Tabs — direct messages vs accountability partners */}
       <div className="flex items-center gap-2">
-        <TabButton active={tab === "dms"} onClick={() => setTab("dms")}>
+        <TabButton active={tab === "dms"} onClick={() => setTab("dms")} badge={requests.length}>
           Messages
         </TabButton>
-        <TabButton active={tab === "partners"} onClick={() => setTab("partners")} badge={reqCount}>
+        <TabButton active={tab === "partners"} onClick={() => setTab("partners")} badge={partnerReqCount}>
           Partners
         </TabButton>
       </div>
 
       {tab === "partners" && (
-        <PartnersPanel user={user} onRequestCount={setReqCount} />
+        <PartnersPanel user={user} onRequestCount={setPartnerReqCount} />
       )}
 
       {tab === "dms" && (
         <>
-      {/* Search to start a new DM */}
+      {/* Search to start a new DM (sends a request the other person must accept) */}
       <div className="flex flex-col gap-2">
         <input
           value={query}
@@ -137,25 +204,100 @@ export default function MessagesInbox({
                 No members found.
               </span>
             ) : (
-              results.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => openWith(r)}
-                  disabled={starting}
-                  className="flex items-center gap-3 px-4 py-3 text-left hover:bg-[rgba(var(--fg-rgb),0.04)] transition-colors disabled:opacity-50"
-                >
-                  <Avatar url={r.avatar_url} username={r.username} />
-                  <span className="font-poppins text-[rgb(var(--fg-rgb))] flex items-center gap-1.5" style={{ fontSize: "16px" }}>
-                    {r.username}
-                    <FounderMark founderNumber={r.founder_number} />
-                  </span>
-                </button>
-              ))
+              results.map((r) => {
+                const convoId = convoByPeer.get(r.id);
+                const incomingId = incomingByUser.get(r.id);
+                const requested = outgoing.has(r.id);
+                return (
+                  <div key={r.id} className="flex items-center gap-3 px-4 py-3">
+                    <Avatar url={r.avatar_url} username={r.username} />
+                    <span className="font-poppins text-[rgb(var(--fg-rgb))] flex items-center gap-1.5 flex-1" style={{ fontSize: "16px" }}>
+                      {r.username}
+                      <FounderMark founderNumber={r.founder_number} />
+                    </span>
+                    {convoId ? (
+                      <Link
+                        href={`/messages/${convoId}`}
+                        className="st-btn px-3 py-1.5 font-poppins shrink-0"
+                        style={{ fontSize: "13px", fontWeight: 600, background: "transparent", color: "rgba(var(--fg-rgb),0.55)", border: "0.5px solid rgba(var(--fg-rgb),0.15)" }}
+                      >
+                        Open
+                      </Link>
+                    ) : incomingId ? (
+                      <button
+                        type="button"
+                        disabled={busy === incomingId}
+                        onClick={() => accept(incomingId, r.id)}
+                        className="st-btn px-3 py-1.5 font-poppins shrink-0 disabled:opacity-50"
+                        style={{ fontSize: "13px", fontWeight: 600, background: "var(--accent)", color: "#fff", border: "none" }}
+                      >
+                        Accept
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={requested || busy === r.id}
+                        onClick={() => sendRequest(r)}
+                        className="st-btn px-3 py-1.5 font-poppins shrink-0 disabled:opacity-50"
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          background: requested ? "transparent" : "var(--accent)",
+                          color: requested ? "rgba(var(--fg-rgb),0.4)" : "#fff",
+                          border: requested ? "0.5px solid rgba(var(--fg-rgb),0.15)" : "none",
+                        }}
+                      >
+                        {requested ? "Requested" : "Message"}
+                      </button>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
         )}
       </div>
+
+      {/* Incoming DM requests */}
+      {requests.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <h2 className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]" style={{ fontSize: "15px", letterSpacing: "0.2em" }}>
+            Requests
+          </h2>
+          {requests.map((r) => (
+            <div key={r.conversation_id} className="flex items-center gap-3">
+              <Avatar url={r.from.avatar_url} username={r.from.username} />
+              <div className="flex-1 min-w-0">
+                <span className="font-poppins text-[rgb(var(--fg-rgb))] flex items-center gap-1.5 truncate" style={{ fontSize: "16px" }}>
+                  {r.from.username}
+                  <FounderMark founderNumber={r.from.founder_number} />
+                </span>
+                <span className="font-poppins font-light text-[rgba(var(--fg-rgb),0.4)]" style={{ fontSize: "13px" }}>
+                  wants to message you
+                </span>
+              </div>
+              <button
+                type="button"
+                disabled={busy === r.conversation_id}
+                onClick={() => accept(r.conversation_id, r.from.id)}
+                className="st-btn px-3 py-1.5 font-poppins shrink-0 disabled:opacity-50"
+                style={{ fontSize: "13px", fontWeight: 600, background: "var(--accent)", color: "#fff", border: "none" }}
+              >
+                Accept
+              </button>
+              <button
+                type="button"
+                disabled={busy === r.conversation_id}
+                onClick={() => decline(r.conversation_id)}
+                className="st-pill px-2 py-1.5 font-poppins shrink-0 disabled:opacity-50"
+                style={{ fontSize: "13px", color: "rgba(var(--fg-rgb),0.45)" }}
+              >
+                Decline
+              </button>
+            </div>
+          ))}
+        </section>
+      )}
 
       {/* Conversation list */}
       <div className="flex flex-col">
@@ -164,7 +306,7 @@ export default function MessagesInbox({
         </h2>
         {conversations.length === 0 ? (
           <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.3)]" style={{ fontSize: "17px" }}>
-            No conversations yet. Search a username above to start one.
+            No conversations yet. Search a username above to send a message request.
           </p>
         ) : (
           <div className="flex flex-col">
@@ -203,7 +345,7 @@ export default function MessagesInbox({
   );
 }
 
-/** A pill tab with an optional count badge (used for pending partner requests). */
+/** A pill tab with an optional count badge (used for pending requests). */
 function TabButton({
   active,
   onClick,

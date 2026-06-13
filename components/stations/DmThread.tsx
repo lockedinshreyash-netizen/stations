@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format, isSameDay } from "date-fns";
 import DateSeparator from "@/components/stations/DateSeparator";
 import { openUserProfile } from "@/lib/userProfile";
@@ -13,10 +14,16 @@ import {
   editDirectMessage,
   deleteDirectMessage,
   markConversationRead,
+  respondToDmRequest,
 } from "@/lib/dm/messages";
-import { notifyNewDm } from "@/lib/push/client";
+import { notifyNewDm, notifyDmRequestAccepted } from "@/lib/push/client";
 import FounderMark from "@/components/ui/FounderMark";
-import type { DirectMessage, DmParticipant, User } from "@/types";
+import type {
+  ConversationStatus,
+  DirectMessage,
+  DmParticipant,
+  User,
+} from "@/types";
 
 const MAX_LEN = 2000;
 
@@ -25,13 +32,23 @@ export default function DmThread({
   conversationId,
   peer,
   initialMessages,
+  initialStatus,
+  viewerIsRequester,
 }: {
   user: User;
   conversationId: string;
   peer: DmParticipant;
   initialMessages: DirectMessage[];
+  initialStatus: ConversationStatus;
+  // True when the caller is the one who sent the (still pending) request.
+  viewerIsRequester: boolean;
 }) {
+  const router = useRouter();
   const [messages, setMessages] = useState<DirectMessage[]>(initialMessages);
+  // Lifecycle of this conversation; flips to "accepted" once the request is
+  // accepted (locally on accept, or live via the conversations channel below).
+  const [status, setStatus] = useState<ConversationStatus>(initialStatus);
+  const [responding, setResponding] = useState(false);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,6 +125,19 @@ export default function DmThread({
           if (old.id) removeById(old.id);
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "conversations",
+          filter: `id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const next = (payload.new as { status?: ConversationStatus }).status;
+          if (next) setStatus(next);
+        }
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
@@ -144,10 +174,38 @@ export default function DmThread({
     }
   }
 
+  async function acceptRequest() {
+    if (responding) return;
+    setResponding(true);
+    try {
+      await respondToDmRequest(conversationId, true);
+      notifyDmRequestAccepted(peer.id, conversationId);
+      setStatus("accepted");
+    } catch {
+      setError("Couldn't accept. Try again.");
+    } finally {
+      setResponding(false);
+    }
+  }
+
+  async function declineRequest() {
+    if (responding) return;
+    setResponding(true);
+    try {
+      await respondToDmRequest(conversationId, false);
+      router.push("/messages");
+    } catch {
+      setError("Couldn't decline. Try again.");
+      setResponding(false);
+    }
+  }
+
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
     const content = draft.trim();
-    if (!content || sending) return;
+    // Messages can only be sent once the request is accepted (DB enforces this
+    // too); guard here so the composer never fires while pending/declined.
+    if (!content || sending || status !== "accepted") return;
     setSending(true);
     setError(null);
     try {
@@ -261,7 +319,7 @@ export default function DmThread({
             {loadingEarlier ? "Loading…" : "Load earlier messages"}
           </button>
         )}
-        {messages.length === 0 && (
+        {messages.length === 0 && status === "accepted" && (
           <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.25)] text-center mt-8" style={{ fontSize: "17px" }}>
             This is the beginning of your conversation with {peer.username}.
           </p>
@@ -436,45 +494,89 @@ export default function DmThread({
         )}
       </div>
 
-      {/* Composer */}
-      <form
-        onSubmit={handleSend}
-        className="shrink-0 px-5 py-4 flex items-end gap-2 max-w-2xl mx-auto w-full"
-        style={{ borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)", paddingBottom: "calc(16px + env(safe-area-inset-bottom))" }}
-      >
-        <textarea
-          value={draft}
-          onChange={(e) => setDraft(e.target.value.slice(0, MAX_LEN))}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSend(e);
-            }
-          }}
-          rows={1}
-          placeholder={`Message ${peer.username}…`}
-          className="flex-1 st-field bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-2.5 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] placeholder:text-[rgba(var(--fg-rgb),0.25)] resize-none rounded-[var(--radius-sm)]"
-          style={{ maxHeight: "120px" }}
-        />
-        <button
-          type="submit"
-          disabled={!draft.trim() || sending}
-          className="st-btn font-poppins font-black uppercase shrink-0"
-          style={{
-            fontSize: "14px",
-            letterSpacing: "0.12em",
-            padding: "11px 18px",
-            background: "rgb(var(--fg-rgb))",
-            color: "var(--bg-primary)",
-            border: "none",
-            borderRadius: "var(--radius-sm)",
-            cursor: !draft.trim() || sending ? "default" : "pointer",
-            opacity: !draft.trim() || sending ? 0.4 : 1,
-          }}
+      {/* Composer — only once the request is accepted */}
+      {status === "accepted" ? (
+        <form
+          onSubmit={handleSend}
+          className="shrink-0 px-5 py-4 flex items-end gap-2 max-w-2xl mx-auto w-full"
+          style={{ borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)", paddingBottom: "calc(16px + env(safe-area-inset-bottom))" }}
         >
-          {sending ? "…" : "Send"}
-        </button>
-      </form>
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value.slice(0, MAX_LEN))}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend(e);
+              }
+            }}
+            rows={1}
+            placeholder={`Message ${peer.username}…`}
+            className="flex-1 st-field bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] px-4 py-2.5 text-base outline-none border border-[rgba(var(--fg-rgb),0.1)] focus:border-[var(--accent)] placeholder:text-[rgba(var(--fg-rgb),0.25)] resize-none rounded-[var(--radius-sm)]"
+            style={{ maxHeight: "120px" }}
+          />
+          <button
+            type="submit"
+            disabled={!draft.trim() || sending}
+            className="st-btn font-poppins font-black uppercase shrink-0"
+            style={{
+              fontSize: "14px",
+              letterSpacing: "0.12em",
+              padding: "11px 18px",
+              background: "rgb(var(--fg-rgb))",
+              color: "var(--bg-primary)",
+              border: "none",
+              borderRadius: "var(--radius-sm)",
+              cursor: !draft.trim() || sending ? "default" : "pointer",
+              opacity: !draft.trim() || sending ? 0.4 : 1,
+            }}
+          >
+            {sending ? "…" : "Send"}
+          </button>
+        </form>
+      ) : status === "pending" && !viewerIsRequester ? (
+        // The recipient landed on a pending request — let them respond here.
+        <div
+          className="shrink-0 px-5 py-4 flex flex-col items-center gap-3 max-w-2xl mx-auto w-full"
+          style={{ borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)", paddingBottom: "calc(16px + env(safe-area-inset-bottom))" }}
+        >
+          <p className="font-poppins text-center text-[rgba(var(--fg-rgb),0.6)]" style={{ fontSize: "15px" }}>
+            <span className="font-medium text-[rgb(var(--fg-rgb))]">{peer.username}</span> wants to message you.
+          </p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              disabled={responding}
+              onClick={acceptRequest}
+              className="st-btn font-poppins uppercase disabled:opacity-50"
+              style={{ fontSize: "13px", letterSpacing: "0.12em", fontWeight: 600, padding: "10px 22px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: "var(--radius-sm)" }}
+            >
+              Accept
+            </button>
+            <button
+              type="button"
+              disabled={responding}
+              onClick={declineRequest}
+              className="st-pill font-poppins uppercase disabled:opacity-50"
+              style={{ fontSize: "13px", letterSpacing: "0.12em", padding: "10px 18px", color: "rgba(var(--fg-rgb),0.45)" }}
+            >
+              Decline
+            </button>
+          </div>
+        </div>
+      ) : (
+        // Requester waiting on a pending request, or a declined request.
+        <div
+          className="shrink-0 px-5 py-5 max-w-2xl mx-auto w-full text-center"
+          style={{ borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)", paddingBottom: "calc(20px + env(safe-area-inset-bottom))" }}
+        >
+          <p className="font-playfair italic text-[rgba(var(--fg-rgb),0.45)]" style={{ fontSize: "16px" }}>
+            {status === "declined"
+              ? "This message request was declined."
+              : `Request sent — you can message ${peer.username} once they accept.`}
+          </p>
+        </div>
+      )}
       {error && (
         <p className="px-5 pb-2 font-poppins text-center" style={{ color: "var(--accent)", fontSize: "14px" }}>
           {error}

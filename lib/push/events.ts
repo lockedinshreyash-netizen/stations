@@ -54,6 +54,46 @@ export async function notifyDm(conversationId: string, senderId: string) {
   await sendPushToUsers([recipient], payload);
 }
 
+/** Someone sent a DM request — notify the addressee so they can accept it. */
+export async function notifyDmRequest(addresseeId: string, requesterId: string) {
+  const supabase = createAdminClient();
+  const { data: requester } = await supabase
+    .from("users")
+    .select("username")
+    .eq("id", requesterId)
+    .maybeSingle();
+
+  const payload: PushPayload = {
+    title: `${requester?.username ?? "Someone"} wants to message you`,
+    body: "Tap to accept their request.",
+    url: "/messages",
+    tag: `dm-req-${requesterId}`,
+  };
+  await sendPushToUsers([addresseeId], payload);
+}
+
+/** A DM request was accepted — notify the original requester they can now chat. */
+export async function notifyDmRequestAccepted(
+  requesterId: string,
+  conversationId: string,
+  accepterId: string
+) {
+  const supabase = createAdminClient();
+  const { data: accepter } = await supabase
+    .from("users")
+    .select("username")
+    .eq("id", accepterId)
+    .maybeSingle();
+
+  const payload: PushPayload = {
+    title: `${accepter?.username ?? "Someone"} accepted your request`,
+    body: "You can message each other now.",
+    url: `/messages/${conversationId}`,
+    tag: `dm-req-acc-${accepterId}`,
+  };
+  await sendPushToUsers([requesterId], payload);
+}
+
 /** A win got a new reaction — notify its author (never the actor). */
 export async function notifyReaction(winId: string, actorId: string) {
   const supabase = createAdminClient();

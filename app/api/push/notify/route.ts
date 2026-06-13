@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   notifyDm,
+  notifyDmRequest,
+  notifyDmRequestAccepted,
   notifyReaction,
   notifySessionStart,
   notifyMention,
@@ -57,6 +59,54 @@ export async function POST(request: Request) {
           return NextResponse.json({ error: "forbidden" }, { status: 403 });
         }
         await notifyDm(conversationId, user.id);
+        break;
+      }
+
+      case "dm_request": {
+        const addresseeId = String(body.addresseeId ?? "");
+        if (!addresseeId) return bad("missing addresseeId");
+        // Authorize: a pending conversation requested BY the caller TO this
+        // addressee exists. Conversations are keyed by the ordered pair.
+        const [lo, hi] =
+          user.id < addresseeId ? [user.id, addresseeId] : [addresseeId, user.id];
+        const { data: convo } = await admin
+          .from("conversations")
+          .select("status, requested_by")
+          .eq("user_low", lo)
+          .eq("user_high", hi)
+          .maybeSingle();
+        if (
+          !convo ||
+          convo.status !== "pending" ||
+          convo.requested_by !== user.id
+        ) {
+          return NextResponse.json({ error: "forbidden" }, { status: 403 });
+        }
+        await notifyDmRequest(addresseeId, user.id);
+        break;
+      }
+
+      case "dm_request_accepted": {
+        const requesterId = String(body.requesterId ?? "");
+        const conversationId = String(body.conversationId ?? "");
+        if (!requesterId || !conversationId) return bad("missing fields");
+        // Authorize: the caller is the recipient (not the requester) of this
+        // now-accepted conversation.
+        const { data: convo } = await admin
+          .from("conversations")
+          .select("user_low, user_high, status, requested_by")
+          .eq("id", conversationId)
+          .maybeSingle();
+        if (
+          !convo ||
+          convo.status !== "accepted" ||
+          convo.requested_by !== requesterId ||
+          user.id === requesterId ||
+          (convo.user_low !== user.id && convo.user_high !== user.id)
+        ) {
+          return NextResponse.json({ error: "forbidden" }, { status: 403 });
+        }
+        await notifyDmRequestAccepted(requesterId, conversationId, user.id);
         break;
       }
 

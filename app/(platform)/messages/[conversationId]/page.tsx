@@ -1,7 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 import DmThread from "@/components/stations/DmThread";
 import { createClient } from "@/lib/supabase/server";
-import type { DirectMessage, DmParticipant, User } from "@/types";
+import type {
+  ConversationStatus,
+  DirectMessage,
+  DmParticipant,
+  User,
+} from "@/types";
 
 export default async function ConversationPage({
   params,
@@ -27,12 +32,17 @@ export default async function ConversationPage({
   // else gets null here and is sent to a 404 — they can't reach the thread.
   const { data: convo } = await supabase
     .from("conversations")
-    .select("user_low, user_high")
+    .select("user_low, user_high, status, requested_by")
     .eq("id", conversationId)
     .maybeSingle();
   if (!convo) notFound();
 
-  const c = convo as { user_low: string; user_high: string };
+  const c = convo as {
+    user_low: string;
+    user_high: string;
+    status: ConversationStatus;
+    requested_by: string | null;
+  };
   const otherId = c.user_low === authUser.id ? c.user_high : c.user_low;
 
   const { data: peer } = await supabase
@@ -58,6 +68,8 @@ export default async function ConversationPage({
       conversationId={conversationId}
       peer={peer as DmParticipant}
       initialMessages={initialMessages}
+      initialStatus={c.status}
+      viewerIsRequester={c.requested_by === authUser.id}
     />
   );
 }

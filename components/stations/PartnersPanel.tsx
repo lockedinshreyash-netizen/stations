@@ -164,8 +164,9 @@ export default function PartnersPanel({
 
   async function message(partner: DmParticipant) {
     try {
-      const id = await startConversation(partner.id);
-      router.push(`/messages/${id}`);
+      // Partners skip the DM-request gate, so this comes back already accepted.
+      const { conversationId } = await startConversation(partner.id);
+      router.push(`/messages/${conversationId}`);
     } catch {
       /* ignore */
     }

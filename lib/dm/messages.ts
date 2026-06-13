@@ -3,9 +3,11 @@
 import { createClient } from "@/lib/supabase/client";
 import { mapInboxRows, type InboxRow } from "@/lib/dm/inbox";
 import type {
+  ConversationStatus,
   ConversationSummary,
   DirectMessage,
   DmParticipant,
+  DmRequest,
 } from "@/types";
 
 /**
@@ -29,14 +31,99 @@ export async function searchUsers(
   return (data as DmParticipant[]) ?? [];
 }
 
-/** Start or resume a conversation with another user; returns its id. */
-export async function startConversation(otherUserId: string): Promise<string> {
+/**
+ * Start or resume a conversation with another user. Returns the conversation id
+ * and its status: a brand-new conversation with a non-partner comes back
+ * `pending` (a DM request the other person must accept before messages can be
+ * sent); partners — or a request you're reciprocating — come back `accepted`.
+ */
+export async function startConversation(
+  otherUserId: string
+): Promise<{ conversationId: string; status: ConversationStatus }> {
   const supabase = createClient();
   const { data, error } = await supabase.rpc("get_or_create_conversation", {
     other_user: otherUserId,
   });
   if (error) throw new Error(error.message);
-  return data as string;
+  // The RPC returns a single-row table, surfaced by supabase-js as an array.
+  const row = (Array.isArray(data) ? data[0] : data) as
+    | { conversation_id: string; status: ConversationStatus }
+    | undefined;
+  if (!row?.conversation_id) throw new Error("Couldn't open that conversation.");
+  return { conversationId: row.conversation_id, status: row.status };
+}
+
+/**
+ * Pending DM requests addressed TO the caller (members who want to message
+ * them), newest first. RLS limits rows to the caller's own conversations, so a
+ * pending row whose `requested_by` is not the caller is an incoming request.
+ */
+export async function listIncomingDmRequests(
+  selfId: string
+): Promise<DmRequest[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("conversations")
+    .select("id, requested_by, created_at")
+    .eq("status", "pending")
+    .neq("requested_by", selfId)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+
+  const rows =
+    (data as { id: string; requested_by: string | null; created_at: string }[]) ?? [];
+  const requesterIds = rows
+    .map((r) => r.requested_by)
+    .filter((id): id is string => !!id);
+  if (requesterIds.length === 0) return [];
+
+  const { data: profiles } = await supabase
+    .from("users")
+    .select("id, username, avatar_url, founder_number")
+    .in("id", [...new Set(requesterIds)]);
+  const byId = new Map(
+    ((profiles as DmParticipant[]) ?? []).map((p) => [p.id, p])
+  );
+
+  return rows
+    .filter((r) => r.requested_by)
+    .map((r) => ({
+      conversation_id: r.id,
+      from:
+        byId.get(r.requested_by!) ??
+        { id: r.requested_by!, username: "member", avatar_url: null, founder_number: null },
+      created_at: r.created_at,
+    }));
+}
+
+/** Other-user ids the caller has an outstanding (pending) outgoing DM request to. */
+export async function listOutgoingDmRequestIds(
+  selfId: string
+): Promise<Set<string>> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("conversations")
+    .select("user_low, user_high")
+    .eq("status", "pending")
+    .eq("requested_by", selfId);
+  if (error) throw new Error(error.message);
+  const rows = (data as { user_low: string; user_high: string }[]) ?? [];
+  return new Set(
+    rows.map((r) => (r.user_low === selfId ? r.user_high : r.user_low))
+  );
+}
+
+/** Accept or decline an incoming DM request. RLS allows only the recipient. */
+export async function respondToDmRequest(
+  conversationId: string,
+  accept: boolean
+): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("conversations")
+    .update({ status: accept ? "accepted" : "declined" })
+    .eq("id", conversationId);
+  if (error) throw new Error(error.message);
 }
 
 /**

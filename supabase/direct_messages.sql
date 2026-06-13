@@ -7,6 +7,11 @@
 -- (postgres_changes) honors the SELECT policy, live events are likewise only
 -- delivered to those two users. There is no client-trusted path — nobody else
 -- can read a conversation or its messages, via the API or realtime.
+--
+-- NOTE: the accept-before-message gate lives in supabase/dm_requests.sql, which
+-- MUST be run after this file (and inbox.sql). It adds conversations.status /
+-- requested_by, tightens the send policy to require an 'accepted' conversation,
+-- and changes get_or_create_conversation's return shape.
 -- ============================================================
 
 -- ------------------------------------------------------------
