@@ -69,7 +69,8 @@ export default function TodoPanel({
           maxWidth: "460px",
           maxHeight: "82vh",
           margin: "0 12px",
-          marginBottom: "calc(12px + env(safe-area-inset-bottom))",
+          // Rest just above the floating taskbar (bottom 16px + its ~64px height).
+          marginBottom: "calc(96px + env(safe-area-inset-bottom))",
           borderRadius: "var(--radius-card)",
         }}
       >

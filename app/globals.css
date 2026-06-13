@@ -289,8 +289,11 @@ body {
       rgba(255, 255, 255, 0) 42%
     ),
     var(--liquid-bg);
-  backdrop-filter: blur(28px) saturate(190%) brightness(1.06);
-  -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.06);
+  /* url(#liquid-glass) refracts the backdrop (real lensing); the light blur +
+     saturation keep it reading as frosted glass without washing the bend away.
+     Safari lacks SVG backdrop filters, so its -webkit- rule leans on blur. */
+  backdrop-filter: blur(3px) saturate(190%) brightness(1.06) url(#liquid-glass);
+  -webkit-backdrop-filter: blur(14px) saturate(190%) brightness(1.06);
   border: 0.75px solid var(--liquid-edge);
   box-shadow:
     0 16px 40px -8px rgba(0, 0, 0, 0.45),
