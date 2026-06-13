@@ -7,5 +7,5 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
   // New / logged-out visitors start the value-first funnel; members go in.
-  redirect(user ? "/wins" : "/join");
+  redirect(user ? "/home" : "/join");
 }

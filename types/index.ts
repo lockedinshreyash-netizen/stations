@@ -67,6 +67,9 @@ export interface User {
   focus_streak_days: number;
   last_focus_session_date: string | null;
   last_active_at: string | null;
+  // First-run welcome flow completion — null until the member finishes it.
+  // supabase/onboarding.sql
+  first_run_completed_at: string | null;
   created_at: string;
 }
 

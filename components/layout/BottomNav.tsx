@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Trophy, Users, Archive, Clock, MessageCircle, Moon, Sun } from "lucide-react";
+import { Home, Trophy, Users, Archive, Clock, MessageCircle, Moon, Sun } from "lucide-react";
 import type { User } from "@/types";
 import ProfileModal from "./ProfileModal";
 import { useWinsUnread } from "@/lib/wins/useWinsUnread";
@@ -12,6 +12,7 @@ import { useDmUnread } from "@/lib/dm/useDmUnread";
 import { tap } from "@/lib/feedback";
 
 const NAV = [
+  { label: "Home", href: "/home", Icon: Home },
   { label: "Wins", href: "/wins", Icon: Trophy },
   { label: "Network", href: "/network", Icon: Users },
   { label: "Archive", href: "/archive", Icon: Archive },

@@ -102,7 +102,7 @@ export default function PlanSelect() {
 
     await addMember("founding", user.id).catch(() => {});
     clearFunnel(); // entering the app for real — the anonymous quiz state is done
-    router.push("/wins");
+    router.push("/onboarding/welcome");
   }
 
   if (!ready) {

@@ -40,5 +40,14 @@ export default async function PlatformLayout({
     redirect("/onboarding/plan");
   }
 
+  // ── FIRST-RUN GATE ───────────────────────────────────────────────────
+  // A member who has never been through the welcome flow (set your 3 things +
+  // introduce yourself in your room) is routed there once. The flow stamps
+  // first_run_completed_at on finish, so it never replays. /onboarding/welcome
+  // lives outside this route group, so this redirect can't loop.
+  if (!profile.first_run_completed_at) {
+    redirect("/onboarding/welcome");
+  }
+
   return <PlatformShell user={profile as User}>{children}</PlatformShell>;
 }
