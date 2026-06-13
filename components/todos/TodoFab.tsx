@@ -42,6 +42,17 @@ export default function TodoFab({ user }: { user: User }) {
     refresh();
   }, [refresh]);
 
+  // Other surfaces (e.g. the Today home) ask this FAB to open the panel via a
+  // window event, so the todo board + completion logic stay owned in one place.
+  useEffect(() => {
+    function openPanel() {
+      refresh();
+      setOpen(true);
+    }
+    window.addEventListener("stations:open-todos", openPanel);
+    return () => window.removeEventListener("stations:open-todos", openPanel);
+  }, [refresh]);
+
   const status = board ? planStatus(board.today) : null;
 
   async function handleToggle(todo: Todo) {
