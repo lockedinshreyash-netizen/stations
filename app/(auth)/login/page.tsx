@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import GoogleButton from "@/components/onboarding/GoogleButton";
 
 function LoginForm() {
   const router = useRouter();
@@ -29,7 +30,8 @@ function LoginForm() {
         .select("id")
         .eq("id", session.user.id)
         .maybeSingle();
-      if (profile) router.replace("/wins");
+      // Onboarded → into the app. Session but no profile → finish the funnel.
+      router.replace(profile ? "/wins" : "/onboarding/complete");
     });
   }, [router]);
 
@@ -117,6 +119,23 @@ function LoginForm() {
         >
           Lock in.
         </p>
+
+        {/* Google */}
+        <div style={{ marginBottom: "20px" }}>
+          <GoogleButton next="/wins" label="Sign in with Google" />
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3" style={{ marginBottom: "20px" }}>
+          <div style={{ height: "0.5px", flex: 1, background: "rgba(var(--fg-rgb),0.12)" }} />
+          <span
+            className="font-poppins font-light uppercase text-[rgba(var(--fg-rgb),0.3)]"
+            style={{ fontSize: "12px", letterSpacing: "0.18em" }}
+          >
+            or
+          </span>
+          <div style={{ height: "0.5px", flex: 1, background: "rgba(var(--fg-rgb),0.12)" }} />
+        </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col" style={{ gap: "16px" }}>
@@ -222,7 +241,7 @@ function LoginForm() {
         >
           Don&apos;t have an account?{" "}
           <a
-            href="/onboarding/step-1"
+            href="/join"
             className="text-[rgba(var(--fg-rgb),0.5)] hover:text-[rgb(var(--fg-rgb))] transition-colors underline underline-offset-4"
           >
             Apply for access

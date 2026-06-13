@@ -25,8 +25,8 @@ export default async function PlatformLayout({
     .single();
 
   if (!profile) {
-    // Auth exists but no profile yet — still in onboarding
-    redirect("/onboarding/step-2");
+    // Auth exists but no profile yet — finish the value-first funnel.
+    redirect("/onboarding/complete");
   }
 
   // ── FOUNDING 100 GATE (authoritative server-side check) ──────────────
@@ -34,10 +34,10 @@ export default async function PlatformLayout({
   // is not enough: the account must be a founding member (set exclusively by
   // the atomic claim_founder_code RPC) or an admin. Anyone else — a free/paid
   // account that never claimed a code, or a profile whose claim lost a race —
-  // is held at the founder-code step. This is read server-side from the DB on
-  // every platform request, so it cannot be bypassed by client tampering.
+  // is held at the plan screen (where they can enter a code or wait for paid
+  // to open). Read server-side on every request, so it can't be bypassed.
   if (profile.membership_tier !== "founding" && !profile.is_admin) {
-    redirect("/onboarding/founder");
+    redirect("/onboarding/plan");
   }
 
   return <PlatformShell user={profile as User}>{children}</PlatformShell>;
