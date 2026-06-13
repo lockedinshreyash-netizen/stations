@@ -43,21 +43,29 @@ export default function PlatformShell({
           height="170%"
           colorInterpolationFilters="sRGB"
         >
+          {/* Uneven glass surface */}
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="0.009 0.013"
+            baseFrequency="0.011 0.015"
             numOctaves="2"
             seed="17"
             result="noise"
           />
-          <feGaussianBlur in="noise" stdDeviation="1.3" result="surface" />
+          <feGaussianBlur in="noise" stdDeviation="1.1" result="surface" />
+          {/* Refract the backdrop through that surface — the actual lensing */}
           <feDisplacementMap
             in="SourceGraphic"
             in2="surface"
-            scale="26"
+            scale="48"
             xChannelSelector="R"
             yChannelSelector="G"
+            result="refracted"
           />
+          {/* Frost + richen the refracted light (baked in so the CSS rule can
+              use url() alone — chaining url() with blur()/saturate() makes
+              Chromium discard the whole backdrop-filter). */}
+          <feGaussianBlur in="refracted" stdDeviation="1.6" result="frosted" />
+          <feColorMatrix in="frosted" type="saturate" values="1.8" />
         </filter>
       </svg>
 
