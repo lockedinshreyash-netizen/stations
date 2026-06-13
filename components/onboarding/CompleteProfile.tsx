@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { categorizeUser } from "@/lib/utils/categorize";
-import { loadFunnel, clearFunnel, type FunnelState } from "@/lib/onboarding/funnel";
+import {
+  loadFunnel,
+  saveFunnel,
+  type FunnelState,
+  type RoleValue,
+  type GoalValue,
+} from "@/lib/onboarding/funnel";
 
 const USERNAME_RE = /^[a-z0-9_]+$/;
 const KNOWN_CATEGORY_ROOMS = ["scholar", "builder", "creator", "athlete"];
@@ -27,6 +33,7 @@ function suggestUsername(seed: string): string {
 export default function CompleteProfile() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [funnel, setFunnel] = useState<FunnelState | null>(null);
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
@@ -44,25 +51,47 @@ export default function CompleteProfile() {
         router.replace("/join");
         return;
       }
-      // Already onboarded? Skip straight to the gate's next stop.
       const { data: existing } = await supabase
         .from("users")
-        .select("id")
+        .select("full_name, username, avatar_url, role, goals")
         .eq("id", user.id)
         .maybeSingle();
+
+      const meta = user.user_metadata ?? {};
+      const metaName = (meta.full_name as string) || (meta.name as string) || "";
+      const metaAvatar =
+        (meta.avatar_url as string) || (meta.picture as string) || null;
+      const f = loadFunnel();
+
       if (existing) {
-        router.replace("/onboarding/plan");
+        // Profile already exists (e.g. they walked back here from the plan
+        // step). Edit mode: prefill from the saved profile and allow updates —
+        // never auto-forward, or the back button would just bounce ahead.
+        setIsEdit(true);
+        setFullName(existing.full_name || metaName);
+        setUsername(existing.username || suggestUsername(metaName));
+        setAvatarUrl(existing.avatar_url || metaAvatar);
+        // Prefer freshly re-picked funnel answers if present; otherwise seed
+        // from the profile (and persist, so a back-step to /join restores the
+        // current picks rather than a blank quiz).
+        const nextFunnel: FunnelState =
+          f.roles.length > 0 && f.goals.length > 0
+            ? f
+            : {
+                roles: (existing.role ?? []) as RoleValue[],
+                goals: (existing.goals ?? []) as GoalValue[],
+                availability: null,
+              };
+        saveFunnel(nextFunnel);
+        setFunnel(nextFunnel);
+        setReady(true);
         return;
       }
 
-      const meta = user.user_metadata ?? {};
-      const name = (meta.full_name as string) || (meta.name as string) || "";
-      setFullName(name);
-      setAvatarUrl((meta.avatar_url as string) || (meta.picture as string) || null);
-      setUsername(suggestUsername(name || user.email?.split("@")[0] || ""));
-
-      const f = loadFunnel();
-      // No funnel answers means they reached here without the quiz — send back.
+      // New account: prefill from the OAuth identity and require the quiz.
+      setFullName(metaName);
+      setAvatarUrl(metaAvatar);
+      setUsername(suggestUsername(metaName || user.email?.split("@")[0] || ""));
       if (f.roles.length === 0 || f.goals.length === 0) {
         router.replace("/join");
         return;
@@ -97,6 +126,7 @@ export default function CompleteProfile() {
       .from("users")
       .select("id")
       .eq("username", handle)
+      .neq("id", user.id) // a username I already own isn't "taken"
       .maybeSingle();
     if (taken) {
       setError("That username is taken.");
@@ -110,8 +140,9 @@ export default function CompleteProfile() {
       ? ["collective", categoryRoom]
       : ["collective"];
 
-    const { error: insertError } = await supabase.from("users").insert({
-      id: user.id,
+    // Fields shared by create and edit. Tier/stats are never set here — tier
+    // defaults to 'free' and founding is granted only by the claim RPC.
+    const profileFields = {
       username: handle,
       full_name: name,
       avatar_url: avatarUrl,
@@ -119,22 +150,26 @@ export default function CompleteProfile() {
       goals: funnel.goals,
       category,
       room_memberships,
-      status: "active",
-      // membership_tier / founder_number intentionally omitted — client cannot
-      // set them; tier defaults to 'free', founding only via claim RPC.
-      is_admin: false,
-      total_focus_minutes: 0,
-      total_sessions: 0,
-      streak_days: 0,
-    });
+    };
 
-    if (insertError) {
-      setError("Couldn’t create your profile: " + insertError.message);
+    const { error: saveError } = isEdit
+      ? await supabase.from("users").update(profileFields).eq("id", user.id)
+      : await supabase.from("users").insert({
+          id: user.id,
+          ...profileFields,
+          status: "active",
+          is_admin: false,
+          total_focus_minutes: 0,
+          total_sessions: 0,
+          streak_days: 0,
+        });
+
+    if (saveError) {
+      setError("Couldn’t save your profile: " + saveError.message);
       setLoading(false);
       return;
     }
 
-    clearFunnel();
     router.push("/onboarding/plan");
   }
 
@@ -148,10 +183,17 @@ export default function CompleteProfile() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-primary)]">
-      <header className="px-6 md:px-8 pt-8">
+      <header className="px-6 md:px-8 pt-8 flex items-center justify-between">
         <span className="font-poppins font-black text-xl tracking-widest uppercase text-[rgb(var(--fg-rgb))]">
           STATIONS
         </span>
+        <button
+          type="button"
+          onClick={() => router.push("/join")}
+          className="text-[rgba(var(--fg-rgb),0.3)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors"
+        >
+          ← Back
+        </button>
       </header>
 
       <main className="flex-1 flex flex-col justify-center px-6 md:px-8 py-12 max-w-lg mx-auto w-full">

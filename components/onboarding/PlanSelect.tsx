@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { addMember } from "@/lib/firebase/rooms";
+import { clearFunnel } from "@/lib/onboarding/funnel";
 
 type CodeState = "idle" | "checking" | "valid" | "invalid";
 
@@ -100,6 +101,7 @@ export default function PlanSelect() {
     }
 
     await addMember("founding", user.id).catch(() => {});
+    clearFunnel(); // entering the app for real — the anonymous quiz state is done
     router.push("/wins");
   }
 
@@ -113,10 +115,17 @@ export default function PlanSelect() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-primary)]">
-      <header className="px-6 md:px-8 pt-8">
+      <header className="px-6 md:px-8 pt-8 flex items-center justify-between">
         <span className="font-poppins font-black text-xl tracking-widest uppercase text-[rgb(var(--fg-rgb))]">
           STATIONS
         </span>
+        <button
+          type="button"
+          onClick={() => router.push("/onboarding/complete")}
+          className="text-[rgba(var(--fg-rgb),0.3)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.6)] transition-colors"
+        >
+          ← Back
+        </button>
       </header>
 
       <main className="flex-1 flex flex-col justify-center px-6 md:px-8 py-12 max-w-xl mx-auto w-full">
