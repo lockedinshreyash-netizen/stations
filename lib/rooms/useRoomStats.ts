@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import {
   subscribeMessages,
-  subscribeMemberCount,
   subscribeOnlineCount,
   isRecent,
   type RoomName,
 } from "@/lib/firebase/rooms";
+import { getRoomMemberCount } from "@/lib/rooms/membership";
 
 const SEEN_PREFIX = "room_lastseen_";
 
@@ -45,7 +45,14 @@ export function useRoomStats(roomName: RoomName, trackUnread = true): RoomStats 
   const [unread, setUnread] = useState(0);
 
   useEffect(() => {
-    const unsubMembers = subscribeMemberCount(roomName, setMemberCount);
+    // Member count comes from Supabase room_memberships (the source of truth),
+    // not the partial Firebase /members mirror. Online + unread stay live from
+    // Firebase. `cancelled` guards against a late resolve after roomName change.
+    let cancelled = false;
+    getRoomMemberCount(roomName).then((c) => {
+      if (!cancelled) setMemberCount(c);
+    });
+
     const unsubOnline = subscribeOnlineCount(roomName, setOnlineCount);
 
     let unsubMsg = () => {};
@@ -62,7 +69,7 @@ export function useRoomStats(roomName: RoomName, trackUnread = true): RoomStats 
     }
 
     return () => {
-      unsubMembers();
+      cancelled = true;
       unsubOnline();
       unsubMsg();
     };

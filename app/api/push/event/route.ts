@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { notifySessionReminder } from "@/lib/push/events";
+import { notifySessionReminder, notifyDailyNudge } from "@/lib/push/events";
 
 /**
  * Trusted entry point for the Supabase pg_cron job that sends timed session
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  let evt: { type?: string; session_id?: string };
+  let evt: { type?: string; session_id?: string; variant?: string };
   try {
     evt = await request.json();
   } catch {
@@ -25,6 +25,11 @@ export async function POST(request: Request) {
   try {
     if (evt.type === "session_reminder" && evt.session_id) {
       await notifySessionReminder(evt.session_id);
+    } else if (
+      evt.type === "daily_nudge" &&
+      (evt.variant === "plan" || evt.variant === "streak")
+    ) {
+      await notifyDailyNudge(evt.variant);
     } else {
       return NextResponse.json({ error: "unknown event" }, { status: 400 });
     }

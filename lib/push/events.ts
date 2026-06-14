@@ -329,6 +329,78 @@ export async function notifyDailyComplete(userId: string) {
   await sendPushToUsers(partners, payload);
 }
 
+/**
+ * Daily habit nudges — fired by pg_cron (off any user write). Two variants,
+ * both UTC-day based (per-user timezones are a V2 item):
+ *  - 'plan'   — morning: members who haven't set today's 3 things yet, so the
+ *               daily ritual starts. Drives Day-1+ return.
+ *  - 'streak' — evening: members on a live streak (completed yesterday) who
+ *               haven't completed today's plan, so loss-aversion pulls them
+ *               back before midnight.
+ * Only push-subscribed members are considered (no sub → nothing to send), and
+ * each message deep-links to /home. Degrades to a no-op if the todos /
+ * daily_plan_completions tables aren't there yet.
+ */
+export async function notifyDailyNudge(variant: "plan" | "streak") {
+  const supabase = createAdminClient();
+  const today = new Date().toISOString().slice(0, 10);
+
+  // The candidate set is exactly the members who can receive a push at all.
+  const { data: subRows } = await supabase
+    .from("push_subscriptions")
+    .select("user_id");
+  const subscribed = [...new Set((subRows ?? []).map((s) => s.user_id))];
+  if (subscribed.length === 0) return;
+
+  let recipients: string[];
+  let payload: PushPayload;
+
+  if (variant === "plan") {
+    // Subscribed members with NO todo committed to today's plan.
+    const { data: plannedRows } = await supabase
+      .from("todos")
+      .select("user_id")
+      .eq("planned_for", today)
+      .in("user_id", subscribed);
+    const planned = new Set((plannedRows ?? []).map((t) => t.user_id));
+    recipients = subscribed.filter((id) => !planned.has(id));
+    payload = {
+      title: "What are your 3 things today?",
+      body: "Set your plan and start the day on the record.",
+      url: "/home",
+      tag: `daily-plan-${today}`,
+    };
+  } else {
+    // On a streak (completed yesterday) but not yet today → at risk.
+    const yesterday = new Date(Date.now() - 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    const { data: yRows } = await supabase
+      .from("daily_plan_completions")
+      .select("user_id")
+      .eq("plan_date", yesterday)
+      .in("user_id", subscribed);
+    const { data: tRows } = await supabase
+      .from("daily_plan_completions")
+      .select("user_id")
+      .eq("plan_date", today)
+      .in("user_id", subscribed);
+    const completedToday = new Set((tRows ?? []).map((r) => r.user_id));
+    recipients = [...new Set((yRows ?? []).map((r) => r.user_id))].filter(
+      (id) => !completedToday.has(id)
+    );
+    payload = {
+      title: "Your streak is on the line 🔥",
+      body: "Finish today's 3 things before midnight to keep it alive.",
+      url: "/home",
+      tag: `daily-streak-${today}`,
+    };
+  }
+
+  if (recipients.length === 0) return;
+  await sendPushToUsers(recipients, payload);
+}
+
 /** A diagnostic push the caller sends to their own devices. */
 export async function notifyTest(userId: string) {
   const payload: PushPayload = {
