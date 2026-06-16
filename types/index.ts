@@ -42,6 +42,22 @@ export type ChallengeMetric =
   | "sessions_completed"
   | "wins_posted"
   | "streak_days";
+export type JourneyCategory =
+  | "startup"
+  | "career"
+  | "fitness"
+  | "education"
+  | "creator"
+  | "project"
+  | "business"
+  | "other";
+export type JourneyStage =
+  | "researching"
+  | "learning"
+  | "building"
+  | "applying"
+  | "growing";
+export type JourneyStatus = "active" | "paused" | "archived";
 
 export interface User {
   id: string;
@@ -272,6 +288,7 @@ export interface Win {
   media_url: string | null;
   reactions_count: number;
   reaction_counts: ReactionCounts | null;
+  journey_id?: string | null;
   created_at: string;
 }
 
@@ -295,6 +312,35 @@ export interface Build {
   url: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// ============================================================
+// JOURNEYS (Archive 03) — supabase/journeys.sql
+// ============================================================
+export interface Journey {
+  id: string;
+  user_id: string;
+  emoji: string;
+  title: string;
+  category: JourneyCategory;
+  why: string | null;
+  stage: JourneyStage;
+  challenges: string | null;
+  is_open_to_connect: boolean;
+  status: JourneyStatus;
+  follower_count: number;
+  last_activity_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Journey row with its author embedded (PostgREST users(...) join). */
+export interface JourneyWithAuthor extends Journey {
+  users: {
+    username: string;
+    avatar_url: string | null;
+    founder_number: number | null;
+  } | null;
 }
 
 export interface Challenge {

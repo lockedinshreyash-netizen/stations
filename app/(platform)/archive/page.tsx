@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import StationHeader from "@/components/layout/StationHeader";
-import ArchiveCatalog from "@/components/stations/ArchiveCatalog";
+import ArchiveTabs from "@/components/stations/ArchiveTabs";
 import { createClient } from "@/lib/supabase/server";
 import type { ArchiveCourse, ArchiveCourseWithMeta, User } from "@/types";
 
@@ -98,9 +98,9 @@ export default async function ArchivePage() {
       <StationHeader
         number="03"
         name="ARCHIVE"
-        tagline="Courses from people who've done it. Watch, learn, build."
+        tagline="What people here are building, becoming, chasing — and the courses to get there."
       />
-      <ArchiveCatalog user={user} courses={catalog} />
+      <ArchiveTabs user={user} courses={catalog} />
     </div>
   );
 }

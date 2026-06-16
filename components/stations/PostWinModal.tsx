@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -67,6 +67,35 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
   const [serverError, setServerError] = useState("");
   const [images, setImages] = useState<(ImageSlot | null)[]>([null, null]);
   const fileRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+
+  // Optional: attach this win to one of the member's journeys. Loaded lazily;
+  // if the journeys table isn't applied yet the query errors and the picker
+  // simply never appears — posting a win is completely unaffected.
+  const [journeys, setJourneys] = useState<{ id: string; emoji: string; title: string }[]>([]);
+  const [journeyId, setJourneyId] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data, error } = await supabase
+          .from("journeys")
+          .select("id, emoji, title")
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .order("last_activity_at", { ascending: false });
+        if (!cancelled && !error && data) {
+          setJourneys(data as { id: string; emoji: string; title: string }[]);
+        }
+      } catch {
+        /* journeys table not present yet — ignore */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const {
     register,
@@ -168,9 +197,22 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
       image_urls: image_urls.length > 0 ? image_urls : null,
       reactions_count: 0,
       reaction_counts: { respect: 0, fire: 0, build: 0, focused: 0, strong: 0 },
+      ...(journeyId ? { journey_id: journeyId } : {}),
     });
 
     if (error) { errorSound(); setServerError(error.message); setLoading(false); return; }
+
+    // Keep the linked journey fresh in the feed. Best-effort — never block the win.
+    if (journeyId) {
+      try {
+        await supabase
+          .from("journeys")
+          .update({ last_activity_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+          .eq("id", journeyId)
+          .eq("user_id", user.id);
+      } catch { /* non-fatal */ }
+    }
+
     fireCelebration(); // silver/gold party-popper + cheerful sound + haptics
     onPosted();
   }
@@ -348,6 +390,28 @@ export default function PostWinModal({ onClose, onPosted }: PostWinModalProps) {
               className="st-field font-poppins text-[rgb(var(--fg-rgb))] outline-none" style={fieldStyle} />
             {errors.media_url && <span className="text-[var(--accent)]" style={{ fontSize: "14px" }}>{errors.media_url.message}</span>}
           </div>
+
+          {/* Attach to a journey (optional) — only shown if the member has one */}
+          {journeys.length > 0 && (
+            <div className="flex flex-col" style={{ gap: "8px" }}>
+              <label className="font-poppins" style={labelStyle}>
+                Part of a journey? <span style={{ opacity: 0.5 }}>(optional)</span>
+              </label>
+              <select
+                value={journeyId}
+                onChange={(e) => setJourneyId(e.target.value)}
+                className="st-field font-poppins outline-none"
+                style={fieldStyle}
+              >
+                <option value="">— None —</option>
+                {journeys.map((j) => (
+                  <option key={j.id} value={j.id}>
+                    {j.emoji} {j.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {serverError && <p className="text-[var(--accent)]" style={{ fontSize: "15px" }}>{serverError}</p>}
 
