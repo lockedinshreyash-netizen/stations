@@ -13,6 +13,7 @@ import {
   GOAL_MAX,
   loadFunnel,
   saveFunnel,
+  saveFounderCode,
   type FunnelState,
   type RoleValue,
   type GoalValue,
@@ -32,7 +33,7 @@ const CATEGORY_ROOMS: Record<string, string[]> = {
   Grinder: ["Collective"],
 };
 
-export default function JoinFlow() {
+export default function JoinFlow({ initialCode }: { initialCode?: string }) {
   const [step, setStep] = useState<Step>("intro");
   const [state, setState] = useState<FunnelState>({
     roles: [],
@@ -53,6 +54,13 @@ export default function JoinFlow() {
       cancelled = true;
     };
   }, []);
+
+  // A founder code carried in from the waitlist (?code=…) is stashed now so it
+  // survives the quiz, the OAuth round-trip, and signup — then auto-applies at
+  // the plan step. We don't touch the URL or the visible flow here.
+  useEffect(() => {
+    if (initialCode) saveFounderCode(initialCode);
+  }, [initialCode]);
 
   function patch(next: Partial<FunnelState>) {
     setState((prev) => {

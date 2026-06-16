@@ -15,7 +15,7 @@ export default async function ArchiveAdminPage() {
     .select("*")
     .eq("id", authUser.id)
     .single();
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
   if (!(profile as User).is_admin) redirect("/archive");
 
   const { data: rows } = await supabase

@@ -4,9 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { addMember } from "@/lib/firebase/rooms";
-import { clearFunnel } from "@/lib/onboarding/funnel";
+import {
+  clearFunnel,
+  loadFounderCode,
+  clearFounderCode,
+} from "@/lib/onboarding/funnel";
 
 type CodeState = "idle" | "checking" | "valid" | "invalid";
+
+// Where to send a member who reached the plan step without a code.
+const WAITLIST_URL =
+  process.env.NEXT_PUBLIC_WAITLIST_URL ?? "https://stationswaitlist.vercel.app";
 
 /**
  * Plan selection — the final step. During the Founding 100 window the ONLY path
@@ -52,15 +60,26 @@ export default function PlanSelect() {
         return;
       }
       setReady(true);
+
+      // Auto-apply a code carried from the waitlist (stashed in /join) or passed
+      // straight to this step as ?code=…, so a founder lands on a pre-filled,
+      // already-validated "Enter as a Founder" — one tap, no retyping.
+      const fromUrl = new URLSearchParams(window.location.search).get("code");
+      const carried = (fromUrl || loadFounderCode())?.trim().toUpperCase();
+      if (carried) {
+        setCode(carried);
+        validateCode(carried);
+      }
     })();
   }, [router]);
 
-  async function validateCode() {
-    if (!normalized) return;
+  async function validateCode(raw?: string) {
+    const target = (raw ?? code).trim().toUpperCase();
+    if (!target) return;
     setCodeState("checking");
     const supabase = createClient();
     const { data, error } = await supabase.rpc("founder_code_available", {
-      code: normalized,
+      code: target,
     });
     setCodeState(error ? "invalid" : data === true ? "valid" : "invalid");
   }
@@ -102,6 +121,7 @@ export default function PlanSelect() {
 
     await addMember("founding", user.id).catch(() => {});
     clearFunnel(); // entering the app for real — the anonymous quiz state is done
+    clearFounderCode(); // the carried waitlist code has served its purpose
     router.push("/onboarding/welcome");
   }
 
@@ -158,7 +178,7 @@ export default function PlanSelect() {
               setCode(e.target.value);
               if (codeState !== "idle") setCodeState("idle");
             }}
-            onBlur={validateCode}
+            onBlur={() => validateCode()}
             autoComplete="off"
             spellCheck={false}
             placeholder="STN-7F3KQ2"
@@ -212,7 +232,7 @@ export default function PlanSelect() {
           opens.
         </p>
 
-        {/* ── FREE / HOLD ──────────────────────────────────────── */}
+        {/* ── NO CODE? ─────────────────────────────────────────── */}
         {held ? (
           <div
             className="font-poppins font-light text-[rgb(var(--fg-rgb))] text-center"
@@ -228,13 +248,21 @@ export default function PlanSelect() {
             line.
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => setHeld(true)}
-            className="text-center text-[rgba(var(--fg-rgb),0.4)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.7)] transition-colors"
-          >
-            I’ll wait for doors to open →
-          </button>
+          <div className="flex flex-col items-center gap-3">
+            <a
+              href={WAITLIST_URL}
+              className="text-center text-[rgb(var(--fg-rgb))] text-base font-light underline underline-offset-4 hover:text-[rgba(var(--fg-rgb),0.7)] transition-colors"
+            >
+              Don’t have a code? Get one →
+            </a>
+            <button
+              type="button"
+              onClick={() => setHeld(true)}
+              className="text-center text-[rgba(var(--fg-rgb),0.4)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.7)] transition-colors"
+            >
+              I’ll wait for doors to open →
+            </button>
+          </div>
         )}
       </main>
     </div>

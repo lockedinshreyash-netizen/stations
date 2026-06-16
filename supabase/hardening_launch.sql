@@ -55,7 +55,7 @@ grant execute on function public.founder_code_available(text) to anon, authentic
 --     skipping onboarding entirely.
 --
 -- PostgreSQL only checks column privileges for columns NAMED in a statement, so
--- onboarding's INSERT (which now OMITS membership_tier — see OnboardingStep4)
+-- onboarding's INSERT (which now OMITS membership_tier — see CompleteProfile)
 -- still succeeds and the column falls back to its default ('free'). All other
 -- self-updates (bio, streak_days, total_focus_minutes, …) keep working. The
 -- billing webhook writes membership_tier via the service-role client, which

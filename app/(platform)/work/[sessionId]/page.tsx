@@ -27,7 +27,7 @@ export default async function SessionPage({
     .select("*")
     .eq("id", authUser.id)
     .single();
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
 
   const { data: row } = await supabase
     .from("work_sessions")

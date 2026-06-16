@@ -24,7 +24,7 @@ export default async function RoomPage({
     .select("*")
     .eq("id", authUser.id)
     .single();
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
 
   // The Founding Cohort room is private — block direct-URL access for anyone
   // who isn't a member (the room is added on founder-code redemption).

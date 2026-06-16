@@ -26,7 +26,7 @@ export default async function ConversationPage({
     .select("*")
     .eq("id", authUser.id)
     .single();
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
 
   // RLS returns the conversation only if the caller is a participant; anyone
   // else gets null here and is sent to a 404 — they can't reach the thread.

@@ -46,6 +46,11 @@ export interface FunnelState {
 
 const KEY = "stations_join";
 
+// A founder code carried in from the waitlist deep link (APP_URL/join?code=…).
+// Kept separate from the typed funnel state so it survives the quiz, the OAuth
+// round-trip, and signup, then auto-applies at the plan step.
+const FOUNDER_CODE_KEY = "stations_founder_code";
+
 const EMPTY: FunnelState = { roles: [], goals: [], availability: null };
 
 export function loadFunnel(): FunnelState {
@@ -81,4 +86,32 @@ export function clearFunnel() {
 /** True once the anonymous quiz has enough to personalize + create a profile. */
 export function isFunnelComplete(s: FunnelState): boolean {
   return s.roles.length > 0 && s.goals.length > 0 && s.availability !== null;
+}
+
+/** Stash a waitlist founder code so it auto-applies at the plan step. */
+export function saveFounderCode(code: string) {
+  if (typeof window === "undefined") return;
+  const normalized = code.trim().toUpperCase();
+  if (!normalized) return;
+  try {
+    window.localStorage.setItem(FOUNDER_CODE_KEY, normalized);
+  } catch {}
+}
+
+/** Read a carried founder code (normalized), or null if none is stashed. */
+export function loadFounderCode(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const v = window.localStorage.getItem(FOUNDER_CODE_KEY);
+    return v ? v.trim().toUpperCase() : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearFounderCode() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(FOUNDER_CODE_KEY);
+  } catch {}
 }

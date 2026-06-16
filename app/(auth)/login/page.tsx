@@ -17,7 +17,7 @@ function LoginForm() {
   const [error, setError] = useState("");
 
   // Redirect if already logged in — but only for a fully onboarded account.
-  // Onboarding step-1 creates a session before the profile exists; redirecting
+  // The join funnel creates a session before the profile exists; redirecting
   // such a session to /wins bounces straight back to onboarding, making the
   // login screen unreachable. Those users stay here and sign in normally
   // (after which the platform layout resumes their onboarding).

@@ -21,7 +21,7 @@ export default async function CoursePage({
     .select("*")
     .eq("id", authUser.id)
     .single();
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
   const user = profile as User;
 
   // RLS: non-admins can only read published courses, so a draft resolves to

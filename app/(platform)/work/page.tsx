@@ -21,7 +21,7 @@ export default async function WorkPage() {
     .eq("id", authUser.id)
     .single();
 
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
 
   const [{ data: rows }, { data: memberships }] = await Promise.all([
     supabase

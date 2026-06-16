@@ -18,7 +18,7 @@ export default async function NetworkPage() {
     .eq("id", authUser.id)
     .single();
 
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
 
   return (
     <div>

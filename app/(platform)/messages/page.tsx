@@ -17,7 +17,7 @@ export default async function MessagesPage() {
     .select("*")
     .eq("id", authUser.id)
     .single();
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
 
   const selfId = authUser.id;
 

@@ -16,7 +16,7 @@ export default async function ArchivePage() {
     .select("*")
     .eq("id", authUser.id)
     .single();
-  if (!profile) redirect("/onboarding/step-2");
+  if (!profile) redirect("/onboarding/complete");
 
   const user = profile as User;
   const isMember =
