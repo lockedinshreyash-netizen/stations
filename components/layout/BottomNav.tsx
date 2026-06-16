@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Home, Trophy, Users, Archive, Clock, MessageCircle, Moon, Sun } from "lucide-react";
+import { Home, Trophy, Users, Archive, Clock, MessageCircle, Swords, Moon, Sun } from "lucide-react";
 import type { User } from "@/types";
 import ProfileModal from "./ProfileModal";
 import { useWinsUnread } from "@/lib/wins/useWinsUnread";
@@ -17,6 +17,7 @@ const NAV = [
   { label: "Network", href: "/network", Icon: Users },
   { label: "Archive", href: "/archive", Icon: Archive },
   { label: "Work", href: "/work", Icon: Clock },
+  { label: "Compete", href: "/compete", Icon: Swords },
   { label: "Messages", href: "/messages", Icon: MessageCircle },
 ] as const;
 
@@ -51,6 +52,14 @@ export default function BottomNav({ user }: { user: User }) {
   useEffect(() => {
     const t = document.documentElement.getAttribute("data-theme");
     if (t === "light" || t === "dark") setTheme(t);
+  }, []);
+
+  // Let other surfaces (e.g. the activation checklist's "complete your profile"
+  // item) open the profile/settings modal without owning it.
+  useEffect(() => {
+    const open = () => setProfileOpen(true);
+    window.addEventListener("stations:open-profile", open);
+    return () => window.removeEventListener("stations:open-profile", open);
   }, []);
 
   // Sliding active indicator — measures the active tab and glides a glowing

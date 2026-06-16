@@ -145,6 +145,10 @@ export default async function PlatformHome() {
   const wins = (winRows as { id: string; title: string; reactions_count: number }[]) ?? [];
   const lastWin = wins[0] ?? null;
 
+  // ── Activation checklist (separate from the daily task todos) ───────
+  const { data: activationData } = await supabase.rpc("get_activation_checklist");
+  const activation = (activationData as Record<string, boolean>) ?? {};
+
   return (
     <TodayHome
       user={user}
@@ -154,6 +158,8 @@ export default async function PlatformHome() {
       liveSessions={liveSessions}
       lastWin={lastWin}
       hasPostedWin={wins.length > 0}
+      activation={activation}
+      activationDismissed={user.activation_dismissed ?? false}
     />
   );
 }

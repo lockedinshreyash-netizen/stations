@@ -10,6 +10,8 @@ import { tap } from "@/lib/feedback";
 import StatCard from "@/components/ui/StatCard";
 import FounderMark from "@/components/ui/FounderMark";
 import PostWinModal from "@/components/stations/PostWinModal";
+import NotificationNudge from "@/components/notifications/NotificationNudge";
+import ActivationChecklist from "@/components/home/ActivationChecklist";
 import type { DmParticipant, PartnerTodo, Todo, User } from "@/types";
 
 export interface LiveSession {
@@ -28,6 +30,8 @@ interface TodayHomeProps {
   liveSessions: LiveSession[];
   lastWin: { id: string; title: string; reactions_count: number } | null;
   hasPostedWin: boolean;
+  activation: Record<string, boolean>;
+  activationDismissed: boolean;
 }
 
 const LABEL =
@@ -48,6 +52,8 @@ export default function TodayHome({
   liveSessions,
   lastWin,
   hasPostedWin,
+  activation,
+  activationDismissed,
 }: TodayHomeProps) {
   const [todos, setTodos] = useState<Todo[]>(todayTodos);
   const [postOpen, setPostOpen] = useState(false);
@@ -124,6 +130,21 @@ export default function TodayHome({
         className="px-5 md:px-10 py-12 max-w-3xl flex flex-col"
         style={{ gap: "56px" }}
       >
+        {/* ── Turn on notifications (capped, dismissible) ─────────── */}
+        <NotificationNudge />
+
+        {/* ── Activation checklist (separate from task todos) ───────
+            Guarded on a populated result so it stays hidden until the
+            get_activation_checklist RPC is applied (empty object = not ready). */}
+        {Object.keys(activation).length > 0 && (
+          <ActivationChecklist
+            initial={activation}
+            dismissed={activationDismissed}
+            userId={user.id}
+            onPostWin={() => setPostOpen(true)}
+          />
+        )}
+
         {/* ── Today's 3 things ───────────────────────────────────── */}
         <div>
           <p className={LABEL} style={LABEL_STYLE}>

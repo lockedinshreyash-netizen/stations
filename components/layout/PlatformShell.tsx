@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import BottomNav from "@/components/layout/BottomNav";
 import TodoFab from "@/components/todos/TodoFab";
+import AnnouncementBell from "@/components/announcements/AnnouncementBell";
 import type { User } from "@/types";
 
 export default function PlatformShell({
@@ -72,6 +73,10 @@ export default function PlatformShell({
           <feColorMatrix in="frosted" type="saturate" values="1.7" />
         </filter>
       </svg>
+
+      {/* Global announcement bell — top-right, hidden on immersive views (which
+          own their full-height layout + back button), matching the bottom dock. */}
+      {!immersive && <AnnouncementBell user={user} />}
 
       {/* Bottom padding clears the floating nav on normal scrollable pages. */}
       <main className={immersive ? "" : "pb-28"}>{children}</main>

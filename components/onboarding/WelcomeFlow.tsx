@@ -16,10 +16,16 @@ import {
   type RoomName,
 } from "@/lib/firebase/rooms";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
+import {
+  pushSupported,
+  permissionState,
+  enablePush,
+  PushError,
+} from "@/lib/push/client";
 import type { UserCategory } from "@/types";
 
-type Step = "identity" | "plan" | "intro";
-const ORDER: Step[] = ["identity", "plan", "intro"];
+type Step = "identity" | "plan" | "intro" | "notify";
+const ORDER: Step[] = ["identity", "plan", "intro", "notify"];
 
 /** The minimal profile the welcome flow needs to personalize + post. */
 interface WelcomeProfile {
@@ -53,6 +59,9 @@ export default function WelcomeFlow() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  // Step 4 — turn on notifications.
+  const [notifBusy, setNotifBusy] = useState(false);
+  const [notifError, setNotifError] = useState("");
 
   useEffect(() => {
     const supabase = createClient();
@@ -145,7 +154,7 @@ export default function WelcomeFlow() {
     router.replace("/home");
   }
 
-  async function postHelloAndFinish() {
+  async function postHelloThenNotify() {
     if (!profile) return;
     const content = hello.trim().slice(0, MAX_MESSAGE_LENGTH);
     if (!content) {
@@ -154,7 +163,7 @@ export default function WelcomeFlow() {
     }
     setSaving(true);
     setError("");
-    // Best-effort: if chat isn't configured, we still complete the flow.
+    // Best-effort: if chat isn't configured, we still advance the flow.
     if (isFirebaseConfigured) {
       try {
         await sendMessage(room, {
@@ -165,9 +174,48 @@ export default function WelcomeFlow() {
           founder_number: profile.founder_number,
           content,
         });
+        // Credit the "introduce yourself" activation item (Firebase has no
+        // server signal we can read, so we stamp it right after a successful post).
+        const supabase = createClient();
+        await supabase
+          .rpc("complete_activation_task", { p_item_key: "room_intro" })
+          .then(() => {}, () => {});
       } catch {
         /* don't trap the user on a chat hiccup */
       }
+    }
+    setSaving(false);
+    proceedToNotify();
+  }
+
+  /** Only show the notifications step when we can actually ask (fresh permission
+   * + supported); otherwise complete onboarding straight away. */
+  function proceedToNotify() {
+    if (!pushSupported() || permissionState() !== "default") {
+      void finish();
+      return;
+    }
+    go("notify");
+  }
+
+  async function enableNotifsThenFinish() {
+    setNotifBusy(true);
+    setNotifError("");
+    try {
+      await enablePush();
+    } catch (e) {
+      // Never trap the user on the notification step.
+      if (permissionState() === "denied") {
+        await finish();
+        return;
+      }
+      setNotifError(
+        e instanceof PushError
+          ? e.message
+          : "Couldn't enable notifications. You can turn them on later in settings."
+      );
+      setNotifBusy(false);
+      return;
     }
     await finish();
   }
@@ -340,12 +388,58 @@ export default function WelcomeFlow() {
               type="button"
               onClick={() => {
                 tap();
-                postHelloAndFinish();
+                postHelloThenNotify();
               }}
               disabled={saving}
               className="st-btn mt-8 bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white disabled:opacity-40"
             >
-              {saving ? "Entering…" : "Post & enter"}
+              {saving ? "Posting…" : "Post & continue"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                tap();
+                proceedToNotify();
+              }}
+              disabled={saving}
+              className="mt-5 text-center text-[rgba(var(--fg-rgb),0.4)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.7)] transition-colors disabled:opacity-40"
+            >
+              I&apos;ll say hello later →
+            </button>
+          </div>
+        )}
+
+        {/* ── NOTIFY (turn on notifications) ─────────────────────── */}
+        {step === "notify" && (
+          <div className="flex flex-col">
+            <span className="font-poppins uppercase tracking-[0.2em] text-sm text-[var(--accent)] mb-4">
+              One last thing
+            </span>
+            <h1 className="font-playfair italic text-4xl md:text-5xl text-[rgb(var(--fg-rgb))] mb-3 leading-tight">
+              Don&apos;t miss what matters.
+            </h1>
+            <p className="text-[rgba(var(--fg-rgb),0.5)] font-light text-lg mb-8">
+              Turn on notifications and we&apos;ll ping you when your partner
+              replies, a session goes live, or the room reacts to your win. No
+              spam — just the moments worth showing up for.
+            </p>
+
+            {notifError && (
+              <span className="text-[var(--accent)] text-base mb-4">
+                {notifError}
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                tap();
+                enableNotifsThenFinish();
+              }}
+              disabled={notifBusy}
+              className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white disabled:opacity-40"
+            >
+              {notifBusy ? "Turning on…" : "Turn on notifications"}
             </button>
             <button
               type="button"
@@ -353,10 +447,10 @@ export default function WelcomeFlow() {
                 tap();
                 finish();
               }}
-              disabled={saving}
+              disabled={notifBusy}
               className="mt-5 text-center text-[rgba(var(--fg-rgb),0.4)] text-base font-light hover:text-[rgba(var(--fg-rgb),0.7)] transition-colors disabled:opacity-40"
             >
-              I&apos;ll say hello later →
+              Maybe later →
             </button>
           </div>
         )}

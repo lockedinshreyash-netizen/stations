@@ -21,6 +21,7 @@ import { isFirebaseConfigured } from "@/lib/firebase/config";
 import { joinRoom } from "@/lib/rooms/membership";
 import { markRoomSeen } from "@/lib/rooms/useRoomStats";
 import { notifyMentions } from "@/lib/push/client";
+import { createClient } from "@/lib/supabase/client";
 import type { User } from "@/types";
 import FounderMark from "@/components/ui/FounderMark";
 
@@ -49,6 +50,9 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
   const seenIds = useRef<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Credit the "introduce yourself" activation item once per session after a
+  // successful post (idempotent server-side; the ref avoids an RPC per message).
+  const introStamped = useRef(false);
 
   const isMember = canPost(user.category, memberships, roomName);
 
@@ -116,6 +120,13 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
         content,
       });
       notifyMentions(roomName, content);
+      if (!introStamped.current) {
+        introStamped.current = true;
+        const supabase = createClient();
+        void supabase
+          .rpc("complete_activation_task", { p_item_key: "room_intro" })
+          .then(() => {}, () => {});
+      }
       setDraft("");
       setShowEmoji(false);
     } catch (e) {

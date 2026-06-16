@@ -70,6 +70,11 @@ export interface User {
   // First-run welcome flow completion — null until the member finishes it.
   // supabase/onboarding.sql
   first_run_completed_at: string | null;
+  // Unread watermark for global announcements — supabase/announcements.sql
+  announcements_seen_at: string | null;
+  // Set true once the member completes/dismisses the activation checklist —
+  // supabase/activation_checklist.sql
+  activation_dismissed: boolean;
   created_at: string;
 }
 
