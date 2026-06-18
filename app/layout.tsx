@@ -7,6 +7,7 @@ import Celebration from "@/components/layout/Celebration";
 import UserProfileModal from "@/components/layout/UserProfileModal";
 import RevealFX from "@/components/layout/RevealFX";
 import ServiceWorkerRegistrar from "@/components/layout/ServiceWorkerRegistrar";
+import InstallPrompt from "@/components/layout/InstallPrompt";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -94,6 +95,7 @@ export default function RootLayout({
         <div className="st-atmosphere" aria-hidden="true" />
         <div className="st-grain" aria-hidden="true" />
         <ServiceWorkerRegistrar />
+        <InstallPrompt />
         <SplashScreen />
         <HapticsProvider />
         <Celebration />
