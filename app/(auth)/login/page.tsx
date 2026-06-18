@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import GoogleButton from "@/components/onboarding/GoogleButton";
+import LegalFooter from "@/components/legal/LegalFooter";
 
 function LoginForm() {
   const router = useRouter();
@@ -247,6 +248,8 @@ function LoginForm() {
             Apply for access
           </a>
         </p>
+
+        <LegalFooter className="mt-12" />
       </div>
     </div>
   );

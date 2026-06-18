@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "space.lockinstations.app.twa",
+      "sha256_cert_fingerprints": [
+        "97:08:FD:06:27:FA:FC:EB:90:20:DC:86:98:D3:4A:96:2C:29:B1:60:29:64:F4:B8:F6:25:03:7C:13:9D:93:AA"
+      ]
+    }
+  }
+]

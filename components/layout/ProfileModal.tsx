@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NotificationsToggle from "@/components/layout/NotificationsToggle";
@@ -570,6 +571,46 @@ export default function ProfileModal({ user, onClose }: Props) {
 
           {/* Preferences — push notifications */}
           <NotificationsToggle />
+
+          {/* Legal */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <span className="font-poppins" style={labelStyle}>Legal</span>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Link
+                href="/privacy"
+                onClick={onClose}
+                className="font-poppins font-light"
+                style={{
+                  fontSize: "16px",
+                  color: "rgba(var(--fg-rgb),0.7)",
+                  padding: "10px 0",
+                  borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                Privacy Policy
+                <span style={{ color: "rgba(var(--fg-rgb),0.3)" }}>›</span>
+              </Link>
+              <Link
+                href="/terms"
+                onClick={onClose}
+                className="font-poppins font-light"
+                style={{
+                  fontSize: "16px",
+                  color: "rgba(var(--fg-rgb),0.7)",
+                  padding: "10px 0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                Terms of Service
+                <span style={{ color: "rgba(var(--fg-rgb),0.3)" }}>›</span>
+              </Link>
+            </div>
+          </div>
 
           {error && (
             <span className="font-poppins font-light" style={{ fontSize: "15px", color: "var(--accent)" }}>

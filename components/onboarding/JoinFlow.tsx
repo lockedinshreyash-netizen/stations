@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { categorizeUser } from "@/lib/utils/categorize";
 import GoogleButton from "@/components/onboarding/GoogleButton";
+import LegalFooter from "@/components/legal/LegalFooter";
 import {
   ROLES,
   GOALS,
@@ -167,6 +168,7 @@ export default function JoinFlow({ initialCode }: { initialCode?: string }) {
                 Sign in
               </a>
             </p>
+            <LegalFooter className="mt-10" />
           </div>
         )}
 
@@ -384,12 +386,17 @@ function AuthStep() {
   const [mode, setMode] = useState<"choice" | "email">("choice");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
   async function signUpEmail(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) {
+      setError("Please agree to the Terms of Service and Privacy Policy to continue.");
+      return;
+    }
     if (!email || password.length < 8) {
       setError("Enter an email and a password of at least 8 characters.");
       return;
@@ -439,7 +446,54 @@ function AuthStep() {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          <GoogleButton next="/onboarding/complete" />
+          {/* Required legal consent — unchecked by default; gates both Google
+              and email sign-up. Required for Play Store compliance. */}
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => {
+                setAgreed(e.target.checked);
+                if (e.target.checked && error) setError("");
+              }}
+              className="mt-1 h-5 w-5 shrink-0 cursor-pointer accent-[var(--accent)]"
+              aria-describedby="legal-consent-text"
+            />
+            <span
+              id="legal-consent-text"
+              className="text-[rgba(var(--fg-rgb),0.6)] font-light text-base leading-relaxed"
+            >
+              I agree to the{" "}
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[rgb(var(--fg-rgb))] underline underline-offset-4"
+              >
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[rgb(var(--fg-rgb))] underline underline-offset-4"
+              >
+                Privacy Policy
+              </a>
+              .
+            </span>
+          </label>
+
+          <GoogleButton
+            next="/onboarding/complete"
+            disabled={!agreed}
+            onBlockedClick={() =>
+              setError(
+                "Please agree to the Terms of Service and Privacy Policy to continue."
+              )
+            }
+          />
 
           {mode === "choice" ? (
             <button
@@ -469,7 +523,7 @@ function AuthStep() {
               />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !agreed}
                 className="st-btn bg-[rgb(var(--fg-rgb))] text-[var(--bg-primary)] font-poppins font-black tracking-widest uppercase text-base px-8 py-4 hover:bg-white disabled:opacity-40"
               >
                 {loading ? "Saving…" : "Save my space"}

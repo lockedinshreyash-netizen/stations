@@ -15,14 +15,24 @@ import { createClient } from "@/lib/supabase/client";
 export default function GoogleButton({
   next = "/onboarding/complete",
   label = "Continue with Google",
+  disabled = false,
+  onBlockedClick,
 }: {
   next?: string;
   label?: string;
+  /** When true, the button is inert (e.g. legal terms not yet accepted). */
+  disabled?: boolean;
+  /** Called instead of sign-in when a disabled button is clicked. */
+  onBlockedClick?: () => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   async function signIn() {
+    if (disabled) {
+      onBlockedClick?.();
+      return;
+    }
     setLoading(true);
     setError("");
     const supabase = createClient();
@@ -44,6 +54,10 @@ export default function GoogleButton({
         type="button"
         onClick={signIn}
         disabled={loading}
+        aria-disabled={disabled}
+        // Inline opacity so the dimmed state always wins over Tailwind's
+        // layered utilities (unlayered/inline beats @layer in Tailwind v4).
+        style={{ opacity: disabled ? 0.4 : 1 }}
         className="st-btn flex items-center justify-center gap-3 bg-[var(--bg-surface)] text-[rgb(var(--fg-rgb))] border border-[rgba(var(--fg-rgb),0.15)] font-poppins font-medium tracking-wide text-base px-8 py-4 hover:border-[rgba(var(--fg-rgb),0.4)] disabled:opacity-40"
       >
         <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">

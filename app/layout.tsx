@@ -20,21 +20,45 @@ const playfair = Playfair_Display({
   style: ["italic"],
 });
 
+// Canonical origin for absolute URLs (Open Graph, etc.). Set NEXT_PUBLIC_APP_URL
+// in the deployment env; omitting metadataBase only affects absolute URL
+// resolution, never rendering.
+const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
 export const metadata: Metadata = {
-  title: "Stations — For India's Most Ambitious",
+  ...(appUrl ? { metadataBase: new URL(appUrl) } : {}),
+  title: {
+    default: "Stations — For India's Most Ambitious",
+    template: "%s · Stations",
+  },
   description:
     "A premium digital institution for India's top 1% of ambitious young people.",
+  applicationName: "Stations",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Stations",
   },
-  icons: { apple: "/icon-192.png" },
+  formatDetection: { telephone: false },
+  icons: {
+    apple: "/icon-192.png",
+    icon: "/icon-192.png",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Stations",
+    title: "Stations — For India's Most Ambitious",
+    description:
+      "A premium digital institution for India's top 1% of ambitious young people.",
+  },
 };
 
 export const viewport: Viewport = {
   themeColor: "#0a0a0a",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

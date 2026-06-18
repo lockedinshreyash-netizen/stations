@@ -1,7 +1,11 @@
 {
+  "id": "/",
   "name": "Stations",
   "short_name": "Stations",
   "description": "For India's most ambitious.",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["social", "productivity", "education"],
   "start_url": "/wins",
   "scope": "/",
   "display": "standalone",

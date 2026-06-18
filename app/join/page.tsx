@@ -1,7 +1,7 @@
 import JoinFlow from "@/components/onboarding/JoinFlow";
 
 export const metadata = {
-  title: "Join Stations",
+  title: "Join",
 };
 
 export default async function JoinPage({
