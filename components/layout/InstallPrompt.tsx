@@ -1,77 +1,47 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Download, X, Share, Plus } from "lucide-react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { Download, X } from "lucide-react";
 import { tap } from "@/lib/feedback";
+import { isStandalone } from "@/lib/pwa";
 
 /**
- * The platform's mobile/desktop install (Add to Home Screen) prompt for the PWA.
+ * The platform's lightweight "get the app" teaser.
  *
- * Shows a loud, top-anchored banner to any visitor who is browsing in a normal
- * tab (i.e. has NOT installed the app). The banner can be dismissed — but per
+ * Shows a loud, top-anchored banner to any visitor browsing in a normal tab
+ * (i.e. has NOT installed the app). The banner can be dismissed — but per
  * product, dismissing does NOT remove it: it collapses to a slim sticky chip
- * pinned to the top of the screen that still carries the install button, so the
- * call to install is always one tap away. That minimized choice is remembered
- * in localStorage so the full banner doesn't re-expand on every navigation.
+ * pinned to the top that still links to install, so the call to install is
+ * always one tap away. That minimized choice is remembered in localStorage so
+ * the full banner doesn't re-expand on every navigation.
  *
- * Install mechanics:
- *  - Chromium (Android/desktop): captures `beforeinstallprompt` and fires the
- *    native install dialog on tap.
- *  - iOS Safari: no programmatic prompt exists, so we reveal the manual
- *    "Share → Add to Home Screen" steps instead.
+ * All the actual install mechanics (native prompt, iOS instructions, platform
+ * detection) live on the dedicated /download page — this surface is just the
+ * teaser that routes there, so there's a single source of truth.
  *
  * Renders nothing once the app is running standalone (already installed) or
- * after the `appinstalled` event fires.
+ * while the user is already on /download (it'd be redundant).
  */
 
 const MIN_KEY = "stations-install-minimized";
 
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-};
-
-function isStandalone() {
-  if (typeof window === "undefined") return false;
-  return (
-    window.matchMedia?.("(display-mode: standalone)").matches ||
-    // iOS Safari exposes installed state here rather than via display-mode.
-    (window.navigator as Navigator & { standalone?: boolean }).standalone === true
-  );
-}
-
-function isIOSDevice() {
-  if (typeof window === "undefined") return false;
-  const ua = window.navigator.userAgent;
-  const iOS = /iphone|ipad|ipod/i.test(ua);
-  // iPadOS 13+ reports as Mac; detect via touch support.
-  const iPadOS = /macintosh/i.test(ua) && navigator.maxTouchPoints > 1;
-  return iOS || iPadOS;
-}
-
 export default function InstallPrompt() {
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [installed, setInstalled] = useState(false);
   const [minimized, setMinimized] = useState(false);
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isIOS, setIsIOS] = useState(false);
-  const [showIosHelp, setShowIosHelp] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     setInstalled(isStandalone());
-    setIsIOS(isIOSDevice());
     try {
       setMinimized(localStorage.getItem(MIN_KEY) === "1");
     } catch {
       /* localStorage unavailable — default to expanded */
     }
 
-    const onBeforeInstall = (e: Event) => {
-      // Keep the event so we can fire the native dialog on demand.
-      e.preventDefault();
-      setDeferred(e as BeforeInstallPromptEvent);
-    };
     const onInstalled = () => {
       setInstalled(true);
       try {
@@ -80,37 +50,13 @@ export default function InstallPrompt() {
         /* ignore */
       }
     };
-
-    window.addEventListener("beforeinstallprompt", onBeforeInstall);
     window.addEventListener("appinstalled", onInstalled);
-    return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
-      window.removeEventListener("appinstalled", onInstalled);
-    };
+    return () => window.removeEventListener("appinstalled", onInstalled);
   }, []);
-
-  const install = useCallback(async () => {
-    tap();
-    if (isIOS) {
-      setShowIosHelp((v) => !v);
-      return;
-    }
-    if (deferred) {
-      await deferred.prompt();
-      const choice = await deferred.userChoice;
-      setDeferred(null);
-      if (choice.outcome === "accepted") setInstalled(true);
-      return;
-    }
-    // No captured prompt (e.g. unsupported browser or already eligible later):
-    // surface the manual hint so the button is never a dead end.
-    setShowIosHelp((v) => !v);
-  }, [deferred, isIOS]);
 
   const minimize = useCallback(() => {
     tap();
     setMinimized(true);
-    setShowIosHelp(false);
     try {
       localStorage.setItem(MIN_KEY, "1");
     } catch {
@@ -128,24 +74,25 @@ export default function InstallPrompt() {
     }
   }, []);
 
-  // Avoid SSR/first-paint flash; never show once installed.
-  if (!mounted || installed) return null;
+  // Avoid SSR/first-paint flash; never show once installed or on /download.
+  if (!mounted || installed || pathname === "/download") return null;
 
-  // ── Minimized: slim sticky chip pinned to the top, install still one tap away.
+  // ── Minimized: slim sticky chip pinned to the top, install one tap away.
   if (minimized) {
     return (
       <div
         className="fixed inset-x-0 top-0 z-[9970] flex justify-center px-3"
         style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 8px)" }}
       >
-        <button
-          onClick={expand}
+        <Link
+          href="/download"
+          onClick={() => tap()}
           className="st-glass st-pill flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium text-text-primary shadow-lg"
-          aria-label="Install the Stations app"
+          aria-label="Get the Stations app"
         >
           <Download size={14} className="text-accent-brass" />
           <span>Install app</span>
-        </button>
+        </Link>
       </div>
     );
   }
@@ -160,7 +107,7 @@ export default function InstallPrompt() {
         className="st-glass w-full max-w-md rounded-2xl border p-4 shadow-2xl"
         style={{ animation: "st-rise 360ms var(--ease, ease-out)" }}
         role="dialog"
-        aria-label="Install the Stations app"
+        aria-label="Get the Stations app"
       >
         <div className="flex items-start gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -189,32 +136,15 @@ export default function InstallPrompt() {
           </button>
         </div>
 
-        {showIosHelp ? (
-          <div className="mt-3 rounded-xl border border-border bg-bg-surface/60 p-3 text-xs leading-relaxed text-text-secondary">
-            <p className="mb-1.5 font-medium text-text-primary">
-              Add to Home Screen
-            </p>
-            <p className="flex items-center gap-1.5">
-              <span>1. Tap</span>
-              <Share size={14} className="text-accent-brass" />
-              <span>in the toolbar</span>
-            </p>
-            <p className="mt-1 flex items-center gap-1.5">
-              <span>2. Choose</span>
-              <Plus size={14} className="text-accent-brass" />
-              <span>“Add to Home Screen”</span>
-            </p>
-          </div>
-        ) : null}
-
         <div className="mt-3 flex items-center gap-2">
-          <button
-            onClick={install}
+          <Link
+            href="/download"
+            onClick={() => tap()}
             className="st-btn flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent-brass px-4 py-2.5 text-sm font-semibold text-bg-primary"
           >
             <Download size={16} />
-            {isIOS ? "How to install" : "Install app"}
-          </button>
+            Get the app
+          </Link>
           <button
             onClick={minimize}
             className="st-pill rounded-xl border border-border px-3 py-2.5 text-sm text-text-secondary hover:text-text-primary"
