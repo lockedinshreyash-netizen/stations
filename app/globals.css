@@ -605,6 +605,22 @@ body {
   .st-burst-p { display: none; }
 }
 
+/* Live presence dot — a soft brass "on air" ping for online indicators. */
+.st-live-dot {
+  border-radius: 9999px;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 0 rgba(var(--accent-2-rgb), 0.55);
+  animation: st-ping 2.4s var(--ease) infinite;
+}
+@keyframes st-ping {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--accent-2-rgb), 0.5); }
+  70%  { box-shadow: 0 0 0 7px rgba(var(--accent-2-rgb), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--accent-2-rgb), 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-live-dot { animation: none; }
+}
+
 /* Per-page entrance — fires on every navigation via template.tsx.
    IMPORTANT: opacity-only. A `transform` or `filter` here would make this
    wrapper the containing block for any `position: fixed` descendant (e.g. the

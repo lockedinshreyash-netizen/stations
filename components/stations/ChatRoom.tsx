@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo, type ReactNode } from "react";
 import { format, isSameDay } from "date-fns";
+import { Smile, ArrowUp, Users } from "lucide-react";
 import DateSeparator from "@/components/stations/DateSeparator";
 import { openUserProfile } from "@/lib/userProfile";
 import {
@@ -17,6 +18,7 @@ import {
   type RoomName,
   type ChatMessage,
 } from "@/lib/firebase/rooms";
+import { ROOM_IDENTITY } from "@/lib/rooms/identity";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
 import { joinRoom } from "@/lib/rooms/membership";
 import { markRoomSeen } from "@/lib/rooms/useRoomStats";
@@ -27,6 +29,10 @@ import FounderMark from "@/components/ui/FounderMark";
 
 const EMOJIS = ["🔥", "💪", "🚀", "🎯", "👏", "🙌", "💡", "📈", "✅", "❤️", "😄", "🧠"];
 
+// Consecutive messages from the same author inside this window collapse into a
+// single visual group (one avatar + name header), Slack/Discord style.
+const GROUP_WINDOW_MS = 5 * 60 * 1000;
+
 interface ChatRoomProps {
   roomName: RoomName;
   user: User;
@@ -36,6 +42,7 @@ interface ChatRoomProps {
 
 export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoomProps) {
   const meta = ROOM_META[roomName];
+  const identity = ROOM_IDENTITY[roomName];
 
   const [memberships, setMemberships] = useState<string[]>(user.room_memberships ?? []);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -163,34 +170,104 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
     }
   }
 
+  const Icon = identity.Icon;
+
   /* ----- Render ----- */
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Header */}
+      {/* Header — a lit platform sign: glyph tile, title + code, live status. */}
       <div
-        className="flex items-baseline justify-between px-6 py-4 shrink-0"
-        style={{ borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
+        className="relative shrink-0 flex items-center gap-3.5 px-5 md:px-6 py-3.5"
+        style={{
+          borderBottom: "0.5px solid rgba(var(--fg-rgb),0.08)",
+          background:
+            "linear-gradient(180deg, rgba(var(--accent-2-rgb),0.04), transparent)",
+        }}
       >
-        <h2
-          className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))]"
-          style={{ fontSize: "21px", letterSpacing: "0.02em" }}
+        {/* Glyph tile */}
+        <div
+          className="shrink-0 flex items-center justify-center rounded-[12px]"
+          style={{
+            width: "44px",
+            height: "44px",
+            background: identity.sealed
+              ? "rgba(var(--accent-2-rgb),0.14)"
+              : "rgba(var(--fg-rgb),0.05)",
+            border: `0.5px solid ${
+              identity.sealed
+                ? "rgba(var(--accent-2-rgb),0.35)"
+                : "rgba(var(--fg-rgb),0.1)"
+            }`,
+            color: identity.sealed
+              ? "var(--accent-2)"
+              : "rgba(var(--fg-rgb),0.65)",
+          }}
         >
-          {meta.title}
-        </h2>
-        <span
-          className="font-poppins text-[rgba(var(--fg-rgb),0.3)]"
-          style={{ fontSize: "14px" }}
-        >
-          <span style={{ color: "var(--accent)" }}>{onlineCount} online</span>
-          {" · "}
-          {memberCount} total
-        </span>
+          <Icon size={22} strokeWidth={1.75} aria-hidden />
+        </div>
+
+        {/* Title + code + description */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2.5">
+            <h2
+              className="font-poppins font-black uppercase text-[rgb(var(--fg-rgb))] truncate"
+              style={{ fontSize: "19px", letterSpacing: "0.01em", lineHeight: 1.1 }}
+            >
+              {meta.title}
+            </h2>
+            <span
+              className="shrink-0 font-poppins font-bold uppercase rounded-full"
+              style={{
+                fontSize: "10px",
+                letterSpacing: "0.18em",
+                padding: "2px 8px",
+                color: "rgba(var(--accent-2-rgb),0.85)",
+                background: "rgba(var(--accent-2-rgb),0.08)",
+                border: "0.5px solid rgba(var(--accent-2-rgb),0.22)",
+              }}
+            >
+              {identity.sealed ? "SEALED" : `PLATFORM ${identity.code}`}
+            </span>
+          </div>
+          <p
+            className="font-poppins font-light text-[rgba(var(--fg-rgb),0.4)] truncate hidden sm:block"
+            style={{ fontSize: "13px", marginTop: "1px" }}
+          >
+            {meta.description}
+          </p>
+        </div>
+
+        {/* Live status */}
+        <div className="shrink-0 flex flex-col items-end gap-1">
+          <span className="flex items-center gap-1.5">
+            {onlineCount > 0 && (
+              <span className="st-live-dot" style={{ width: "7px", height: "7px" }} />
+            )}
+            <span
+              className="font-poppins font-bold uppercase"
+              style={{
+                fontSize: "11px",
+                letterSpacing: "0.14em",
+                color: onlineCount > 0 ? "var(--accent-2)" : "rgba(var(--fg-rgb),0.3)",
+              }}
+            >
+              {onlineCount} online
+            </span>
+          </span>
+          <span
+            className="flex items-center gap-1 font-poppins text-[rgba(var(--fg-rgb),0.3)]"
+            style={{ fontSize: "12px" }}
+          >
+            <Users size={12} strokeWidth={2} aria-hidden />
+            {memberCount}
+          </span>
+        </div>
       </div>
 
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 min-h-0 overflow-y-auto px-6 py-4"
+        className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6 py-5"
         style={{ background: "var(--bg-surface)" }}
       >
         {!isFirebaseConfigured ? (
@@ -198,21 +275,55 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
             Chat is not configured. Add your Firebase keys to <code>.env.local</code>.
           </p>
         ) : sorted.length === 0 ? (
-          <p
-            className="font-playfair italic text-[rgba(var(--fg-rgb),0.25)]"
-            style={{ fontSize: "17px" }}
-          >
-            No messages yet. {isMember ? "Say something." : "Join to start the conversation."}
-          </p>
+          <div className="h-full flex flex-col items-center justify-center text-center gap-3 px-6">
+            <Icon
+              size={56}
+              strokeWidth={1.25}
+              aria-hidden
+              style={{ color: "rgba(var(--accent-2-rgb),0.25)" }}
+            />
+            <p
+              className="font-poppins font-bold uppercase"
+              style={{
+                fontSize: "13px",
+                letterSpacing: "0.22em",
+                color: "rgba(var(--accent-2-rgb),0.7)",
+              }}
+            >
+              Platform clear
+            </p>
+            <p
+              className="font-playfair italic text-[rgba(var(--fg-rgb),0.35)] max-w-xs"
+              style={{ fontSize: "17px", lineHeight: 1.4 }}
+            >
+              {isMember
+                ? "No departures yet. Be the first to say something."
+                : "Join the room to start the conversation."}
+            </p>
+          </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
             {sorted.flatMap((m, i) => {
               const prev = sorted[i - 1];
               const out: ReactNode[] = [];
-              if (!prev || !isSameDay(prev.created_at, m.created_at)) {
+              const newDay = !prev || !isSameDay(prev.created_at, m.created_at);
+              if (newDay) {
                 out.push(<DateSeparator key={`s-${m.id}`} date={new Date(m.created_at)} />);
               }
-              out.push(<MessageRow key={m.id} message={m} />);
+              // First of a group when the day breaks, the author changes, or
+              // there's a gap larger than the grouping window.
+              const firstOfGroup =
+                newDay ||
+                prev.user_id !== m.user_id ||
+                m.created_at - prev.created_at > GROUP_WINDOW_MS;
+              out.push(
+                <MessageRow
+                  key={m.id}
+                  message={m}
+                  isOwn={m.user_id === user.id}
+                  firstOfGroup={firstOfGroup}
+                />
+              );
               return out;
             })}
           </div>
@@ -232,18 +343,26 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
       {/* Input or Join */}
       {isMember ? (
         <div
-          className="shrink-0 px-6 py-4"
+          className="shrink-0 px-4 md:px-6 py-4"
           style={{ borderTop: "0.5px solid rgba(var(--fg-rgb),0.08)" }}
         >
           {showEmoji && (
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div
+              className="flex flex-wrap gap-1 mb-3 p-2 w-fit"
+              style={{
+                background: "var(--bg-surface)",
+                border: "0.5px solid rgba(var(--accent-2-rgb),0.2)",
+                borderRadius: "var(--radius-md)",
+                boxShadow: "var(--shadow-md)",
+              }}
+            >
               {EMOJIS.map((e) => (
                 <button
                   key={e}
                   type="button"
                   onClick={() => insertEmoji(e)}
-                  className="hover:scale-125 transition-transform"
-                  style={{ fontSize: "21px" }}
+                  className="rounded-lg hover:bg-[rgba(var(--fg-rgb),0.06)] hover:scale-110 transition-transform"
+                  style={{ fontSize: "20px", width: "34px", height: "34px", lineHeight: 1 }}
                 >
                   {e}
                 </button>
@@ -251,9 +370,9 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
             </div>
           )}
           <div
-            className="flex items-end gap-3 px-3 py-1.5"
+            className="flex items-end gap-2 px-2 py-1.5"
             style={{
-              background: "var(--bg-surface)",
+              background: "var(--bg-secondary)",
               border: "0.5px solid rgba(var(--fg-rgb),0.1)",
               borderRadius: "var(--radius-md)",
             }}
@@ -262,42 +381,56 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
               type="button"
               onClick={() => setShowEmoji((v) => !v)}
               aria-label="Emoji"
-              className="text-[rgba(var(--fg-rgb),0.4)] hover:text-[rgb(var(--fg-rgb))] transition-colors pb-2"
-              style={{ fontSize: "21px" }}
+              className="shrink-0 flex items-center justify-center rounded-lg transition-colors"
+              style={{
+                width: "36px",
+                height: "36px",
+                color: showEmoji ? "var(--accent-2)" : "rgba(var(--fg-rgb),0.4)",
+              }}
             >
-              ☺
+              <Smile size={20} strokeWidth={1.75} />
             </button>
             <textarea
               ref={textareaRef}
               value={draft}
               onChange={(e) => setDraft(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
               onKeyDown={handleKeyDown}
-              placeholder="Message the room..."
+              placeholder="Message the room…"
               rows={1}
               maxLength={MAX_MESSAGE_LENGTH}
               className="flex-1 resize-none bg-transparent font-poppins font-light text-[rgb(var(--fg-rgb))] placeholder:text-[rgba(var(--fg-rgb),0.25)] focus:outline-none py-2"
               style={{ fontSize: "16px", maxHeight: "120px", lineHeight: 1.5 }}
             />
-            <span
-              className="font-poppins text-[rgba(var(--fg-rgb),0.25)] pb-2.5"
-              style={{ fontSize: "13px" }}
-            >
-              {draft.length}/{MAX_MESSAGE_LENGTH}
-            </span>
+            {draft.length > MAX_MESSAGE_LENGTH * 0.8 && (
+              <span
+                className="font-poppins pb-2.5 tabular-nums"
+                style={{
+                  fontSize: "12px",
+                  color:
+                    draft.length >= MAX_MESSAGE_LENGTH
+                      ? "var(--accent)"
+                      : "rgba(var(--fg-rgb),0.3)",
+                }}
+              >
+                {MAX_MESSAGE_LENGTH - draft.length}
+              </span>
+            )}
             <button
               type="button"
               onClick={handleSend}
               disabled={sending || !draft.trim()}
-              className="st-btn font-poppins font-bold uppercase disabled:opacity-40 my-1"
+              aria-label="Send message"
+              className="st-btn shrink-0 flex items-center justify-center disabled:opacity-30 my-0.5"
               style={{
-                fontSize: "14px",
-                letterSpacing: "0.1em",
-                background: "var(--accent)",
+                width: "38px",
+                height: "38px",
+                borderRadius: "10px",
+                background: draft.trim() ? "rgb(var(--fg-rgb))" : "rgba(var(--fg-rgb),0.12)",
                 color: "var(--bg-primary)",
-                padding: "8px 16px",
+                transition: "background 200ms var(--ease), opacity 200ms var(--ease)",
               }}
             >
-              Send
+              <ArrowUp size={20} strokeWidth={2.5} />
             </button>
           </div>
         </div>
@@ -333,40 +466,91 @@ export default function ChatRoom({ roomName, user, onMembershipChange }: ChatRoo
   );
 }
 
-function MessageRow({ message }: { message: ChatMessage }) {
-  return (
-    <div className="flex gap-3">
-      <button
-        type="button"
-        onClick={() => openUserProfile(message.user_id)}
-        className="shrink-0"
-        style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
-        aria-label={`View ${message.username}'s profile`}
+/** Splits message text so @mentions render in brass. */
+function renderContent(text: string): ReactNode[] {
+  return text.split(/(@[\w-]+)/g).map((part, i) =>
+    part.startsWith("@") && part.length > 1 ? (
+      <span
+        key={i}
+        style={{
+          color: "var(--accent-2)",
+          fontWeight: 400,
+          background: "rgba(var(--accent-2-rgb),0.08)",
+          borderRadius: "4px",
+          padding: "0 3px",
+        }}
       >
-        <Avatar url={message.avatar_url} username={message.username} />
-      </button>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2">
-          <span
-            className="font-poppins font-medium text-[rgb(var(--fg-rgb))] hover:text-[var(--accent)] transition-colors"
-            style={{ fontSize: "15px", cursor: "pointer" }}
+        {part}
+      </span>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+}
+
+function MessageRow({
+  message,
+  isOwn,
+  firstOfGroup,
+}: {
+  message: ChatMessage;
+  isOwn: boolean;
+  firstOfGroup: boolean;
+}) {
+  return (
+    <div
+      className="group flex gap-3 px-2 -mx-2 rounded-lg hover:bg-[rgba(var(--fg-rgb),0.03)]"
+      style={{ paddingTop: firstOfGroup ? "8px" : "1px", paddingBottom: "1px" }}
+    >
+      {/* Gutter: avatar on the first message of a group, hover-time otherwise */}
+      <div className="shrink-0 flex justify-center" style={{ width: "40px" }}>
+        {firstOfGroup ? (
+          <button
+            type="button"
             onClick={() => openUserProfile(message.user_id)}
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            aria-label={`View ${message.username}'s profile`}
           >
-            {message.username}
-          </span>
-          <FounderMark founderNumber={message.founder_number} />
+            <Avatar url={message.avatar_url} username={message.username} />
+          </button>
+        ) : (
           <span
-            className="font-poppins text-[rgba(var(--fg-rgb),0.25)] ml-auto"
-            style={{ fontSize: "13px" }}
+            className="opacity-0 group-hover:opacity-100 transition-opacity font-poppins tabular-nums self-start"
+            style={{ fontSize: "10px", color: "rgba(var(--fg-rgb),0.3)", paddingTop: "3px" }}
           >
-            {format(message.created_at, "h:mm a")}
+            {format(message.created_at, "h:mm")}
           </span>
-        </div>
+        )}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        {firstOfGroup && (
+          <div className="flex items-baseline gap-2">
+            <span
+              className="font-poppins font-medium hover:underline transition-colors"
+              style={{
+                fontSize: "15px",
+                cursor: "pointer",
+                color: isOwn ? "var(--accent-2)" : "rgb(var(--fg-rgb))",
+              }}
+              onClick={() => openUserProfile(message.user_id)}
+            >
+              {message.username}
+            </span>
+            <FounderMark founderNumber={message.founder_number} />
+            <span
+              className="font-poppins text-[rgba(var(--fg-rgb),0.25)]"
+              style={{ fontSize: "12px" }}
+            >
+              {format(message.created_at, "h:mm a")}
+            </span>
+          </div>
+        )}
         <p
-          className="font-poppins font-light text-[rgba(var(--fg-rgb),0.8)] break-words whitespace-pre-wrap"
+          className="font-poppins font-light text-[rgba(var(--fg-rgb),0.82)] break-words whitespace-pre-wrap"
           style={{ fontSize: "16px", lineHeight: 1.5 }}
         >
-          {message.content}
+          {renderContent(message.content)}
         </p>
       </div>
     </div>
@@ -391,9 +575,9 @@ function Avatar({ url, username }: { url: string | null; username: string }) {
     <div
       className="rounded-full shrink-0 flex items-center justify-center font-poppins font-bold"
       style={{
-        width: "28px",
-        height: "28px",
-        fontSize: "14px",
+        width: "40px",
+        height: "40px",
+        fontSize: "16px",
         background: "rgba(var(--fg-rgb),0.1)",
         color: "rgba(var(--fg-rgb),0.6)",
       }}
