@@ -118,10 +118,10 @@ export default function AnnouncementBell({ user }: { user: User }) {
         title="Announcements"
         className="st-liquid fixed z-50 flex items-center justify-center"
         style={{
-          top: "calc(14px + env(safe-area-inset-top))",
-          right: "14px",
-          width: "42px",
-          height: "42px",
+          top: "calc(10px + env(safe-area-inset-top))",
+          right: "16px",
+          width: "40px",
+          height: "40px",
           borderRadius: "9999px",
           color: "rgba(var(--fg-rgb),0.7)",
           border: "none",

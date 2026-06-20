@@ -93,7 +93,7 @@ export default function TodayHome({
   return (
     <div>
       {/* ── Editorial header ─────────────────────────────────────── */}
-      <div className="relative overflow-hidden px-5 md:px-10 pt-7 pb-5 md:pt-9 md:pb-6 border-b border-[rgba(var(--fg-rgb),0.06)]">
+      <div className="relative overflow-hidden px-5 md:px-10 pr-16 md:pr-10 pt-3 pb-5 md:pt-9 md:pb-6 border-b border-[rgba(var(--fg-rgb),0.06)]">
         <div className="st-aurora" aria-hidden="true" />
         <p
           className="flex items-center gap-2 font-playfair italic text-[rgba(var(--accent-2-rgb),0.55)]"
